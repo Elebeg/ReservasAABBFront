@@ -91,7 +91,7 @@ function Sobre() {
               <div className="diretor-avatar">
                 <img src="/images/default-avatar.png" alt="Diretor de Esportes" className="diretor-img" />
               </div>
-              <h3>Pedro Santos</h3>
+              <h3>André Saddi</h3>
               <p className="diretor-cargo">Diretor de Esportes</p>
               <p>Gestão 2024-2027</p>
             </div>
