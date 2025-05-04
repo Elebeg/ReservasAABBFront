@@ -80,7 +80,7 @@ function ReservationsPage() {
   // Gerar horários disponíveis (8h às 22h)
   const generateTimeSlots = () => {
     const slots = [];
-    for (let i = 8; i < 23; i++) {
+    for (let i = 8; i < 22; i++) {
       slots.push(`${i.toString().padStart(2, '0')}:00`);
     }
     return slots;
