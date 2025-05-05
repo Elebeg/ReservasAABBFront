@@ -42,25 +42,36 @@ function Login() {
   };
 
   const handleGoogleLogin = async (credentialResponse) => {
+    console.log("Credential Response: ", credentialResponse); // Adicione isso para depurar
+  
     try {
-      const { credential } = credentialResponse;  // Aqui você extrai o "credential"
-      const googleUser = jwtDecode(credential);  // Decodifica o JWT do Google
+      // Verifique o formato do objeto retornado e se o credential está presente
+      if (credentialResponse && credentialResponse.credential) {
+        const { credential } = credentialResponse;  // Extraia o 'credential'
+        const googleUser = jwtDecode(credential);  // Decodifique o token JWT do Google
   
-      const response = await api.post('/auth/google', { credential });
+        // Envie para o seu backend com o Google credential
+        const response = await api.post('/auth/google', { credential });
   
-      const { access_token, user } = response.data;
+        const { access_token, user } = response.data;
   
-      localStorage.setItem('token', access_token);
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      setUser(user); 
+        // Armazene o token e defina o cabeçalho para autenticação
+        localStorage.setItem('token', access_token);
+        api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+        setUser(user); // Atualize o usuário no contexto
   
-      navigate('/');
+        // Navegue para a página principal
+        navigate('/');
+      } else {
+        console.error('Credential não encontrado no response.');
+        setError('Falha no login com Google.');
+      }
     } catch (err) {
       console.error('Erro no login com Google:', err);
       setError('Falha no login com Google.');
       setAuthError('Falha no login com Google.');
     }
-  };  
+  };
 
   return (
     <div className="auth-container">
