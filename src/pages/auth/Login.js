@@ -43,27 +43,24 @@ function Login() {
 
   const handleGoogleLogin = async (credentialResponse) => {
     try {
-      const { credential } = credentialResponse;
-      
-      const googleUser = jwtDecode(credential);
-      console.log('Google User:', googleUser);
-
+      const { credential } = credentialResponse;  // Aqui você extrai o "credential"
+      const googleUser = jwtDecode(credential);  // Decodifica o JWT do Google
+  
       const response = await api.post('/auth/google', { credential });
-
+  
       const { access_token, user } = response.data;
-
+  
       localStorage.setItem('token', access_token);
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-
-      setUser(user);
-
-      navigate('/'); 
+      setUser(user); 
+  
+      navigate('/');
     } catch (err) {
       console.error('Erro no login com Google:', err);
       setError('Falha no login com Google.');
       setAuthError('Falha no login com Google.');
     }
-  };
+  };  
 
   return (
     <div className="auth-container">
