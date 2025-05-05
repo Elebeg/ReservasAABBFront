@@ -11,20 +11,13 @@ function AuthCallBack() {
 
   useEffect(() => {
     if (token) {
-      localStorage.setItem('token', token);
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
-      api.get('/users/me')
-        .then(res => {
-          setUser(res.data);
-          navigate('/');
-        })
-        .catch(err => {
-          console.error('Erro ao buscar usuário:', err);
-          navigate('/login');
-        });
-    } else {
-      navigate('/login');
+        const { access_token, user } = response.data;
+
+        localStorage.setItem('token', access_token);
+        api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+        setUser(user); 
+        
+        navigate('/');
     }
   }, [token, navigate, setUser]);
 
