@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop'; // Importa o componente ScrollToTop
 import Home from './pages/Home';
 import Login from './pages/auth/Login';
 import Sobre from './pages/sobre/Sobre';
@@ -17,6 +18,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ScrollToTop /> 
         <div className="App">
           <Header />
           <main>

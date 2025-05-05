@@ -1,5 +1,5 @@
-// Enhanced ReservationsPage.jsx com ajustes para o backend
-import React, { useState, useEffect } from 'react';
+// Enhanced ReservationsPage.jsx com ajustes para o backend e UX
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { format, parseISO, addDays } from 'date-fns';
@@ -19,6 +19,11 @@ function ReservationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
+  // Refs para rolagem
+  const formRef = useRef(null);
+  const reservationsListRef = useRef(null);
+  const errorRef = useRef(null);
 
   // Verificar e configurar token antes de cada operação API
   const setupApiAuthToken = () => {
@@ -42,14 +47,25 @@ function ReservationsPage() {
     }
   }, [isAuthenticated]);
 
+  // Efeito para rolar até o erro quando ele é exibido
+  useEffect(() => {
+    if (error && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [error]);
+
+  // Efeito para rolar até o formulário quando estiver editando
+  useEffect(() => {
+    if (isEditing && formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isEditing]);
+
   const fetchData = async () => {
     if (!setupApiAuthToken()) return;
     
     setLoading(true);
     try {
-      // Logging para debug
-      console.log('Buscando dados com token:', api.defaults.headers.common['Authorization']);
-      
       // Usando o endpoint correto para reservas do usuário atual - /reservations/me
       const [userReservationsRes, allReservationsRes, courtsRes] = await Promise.all([
         api.get('/reservations/me'),
@@ -61,12 +77,9 @@ function ReservationsPage() {
       setAllReservations(allReservationsRes.data);
       setCourts(courtsRes.data);
       
-      console.log('Reservas do usuário:', userReservationsRes.data);
-      console.log('Todas as reservas:', allReservationsRes.data);
     } catch (err) {
       const errorMessage = getApiErrorMessage(err);
       setError(`Erro ao carregar dados: ${errorMessage}`);
-      console.error('Erro ao buscar dados:', err);
       
       // Se o erro for de autenticação, limpar dados do usuário
       if (err.response?.status === 401) {
@@ -92,6 +105,17 @@ function ReservationsPage() {
     const timeStr = `${dateStr}T${time}:00`;
     const reservationTimeDate = new Date(timeStr);
 
+    // Se estiver editando, precisamos verificar se o horário está disponível,
+    // exceto o horário da própria reserva que está sendo editada
+    if (isEditing) {
+      return !allReservations.some(reservation => 
+        reservation.court.id === courtId && 
+        new Date(reservation.startTime).getTime() === reservationTimeDate.getTime() &&
+        reservation.id !== editingReservationId 
+      );
+    }
+
+    // Caso normal - verificar disponibilidade para nova reserva
     return !allReservations.some(reservation => 
       reservation.court.id === courtId && 
       new Date(reservation.startTime).getTime() === reservationTimeDate.getTime()
@@ -125,7 +149,8 @@ function ReservationsPage() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     delete api.defaults.headers.common['Authorization'];
-    // Redirecionar para a página de login seria ideal aqui
+    // Redirecionamento para login
+    window.location.href = '/login?redirect=reservas'; // Ajustado para facilitar retorno
   };
 
   // Criar nova reserva
@@ -153,6 +178,14 @@ function ReservationsPage() {
       setUserReservations([...userReservations, response.data]);
       setAllReservations([...allReservations, response.data]);
       setSuccess('Reserva criada com sucesso!');
+      
+      // Rolar para a lista de reservas após criar
+      setTimeout(() => {
+        if (reservationsListRef.current) {
+          reservationsListRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 500);
+      
       resetForm();
     } catch (err) {
       const errorMessage = getApiErrorMessage(err);
@@ -184,10 +217,6 @@ function ReservationsPage() {
     try {
       setLoading(true);
       
-      // Log para debug
-      console.log(`Atualizando reserva #${editingReservationId}`);
-      console.log('Dados enviados:', { startTime: isoStartTime });
-      
       // Enviar apenas o startTime, o userId será extraído do JWT no backend
       const response = await api.put(`/reservations/${editingReservationId}`, {
         startTime: isoStartTime
@@ -203,12 +232,19 @@ function ReservationsPage() {
       ));
       
       setSuccess('Reserva atualizada com sucesso!');
+      
+      // Rolar para a lista de reservas após atualizar
+      setTimeout(() => {
+        if (reservationsListRef.current) {
+          reservationsListRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 500);
+      
       resetForm();
     } catch (err) {
       const errorMessage = getApiErrorMessage(err);
       setError(`Erro ao atualizar reserva: ${errorMessage}`);
       console.error('Erro ao atualizar reserva:', err);
-      console.error('Detalhes da resposta:', err.response?.data);
       
       if (err.response?.status === 401) {
         handleAuthError();
@@ -229,9 +265,6 @@ function ReservationsPage() {
     try {
       setLoading(true);
       
-      // Log de debug para verificar o token antes da deleção
-      console.log('Deletando reserva ID:', id);
-      
       // O userId será extraído do JWT no backend
       await api.delete(`/reservations/${id}`);
       
@@ -244,7 +277,6 @@ function ReservationsPage() {
       const errorMessage = getApiErrorMessage(err);
       setError(`Erro ao cancelar reserva: ${errorMessage}`);
       console.error('Erro ao deletar reserva:', err);
-      console.error('Detalhes da resposta:', err.response?.data);
       
       if (err.response?.status === 401) {
         handleAuthError();
@@ -264,6 +296,11 @@ function ReservationsPage() {
     setSelectedTime(format(reservationDate, 'HH:mm'));
     setIsEditing(true);
     setEditingReservationId(reservation.id);
+    
+    // Rolar para o formulário após selecionar para edição
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   // Resetar formulário
@@ -311,19 +348,31 @@ function ReservationsPage() {
     <div className="reservations-container">
       <h1>Reservas de Quadras</h1>
       
-      {error && (
-        <div className="alert alert-error">
-          {error}
-          <button className="close-btn" onClick={() => setError('')}>×</button>
-        </div>
-      )}
-      
-      {success && (
-        <div className="alert alert-success">
-          {success}
-          <button className="close-btn" onClick={() => setSuccess('')}>×</button>
-        </div>
-      )}
+      <div ref={errorRef}>
+        {error && (
+          <div className="alert alert-error">
+            <div className="alert-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+              </svg>
+            </div>
+            <div className="alert-content">{error}</div>
+            <button className="close-btn" onClick={() => setError('')}>×</button>
+          </div>
+        )}
+        
+        {success && (
+          <div className="alert alert-success">
+            <div className="alert-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+              </svg>
+            </div>
+            <div className="alert-content">{success}</div>
+            <button className="close-btn" onClick={() => setSuccess('')}>×</button>
+          </div>
+        )}
+      </div>
       
       <div className="page-actions">
         <button 
@@ -331,12 +380,16 @@ function ReservationsPage() {
           onClick={handleRefresh}
           disabled={loading}
         >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fillRule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+          </svg>
           {loading ? 'Atualizando...' : 'Atualizar dados'}
         </button>
       </div>
       
       <div className="reservations-grid">
-        <div className="reservations-form">
+        <div className="reservations-form" ref={formRef}>
           <h2>{isEditing ? 'Editar Reserva' : 'Nova Reserva'}</h2>
           
           <div className="form-group">
@@ -364,7 +417,7 @@ function ReservationsPage() {
               <option value="">Selecione uma quadra</option>
               {courts.map((court) => (
                 <option key={court.id} value={court.id}>
-                  {court.name} Beach Tennis
+                  {court.name}
                 </option>
               ))}
             </select>
@@ -423,11 +476,13 @@ function ReservationsPage() {
           </div>
         </div>
         
-        <div className="user-reservations">
+        <div className="user-reservations" ref={reservationsListRef}>
           <h2>Minhas Reservas</h2>
           
           {userReservations.length === 0 ? (
-            <p className="no-reservations">Você não possui reservas.</p>
+            <div className="no-reservations">
+              Você não possui reservas agendadas.
+            </div>
           ) : (
             <div className="reservations-list">
               {userReservations
@@ -452,7 +507,7 @@ function ReservationsPage() {
                           {format(reservationDate, "HH:mm", { locale: ptBR })}
                         </p>
                         <p className="reservation-detail">
-                          <span className="label">Local:</span> 
+                          <span className="label">Quadra:</span> 
                           {reservation.court.name}
                         </p>
                       </div>
@@ -528,6 +583,7 @@ function ReservationsPage() {
                         <div className="reservation-tooltip">
                           <p><strong>Reservado por:</strong> {isUserReservation ? 'Você' : reservation.user?.name || 'outro usuário'}</p>
                           <p><strong>Horário:</strong> {time}</p>
+                          <p><strong>Data:</strong> {format(selectedDate, "dd/MM/yyyy", { locale: ptBR })}</p>
                         </div>
                       )}
                     </div>
