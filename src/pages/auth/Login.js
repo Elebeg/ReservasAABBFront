@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
 import './Auth.css';
-import api from '../../services/api';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -14,7 +12,7 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, setError: setAuthError, setUser } = useAuth();
+  const { login, googleLogin, setError: setAuthError } = useAuth();
 
   const handleChange = (e) => {
     setFormData({
@@ -41,36 +39,23 @@ function Login() {
     }
   };
 
-  const handleGoogleLogin = async (credentialResponse) => {
-    console.log("Credential Response: ", credentialResponse); // Adicione isso para depurar
-  
+  const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      // Verifique o formato do objeto retornado e se o credential está presente
-      if (credentialResponse && credentialResponse.credential) {
-        const { credential } = credentialResponse;  // Extraia o 'credential'
-        const googleUser = jwtDecode(credential);  // Decodifique o token JWT do Google
-  
-        // Envie para o seu backend com o Google credential
-        const response = await api.post('/auth/google', { credential });
-  
-        const { access_token, user } = response.data;
-  
-        // Armazene o token e defina o cabeçalho para autenticação
-        localStorage.setItem('token', access_token);
-        api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-        setUser(user); // Atualize o usuário no contexto
-  
-        // Navegue para a página principal
+      setLoading(true);
+      const success = await googleLogin(credentialResponse.credential);
+      if (success) {
         navigate('/');
-      } else {
-        console.error('Credential não encontrado no response.');
-        setError('Falha no login com Google.');
       }
     } catch (err) {
-      console.error('Erro no login com Google:', err);
-      setError('Falha no login com Google.');
-      setAuthError('Falha no login com Google.');
+      console.error('Erro ao fazer login com Google:', err);
+      setError('Ocorreu um erro durante o login com Google. Por favor, tente novamente.');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleGoogleError = () => {
+    setError('Erro na autenticação com Google. Por favor, tente novamente.');
   };
 
   return (
@@ -117,14 +102,19 @@ function Login() {
           </button>
         </form>
 
-        <div className="auth-divider">
-          <span>ou</span>
+        <div className="social-login">
+          <p className="divider">ou</p>
+          <div className="google-login-container">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+              text="continue_with"
+              shape="pill"
+              locale="pt_BR"
+            />
+          </div>
         </div>
-
-        <GoogleLogin 
-          onSuccess={handleGoogleLogin} 
-          onError={() => setError('Erro ao autenticar com o Google.')} 
-        />
 
         <div className="auth-footer">
           <p>Não tem uma conta? <Link to="/register">Registre-se</Link></p>

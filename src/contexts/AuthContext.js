@@ -1,7 +1,7 @@
 // src/contexts/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import api from '../services/api';
-import { jwtDecode } from 'jwt-decode'; // Certifique-se de ter esta dependência instalada
+import { jwtDecode } from 'jwt-decode';
 
 // Criando o contexto
 const AuthContext = createContext();
@@ -91,6 +91,39 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Função de login com Google
+  const googleLogin = async (credential) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await api.post('/auth/google', { credential });
+      
+      // Check if the response has the expected format
+      const { access_token, user: userData } = response.data;
+      
+      if (!access_token) {
+        throw new Error('Token não recebido do servidor');
+      }
+      
+      // Armazenar token e dados do usuário
+      localStorage.setItem('token', access_token);
+      
+      // Configurar cabeçalho de autorização para futuras requisições
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      
+      setUser(userData);
+      return true;
+    } catch (err) {
+      console.error('Erro de login com Google:', err);
+      const errorMessage = err.response?.data?.message || 'Erro ao fazer login com Google.';
+      setError(errorMessage);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Função de registro
   const register = async (userData) => {
     setLoading(true);
@@ -166,13 +199,15 @@ export const AuthProvider = ({ children }) => {
     loading,
     error,
     login,
+    googleLogin,
     register,
     logout,
     isAuthenticated,
     getUserId,
     getToken,
     hasRole,
-    setError
+    setError,
+    setUser
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
