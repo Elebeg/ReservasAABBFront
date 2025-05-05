@@ -14,7 +14,7 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, setError: setAuthError } = useAuth();
+  const { login, setError: setAuthError, setUser } = useAuth();
 
   const handleChange = (e) => {
     setFormData({
@@ -44,16 +44,17 @@ function Login() {
   const handleGoogleLogin = async (credentialResponse) => {
     try {
       const { credential } = credentialResponse;
-      const googleUser = jwtDecode(credential); 
+      const googleUser = jwtDecode(credential); // útil se quiser validar dados
 
-      const response = await api.post('https://reservasaabb-production.up.railway.app/auth/google', { credential });
+      const response = await api.post('/auth/google', { credential });
 
       const { access_token, user } = response.data;
 
       localStorage.setItem('token', access_token);
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      setUser(user); // ✅ autentica no contexto
 
-      window.location.href = '/'; 
+      navigate('/');
     } catch (err) {
       console.error('Erro no login com Google:', err);
       setError('Falha no login com Google.');
@@ -109,13 +110,7 @@ function Login() {
           <span>ou</span>
         </div>
 
-        <a 
-  href="https://reservasaabb-production.up.railway.app/auth/google" 
-  className="btn-google"
->
-  Entrar com Google
-</a>
-
+        <GoogleLogin onSuccess={handleGoogleLogin} onError={() => setError('Erro ao autenticar com o Google.')} />
 
         <div className="auth-footer">
           <p>Não tem uma conta? <Link to="/register">Registre-se</Link></p>
