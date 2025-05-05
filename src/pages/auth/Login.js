@@ -44,7 +44,9 @@ function Login() {
   const handleGoogleLogin = async (credentialResponse) => {
     try {
       const { credential } = credentialResponse;
+      
       const googleUser = jwtDecode(credential);
+      console.log('Google User:', googleUser);
 
       const response = await api.post('/auth/google', { credential });
 
@@ -52,9 +54,10 @@ function Login() {
 
       localStorage.setItem('token', access_token);
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      setUser(user); 
 
-      navigate('/');
+      setUser(user);
+
+      navigate('/'); 
     } catch (err) {
       console.error('Erro no login com Google:', err);
       setError('Falha no login com Google.');
@@ -110,7 +113,10 @@ function Login() {
           <span>ou</span>
         </div>
 
-        <GoogleLogin onSuccess={handleGoogleLogin} onError={() => setError('Erro ao autenticar com o Google.')} />
+        <GoogleLogin 
+          onSuccess={handleGoogleLogin} 
+          onError={() => setError('Erro ao autenticar com o Google.')} 
+        />
 
         <div className="auth-footer">
           <p>Não tem uma conta? <Link to="/register">Registre-se</Link></p>
