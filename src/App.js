@@ -13,7 +13,6 @@ import Eventos from './pages/eventos/Eventos';
 import Register from './pages/auth/Register';
 import Reservas from './pages/reservas/Reservas';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import AuthCallback from './pages/auth/AuthCallBack';
 import './App.css';
 
 function App() {
@@ -34,7 +33,6 @@ function App() {
               <Route path="/estrutura" element={<Estrutura />} />
               <Route path="/esportes" element={<Esportes />} />
               <Route path='/eventos' element={<Eventos />} />
-              <Route path="/auth/callback" element={<AuthCallback />} />
               {/* Adicione outras rotas conforme necessário */}
             </Routes>
           </main>

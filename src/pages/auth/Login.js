@@ -44,7 +44,7 @@ function Login() {
   const handleGoogleLogin = async (credentialResponse) => {
     try {
       const { credential } = credentialResponse;
-      const googleUser = jwtDecode(credential); // útil se quiser validar dados
+      const googleUser = jwtDecode(credential);
 
       const response = await api.post('/auth/google', { credential });
 
@@ -52,7 +52,7 @@ function Login() {
 
       localStorage.setItem('token', access_token);
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      setUser(user); // ✅ autentica no contexto
+      setUser(user); 
 
       navigate('/');
     } catch (err) {
