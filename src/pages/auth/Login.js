@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 import './Auth.css';
+import api from '../../services/api';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -11,7 +14,7 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, setError: setAuthError } = useAuth();
 
   const handleChange = (e) => {
     setFormData({
@@ -26,11 +29,8 @@ function Login() {
     setLoading(true);
 
     try {
-      // Aqui, o login retorna true/false diretamente (não um objeto com success)
       const success = await login(formData.email, formData.password);
-      
       if (success) {
-        // Redirecionar para a página inicial após login bem-sucedido
         navigate('/');
       }
     } catch (err) {
@@ -38,6 +38,26 @@ function Login() {
       setError('Ocorreu um erro durante o login. Por favor, tente novamente.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async (credentialResponse) => {
+    try {
+      const { credential } = credentialResponse;
+      const googleUser = jwtDecode(credential); 
+
+      const response = await api.post('https://reservasaabb-production.up.railway.app/auth/google', { credential });
+
+      const { access_token, user } = response.data;
+
+      localStorage.setItem('token', access_token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+
+      window.location.href = '/'; 
+    } catch (err) {
+      console.error('Erro no login com Google:', err);
+      setError('Falha no login com Google.');
+      setAuthError('Falha no login com Google.');
     }
   };
 
@@ -84,6 +104,18 @@ function Login() {
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
+
+        <div className="auth-divider">
+          <span>ou</span>
+        </div>
+
+        <a 
+  href="https://reservasaabb-production.up.railway.app/auth/google" 
+  className="btn-google"
+>
+  Entrar com Google
+</a>
+
 
         <div className="auth-footer">
           <p>Não tem uma conta? <Link to="/register">Registre-se</Link></p>
