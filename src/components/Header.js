@@ -124,27 +124,6 @@ function Header() {
               <Link to="/eventos" className="nav-link">Eventos</Link>
             </li>
             
-            {/* Torneios dropdown menu */}
-            {isAuthenticated() && (
-              <li className={`nav-item dropdown ${tournamentDropdownOpen ? 'open' : ''}`}>
-                <button 
-                  className="dropdown-toggle nav-link" 
-                  onClick={toggleTournamentDropdown}
-                  aria-expanded={tournamentDropdownOpen}
-                >
-                  Torneios <span className="dropdown-arrow"></span>
-                </button>
-                <ul className={`dropdown-menu ${tournamentDropdownOpen ? 'show' : ''}`}>
-                  <li className="dropdown-item">
-                    <Link to="/tournaments" className="dropdown-link">Ver Torneios</Link>
-                  </li>
-                  <li className="dropdown-item">
-                    <Link to="/my-tournaments" className="dropdown-link">Minhas Inscrições</Link>
-                  </li>
-                </ul>
-              </li>
-            )}
-            
             {isAuthenticated() && (
               <li className="nav-item">
                 <Link to="/reservas" className="nav-link">Minhas Reservas</Link>
