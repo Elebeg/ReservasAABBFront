@@ -21,6 +21,7 @@ const TournamentDetail = () => {
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
@@ -138,15 +139,17 @@ const TournamentDetail = () => {
   const handleCancelRegistration = async () => {
     if (!userRegistration) return;
     
-    if (!confirm('Tem certeza que deseja cancelar sua inscrição?')) {
-      return;
-    }
-    
+    // Show confirmation dialog instead of using global confirm
+    setShowConfirmDialog(true);
+  };
+
+  const confirmCancelRegistration = async () => {
     try {
       setLoading(true);
       await tournamentRegistrationService.cancelRegistration(userRegistration.id);
       setUserRegistration(null);
       setSuccessMessage('Inscrição cancelada com sucesso!');
+      setShowConfirmDialog(false);
       
       // Refresh registrations list
       const registrationsData = await tournamentRegistrationService.getTournamentRegistrations(id);
@@ -206,6 +209,30 @@ const TournamentDetail = () => {
             <button onClick={() => setSuccessMessage('')} className="btn-close">
               <i className="icon-close"></i>
             </button>
+          </div>
+        )}
+        
+        {/* Confirmation Dialog */}
+        {showConfirmDialog && (
+          <div className="confirmation-dialog-overlay">
+            <div className="confirmation-dialog">
+              <h3>Confirmar cancelamento</h3>
+              <p>Tem certeza que deseja cancelar sua inscrição?</p>
+              <div className="confirmation-actions">
+                <button 
+                  onClick={() => setShowConfirmDialog(false)} 
+                  className="btn-cancel"
+                >
+                  Não
+                </button>
+                <button 
+                  onClick={confirmCancelRegistration} 
+                  className="btn-confirm"
+                >
+                  Sim, cancelar inscrição
+                </button>
+              </div>
+            </div>
           </div>
         )}
         
