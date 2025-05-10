@@ -13,6 +13,7 @@ import Eventos from './pages/eventos/Eventos';
 import Register from './pages/auth/Register';
 import Reservas from './pages/reservas/Reservas';
 import Tournaments from './pages/tournaments/Tournaments'
+import TournamentDetail from './pages/tournaments/TournamentDetails';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import './App.css';
 
@@ -35,6 +36,7 @@ function App() {
               <Route path="/esportes" element={<Esportes />} />
               <Route path='/eventos' element={<Eventos />} />
               <Route path="/tournaments" element={<Tournaments />} />
+              <Route path="/tournamentsDetail" element={<TournamentDetail />} />
               {/* Adicione outras rotas conforme necessário */}
             </Routes>
           </main>
