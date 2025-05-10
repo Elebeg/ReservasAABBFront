@@ -6,9 +6,9 @@ const eventos = [
   {
     id: 1,
     titulo: 'Torneio de Beach Tennis',
-    descricao: 'Torneio aberto para duplas masculinas, femininas e mistas.',
-    dia: '15',
-    mes: 'Jun',
+    descricao: 'Torneio aberto para duplas masculinas e femininas.',
+    dia: '17',
+    mes: 'Mai',
     link: '/eventos/torneio-beach-tennis'
   },
   {

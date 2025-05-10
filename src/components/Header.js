@@ -10,6 +10,7 @@ function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [tournamentDropdownOpen, setTournamentDropdownOpen] = useState(false);
 
   // Fechar o menu mobile quando a rota mudar
   useEffect(() => {
@@ -40,10 +41,17 @@ function Header() {
     setMobileMenuOpen(!mobileMenuOpen);
     // Fechar dropdowns quando o menu mobile é toggled
     setDropdownOpen(false);
+    setTournamentDropdownOpen(false);
   };
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
+    setTournamentDropdownOpen(false);
+  };
+
+  const toggleTournamentDropdown = () => {
+    setTournamentDropdownOpen(!tournamentDropdownOpen);
+    setDropdownOpen(false);
   };
 
   // Fechar o menu quando clicar fora
@@ -115,6 +123,28 @@ function Header() {
             <li className="nav-item">
               <Link to="/eventos" className="nav-link">Eventos</Link>
             </li>
+            
+            {/* Torneios dropdown menu */}
+            {isAuthenticated() && (
+              <li className={`nav-item dropdown ${tournamentDropdownOpen ? 'open' : ''}`}>
+                <button 
+                  className="dropdown-toggle nav-link" 
+                  onClick={toggleTournamentDropdown}
+                  aria-expanded={tournamentDropdownOpen}
+                >
+                  Torneios <span className="dropdown-arrow"></span>
+                </button>
+                <ul className={`dropdown-menu ${tournamentDropdownOpen ? 'show' : ''}`}>
+                  <li className="dropdown-item">
+                    <Link to="/tournaments" className="dropdown-link">Ver Torneios</Link>
+                  </li>
+                  <li className="dropdown-item">
+                    <Link to="/my-tournaments" className="dropdown-link">Minhas Inscrições</Link>
+                  </li>
+                </ul>
+              </li>
+            )}
+            
             {isAuthenticated() && (
               <li className="nav-item">
                 <Link to="/reservas" className="nav-link">Minhas Reservas</Link>
