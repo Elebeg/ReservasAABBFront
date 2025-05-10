@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
-import { tournamentService, tournamentRegistrationService } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { tournamentService, tournamentRegistrationService } from '../../services/TournamentService';
 import { toast } from 'react-toastify';
 import './Tournaments.css';
 
 const Tournaments = () => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const [tournaments, setTournaments] = useState([]);
   const [selectedTournament, setSelectedTournament] = useState(null);
   const [myRegistrations, setMyRegistrations] = useState([]);
