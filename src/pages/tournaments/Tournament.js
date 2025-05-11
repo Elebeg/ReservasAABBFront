@@ -12,10 +12,10 @@ const Tournaments = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [activeTournament, setActiveTournament] = useState(null);
   const [registrationForm, setRegistrationForm] = useState({
-    tournamentId: '',
+    tournamentId: Number(tournament.id),
     category: '',
     partnerEmail: '',
-    gender: ''
+    gender: user?.gender === 'Masculino' ? 'male' : user?.gender === 'Feminino' ? 'female' : ''
   });
   const [formErrors, setFormErrors] = useState({});
   const [formSuccess, setFormSuccess] = useState('');
@@ -537,18 +537,18 @@ const Tournaments = () => {
           )}
           
           <div className="form-group">
-            <label htmlFor="partnerEmail">Email do Parceiro</label>
+            <label htmlFor="partnerEmail">Email do Parceiro *</label>
             <input 
               type="email" 
               id="partnerEmail" 
               name="partnerEmail" 
               value={registrationForm.partnerEmail} 
               onChange={handleInputChange}
+              required
               placeholder="nome@exemplo.com"
               className={formErrors.partnerEmail ? 'error' : ''}
             />
             {formErrors.partnerEmail && <p className="error-text">{formErrors.partnerEmail}</p>}
-            <small className="help-text">Deixe em branco se não tiver um parceiro definido.</small>
           </div>
           
           <button 
