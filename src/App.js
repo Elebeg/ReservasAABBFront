@@ -12,7 +12,7 @@ import Esportes from './pages/esportes/Esportes';
 import Eventos from './pages/eventos/Eventos';
 import Register from './pages/auth/Register';
 import Reservas from './pages/reservas/Reservas';
-import Tournaments from './pages/tournaments/Tournaments'
+import Tournaments from './pages/tournaments/Tournament'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import './App.css';
 
