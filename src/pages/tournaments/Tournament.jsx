@@ -106,7 +106,7 @@ const Tournaments = () => {
       setFormErrors(validationErrors);
       return;
     }
-
+  
     setIsRegistering(true);
     
     try {
@@ -118,10 +118,12 @@ const Tournaments = () => {
       setFormSuccess('Inscrição realizada com sucesso!');
       setFormErrors({});
       
-      // Switch back to details view after short delay
+      // Mudamos para primeiro definir isRegistering como false
+      setIsRegistering(false);
+      
+      // Depois mudar a view após o pequeno delay
       setTimeout(() => {
         setViewMode('details');
-        setIsRegistering(false);
       }, 2000);
       
     } catch (err) {
@@ -450,7 +452,7 @@ const Tournaments = () => {
           )}
           
           <div className="form-group">
-            <label htmlFor="partnerEmail">Email do Parceiro (opcional)</label>
+            <label htmlFor="partnerEmail">Email do Parceiro *</label>
             <input 
               type="email" 
               id="partnerEmail" 
@@ -458,19 +460,32 @@ const Tournaments = () => {
               value={registrationForm.partnerEmail} 
               onChange={handleInputChange}
               placeholder="nome@exemplo.com"
+              required
               className={formErrors.partnerEmail ? 'error' : ''}
             />
             {formErrors.partnerEmail && <p className="error-text">{formErrors.partnerEmail}</p>}
-            <small>Deixe em branco se não tiver um parceiro definido</small>
           </div>
           
-          <button 
-            type="submit" 
-            className="submit-registration-btn" 
-            disabled={isRegistering}
-          >
-            {isRegistering ? 'Processando...' : 'Confirmar Inscrição'}
-          </button>
+                    <button 
+                type="submit" 
+                className="submit-registration-btn" 
+                disabled={isRegistering}
+            >
+                {isRegistering ? 'Processando...' : 'Confirmar Inscrição'}
+            </button>
+            
+            {isRegistering && (
+                <button 
+                type="button"
+                className="cancel-processing-btn"
+                onClick={() => {
+                    setIsRegistering(false);
+                    setError('Inscrição cancelada pelo usuário.');
+                }}
+                >
+                Cancelar
+                </button>
+            )}
         </form>
       </div>
     );
