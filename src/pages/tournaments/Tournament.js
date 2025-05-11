@@ -28,7 +28,27 @@ const Tournaments = () => {
       try {
         // Fetch all tournaments
         const tournamentsRes = await api.get('/tournaments');
-        setTournaments(tournamentsRes.data);
+        
+        // Processar dados para garantir que informações do usuário estejam presentes
+        const processedTournaments = tournamentsRes.data.map(tournament => {
+          if (tournament.registrations && tournament.registrations.length > 0) {
+            // Garantir que cada registro tenha as informações completas do usuário
+            const processedRegistrations = tournament.registrations.map(reg => {
+              return {
+                ...reg,
+                // Se não tiver user.name disponível, usar nome do usuário logado quando for o mesmo ID
+                user: {
+                  ...reg.user,
+                  name: reg.user?.name || (reg.user?.id === getUserId() ? user?.name : null)
+                }
+              };
+            });
+            return { ...tournament, registrations: processedRegistrations };
+          }
+          return tournament;
+        });
+        
+        setTournaments(processedTournaments);
 
         // If user is authenticated, fetch their registrations
         if (isAuthenticated()) {
@@ -44,7 +64,7 @@ const Tournaments = () => {
     };
 
     fetchData();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, getUserId, user]);
 
   const openTournamentDetails = (tournament) => {
     setActiveTournament(tournament);
@@ -120,8 +140,33 @@ const Tournaments = () => {
     try {
       const response = await api.post('/tournament-registrations', registrationForm);
       
+      // Adicionar nome do usuário ao registro retornado da API
+      const registrationWithUserData = {
+        ...response.data,
+        user: {
+          ...response.data.user,
+          name: user?.name || response.data.user?.name || 'Usuário'
+        }
+      };
+      
       // Update registrations list
-      setUserRegistrations(prevRegistrations => [...prevRegistrations, response.data]);
+      setUserRegistrations(prevRegistrations => [...prevRegistrations, registrationWithUserData]);
+      
+      // Atualizar também a lista de registros do torneio ativo
+      if (activeTournament) {
+        const updatedTournament = {
+          ...activeTournament,
+          registrations: [...(activeTournament.registrations || []), registrationWithUserData]
+        };
+        setActiveTournament(updatedTournament);
+        
+        // Atualizar na lista geral de torneios
+        setTournaments(prevTournaments => 
+          prevTournaments.map(t => 
+            t.id === activeTournament.id ? updatedTournament : t
+          )
+        );
+      }
       
       setFormSuccess('Inscrição realizada com sucesso!');
       
@@ -154,6 +199,22 @@ const Tournaments = () => {
       
       // Remove from local state
       setUserRegistrations(userRegistrations.filter(reg => reg.id !== registrationId));
+      
+      // Se tivermos um torneio ativo, remover o registro dele também
+      if (activeTournament && activeTournament.registrations) {
+        const updatedTournament = {
+          ...activeTournament,
+          registrations: activeTournament.registrations.filter(reg => reg.id !== registrationId)
+        };
+        setActiveTournament(updatedTournament);
+        
+        // Atualizar na lista geral de torneios
+        setTournaments(prevTournaments => 
+          prevTournaments.map(t => 
+            t.id === activeTournament.id ? updatedTournament : t
+          )
+        );
+      }
       
       setFormSuccess('Inscrição cancelada com sucesso!');
       setTimeout(() => setFormSuccess(''), 3000);
@@ -390,14 +451,29 @@ const Tournaments = () => {
                 </tr>
               </thead>
               <tbody>
-                {activeTournament.registrations.map(reg => (
-                  <tr key={reg.id} className={reg.user?.id === getUserId() ? 'current-user' : ''}>
-                    <td>{reg.user?.name || 'Não informado'}</td>
-                    <td>{reg.gender === 'male' ? 'Masculino' : 'Feminino'}</td>
-                    <td>{reg.category || 'Não informada'}</td>
-                    <td>{reg.partnerEmail || 'Sem parceiro'}</td>
-                  </tr>
-                ))}
+                {activeTournament.registrations.map(reg => {
+                  // Lógica para mostrar o nome do usuário corretamente
+                  let displayName = reg.user?.name;
+                  
+                  // Se for o usuário atual e não tivermos o nome, usar o do contexto de autenticação
+                  if (!displayName && reg.user?.id === getUserId() && user?.name) {
+                    displayName = user.name;
+                  }
+                  
+                  // Última tentativa: usar o email ou marcar como não informado
+                  if (!displayName) {
+                    displayName = reg.partnerEmail ? reg.partnerEmail.split('@')[0] : 'Não informado';
+                  }
+                  
+                  return (
+                    <tr key={reg.id} className={reg.user?.id === getUserId() ? 'current-user' : ''}>
+                      <td>{displayName}</td>
+                      <td>{reg.gender === 'male' ? 'Masculino' : 'Feminino'}</td>
+                      <td>{reg.category || 'Não informada'}</td>
+                      <td>{reg.partnerEmail || 'Sem parceiro'}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           ) : (
@@ -461,7 +537,7 @@ const Tournaments = () => {
           )}
           
           <div className="form-group">
-            <label htmlFor="partnerEmail">Email do Parceiro *</label>
+            <label htmlFor="partnerEmail">Email do Parceiro</label>
             <input 
               type="email" 
               id="partnerEmail" 
@@ -469,10 +545,10 @@ const Tournaments = () => {
               value={registrationForm.partnerEmail} 
               onChange={handleInputChange}
               placeholder="nome@exemplo.com"
-              required
               className={formErrors.partnerEmail ? 'error' : ''}
             />
             {formErrors.partnerEmail && <p className="error-text">{formErrors.partnerEmail}</p>}
+            <small className="help-text">Deixe em branco se não tiver um parceiro definido.</small>
           </div>
           
           <button 
