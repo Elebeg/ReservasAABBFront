@@ -108,22 +108,21 @@ const Tournaments = () => {
     }
   
     setIsRegistering(true);
+    setFormErrors({});
     
     try {
       const response = await api.post('/tournament-registrations', registrationForm);
       
       // Update registrations list
-      setUserRegistrations([...userRegistrations, response.data]);
+      setUserRegistrations(prevRegistrations => [...prevRegistrations, response.data]);
       
       setFormSuccess('Inscrição realizada com sucesso!');
-      setFormErrors({});
       
-      // Mudamos para primeiro definir isRegistering como false
-      setIsRegistering(false);
-      
-      // Depois mudar a view após o pequeno delay
+      // Mudamos para o modo de detalhes após o sucesso
       setTimeout(() => {
         setViewMode('details');
+        // Garantimos que isRegistering esteja como false após a mudança de view
+        setIsRegistering(false);
       }, 2000);
       
     } catch (err) {
@@ -131,6 +130,7 @@ const Tournaments = () => {
       setFormErrors({
         submit: err.response?.data?.message || 'Erro ao realizar inscrição. Tente novamente.'
       });
+      // Garantimos que isRegistering seja definido como false em caso de erro
       setIsRegistering(false);
     }
   };
