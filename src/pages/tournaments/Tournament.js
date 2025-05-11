@@ -12,7 +12,7 @@ const Tournaments = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [activeTournament, setActiveTournament] = useState(null);
   const [registrationForm, setRegistrationForm] = useState({
-    tournamentId: Number(tournament.id),
+    tournamentId: Number(tournaments.id),
     category: '',
     partnerEmail: '',
     gender: user?.gender === 'Masculino' ? 'male' : user?.gender === 'Feminino' ? 'female' : ''
