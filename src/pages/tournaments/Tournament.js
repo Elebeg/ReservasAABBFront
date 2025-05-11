@@ -107,7 +107,14 @@ const Tournaments = () => {
       return;
     }
   
-    setIsRegistering(true);
+    // Não usamos mais o isRegistering state
+    // Usamos uma variável local para controlar o botão
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Processando...';
+    }
+    
     setFormErrors({});
     
     try {
@@ -121,8 +128,6 @@ const Tournaments = () => {
       // Mudamos para o modo de detalhes após o sucesso
       setTimeout(() => {
         setViewMode('details');
-        // Garantimos que isRegistering esteja como false após a mudança de view
-        setIsRegistering(false);
       }, 2000);
       
     } catch (err) {
@@ -130,8 +135,12 @@ const Tournaments = () => {
       setFormErrors({
         submit: err.response?.data?.message || 'Erro ao realizar inscrição. Tente novamente.'
       });
-      // Garantimos que isRegistering seja definido como false em caso de erro
-      setIsRegistering(false);
+      
+      // Reativamos o botão em caso de erro
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Confirmar Inscrição';
+      }
     }
   };
 
@@ -466,14 +475,13 @@ const Tournaments = () => {
             {formErrors.partnerEmail && <p className="error-text">{formErrors.partnerEmail}</p>}
           </div>
           
-            <button 
-                type="submit" 
-                className="submit-registration-btn" 
-                disabled={isRegistering}
-            >
-                {isRegistering ? 'Processando...' : 'Confirmar Inscrição'}
-            </button>
-            
+          <button 
+            type="submit" 
+            className="submit-registration-btn"
+          >
+            Confirmar Inscrição
+          </button>
+                      
         </form>
       </div>
     );
