@@ -466,7 +466,7 @@ const Tournaments = () => {
             {formErrors.partnerEmail && <p className="error-text">{formErrors.partnerEmail}</p>}
           </div>
           
-                    <button 
+            <button 
                 type="submit" 
                 className="submit-registration-btn" 
                 disabled={isRegistering}
@@ -474,18 +474,6 @@ const Tournaments = () => {
                 {isRegistering ? 'Processando...' : 'Confirmar Inscrição'}
             </button>
             
-            {isRegistering && (
-                <button 
-                type="button"
-                className="cancel-processing-btn"
-                onClick={() => {
-                    setIsRegistering(false);
-                    setError('Inscrição cancelada pelo usuário.');
-                }}
-                >
-                Cancelar
-                </button>
-            )}
         </form>
       </div>
     );
