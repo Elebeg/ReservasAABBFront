@@ -246,7 +246,7 @@
   padding-left: 24px;
 }
 
-/* Auth Buttons styles */
+/* Auth Buttons styles (desktop) */
 .auth-buttons {
   display: flex;
   align-items: center;
@@ -257,7 +257,8 @@
   gap: 10px;
 }
 
-.btn-login, .btn-register {
+.btn-login,
+.btn-register {
   padding: 9px 18px;
   border-radius: 6px;
   font-weight: 600;
@@ -295,7 +296,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* User Info styles */
+/* User Info styles (desktop) */
 .user-info {
   display: flex;
   align-items: center;
@@ -358,6 +359,118 @@
   background-color: rgba(255, 255, 255, 0.2);
   color: var(--primary-yellow);
   transform: scale(1.1);
+}
+
+/* Área de autenticação dentro do menu mobile (escondida no desktop) */
+.nav-auth-mobile {
+  display: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.nav-mobile-auth {
+  padding: 15px 20px 10px;
+}
+
+.nav-mobile-auth-title {
+  display: block;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.nav-mobile-auth-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-mobile-login,
+.btn-mobile-register {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: var(--transition);
+}
+
+.btn-mobile-login {
+  background-color: transparent;
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-mobile-login:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-mobile-register {
+  background-color: var(--primary-yellow);
+  color: var(--primary-blue);
+  border-color: var(--primary-yellow);
+}
+
+.btn-mobile-register:hover {
+  background-color: var(--primary-yellow-dark);
+  border-color: var(--primary-yellow-dark);
+}
+
+/* User logado no menu mobile */
+.nav-mobile-user {
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-mobile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  background-color: var(--gray-200);
+  flex-shrink: 0;
+}
+
+.nav-mobile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-mobile-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-mobile-user-name {
+  color: var(--white);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.nav-mobile-logout {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  align-self: flex-start;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fefefe;
+  transition: var(--transition);
+}
+
+.nav-mobile-logout:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Mobile menu toggle */
@@ -437,15 +550,16 @@
     display: block;
     order: 3;
   }
-  
+
   .logo-container {
     order: 1;
   }
-  
+
   .auth-buttons {
-    order: 2;
+    /* Esconde os botões de Entrar/Registrar no topo no mobile */
+    display: none;
   }
-  
+
   .main-nav {
     position: fixed;
     top: 0;
@@ -459,37 +573,38 @@
     z-index: 1000;
     box-shadow: var(--shadow-lg);
   }
-  
+
   .main-nav.mobile-open {
     right: 0;
   }
-  
+
   .backdrop {
     display: block;
   }
-  
+
   .nav-list {
     flex-direction: column;
     gap: 0;
     width: 100%;
   }
-  
+
   .nav-item {
     width: 100%;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
-  .nav-link, .dropdown-toggle {
+
+  .nav-link,
+  .dropdown-toggle {
     padding: 15px 20px;
     border-radius: 0;
     font-size: 17px;
   }
-  
+
   .dropdown-toggle {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .dropdown-menu {
     position: static;
     opacity: 1;
@@ -503,18 +618,19 @@
     overflow: hidden;
     transition: max-height 0.3s ease;
   }
-  
+
   .dropdown-menu.show {
     max-height: 300px;
     padding: 5px 0;
   }
-  
+
   .dropdown-link {
     padding: 12px 30px;
   }
-  
-  .auth-buttons-container {
-    gap: 5px;
+
+  /* Agora mostramos a área de auth dentro do menu */
+  .nav-auth-mobile {
+    display: block;
   }
 }
 
@@ -522,55 +638,42 @@
   .header-content {
     padding: 0 15px;
   }
-  
+
   .logo h1 {
     font-size: 26px;
   }
-  
+
   .logo-subtitle {
     font-size: 12px;
   }
-  
-  .btn-login, .btn-register {
+
+  .btn-login,
+  .btn-register {
     padding: 7px 14px;
     font-size: 14px;
   }
 }
 
 @media (max-width: 480px) {
-  .auth-buttons-container {
-    flex-direction: column-reverse;
-    gap: 5px;
-    align-items: flex-end;
-    position: relative;
-    right: 10px;
-  }
-  
-  .btn-login, .btn-register {
-    padding: 6px 12px;
-    font-size: 13px;
-    min-width: 100px;
-  }
-  
   .logo h1 {
     font-size: 24px;
   }
-  
+
   .logo-subtitle {
     font-size: 11px;
     margin-top: -4px;
   }
-  
+
   .user-info {
     padding: 4px 8px 4px 4px;
   }
-  
+
   .user-avatar {
     width: 34px;
     height: 34px;
     margin-right: 8px;
   }
-  
+
   .user-name {
     display: none;
   }

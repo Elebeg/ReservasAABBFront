@@ -57,7 +57,11 @@ function Header() {
   // Fechar o menu quando clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (mobileMenuOpen && !event.target.closest('.main-nav') && !event.target.closest('.mobile-menu-toggle')) {
+      if (
+        mobileMenuOpen &&
+        !event.target.closest('.main-nav') &&
+        !event.target.closest('.mobile-menu-toggle')
+      ) {
         setMobileMenuOpen(false);
       }
     };
@@ -67,6 +71,8 @@ function Header() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [mobileMenuOpen]);
+
+  const firstName = user?.name ? user.name.split(' ')[0] : null;
 
   return (
     <header className={`header ${scrolled ? 'scrolled' : ''}`}>
@@ -80,8 +86,9 @@ function Header() {
           </div>
         </Link>
 
-        <button 
-          className="mobile-menu-toggle" 
+        {/* Botão hamburguer (mobile) */}
+        <button
+          className="mobile-menu-toggle"
           onClick={toggleMobileMenu}
           aria-label="Menu"
           aria-expanded={mobileMenuOpen}
@@ -89,6 +96,7 @@ function Header() {
           <span className={`burger-icon ${mobileMenuOpen ? 'open' : ''}`}></span>
         </button>
 
+        {/* Navegação principal */}
         <nav className={`main-nav ${mobileMenuOpen ? 'mobile-open' : ''}`}>
           <ul className="nav-list">
             <li className="nav-item">
@@ -98,8 +106,8 @@ function Header() {
               <Link to="/sobre" className="nav-link">Sobre</Link>
             </li>
             <li className={`nav-item dropdown ${dropdownOpen ? 'open' : ''}`}>
-              <button 
-                className="dropdown-toggle nav-link" 
+              <button
+                className="dropdown-toggle nav-link"
                 onClick={toggleDropdown}
                 aria-expanded={dropdownOpen}
               >
@@ -123,34 +131,87 @@ function Header() {
             <li className="nav-item">
               <Link to="/eventos" className="nav-link">Eventos</Link>
             </li>
-            
+
             {isAuthenticated() && (
               <li className="nav-item">
                 <Link to="/reservas" className="nav-link">Minhas Reservas</Link>
               </li>
             )}
+
+            {/* Área de autenticação dentro do menu (só aparece no mobile via CSS) */}
+            {isAuthenticated() && user ? (
+              <li className="nav-item nav-auth-mobile">
+                <div className="nav-mobile-user">
+                  <div className="nav-mobile-avatar">
+                    <img
+                      src={user?.avatar || '/images/default-avatar.png'}
+                      alt="Avatar"
+                      onError={(e) => { e.target.src = '/images/default-avatar.png'; }}
+                    />
+                  </div>
+                  <div className="nav-mobile-user-info">
+                    <span className="nav-mobile-user-name">
+                      Olá{firstName ? `, ${firstName}` : ''}!
+                    </span>
+                    <button
+                      onClick={handleLogout}
+                      className="nav-mobile-logout"
+                    >
+                      Sair
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ) : (
+              <li className="nav-item nav-auth-mobile">
+                <div className="nav-mobile-auth">
+                  <span className="nav-mobile-auth-title">
+                    Acesse sua conta
+                  </span>
+                  <div className="nav-mobile-auth-buttons">
+                    <Link to="/login" className="btn-mobile-login">
+                      Entrar
+                    </Link>
+                    <Link to="/register" className="btn-mobile-register">
+                      Criar conta
+                    </Link>
+                  </div>
+                </div>
+              </li>
+            )}
           </ul>
         </nav>
 
+        {/* Área de autenticação no desktop */}
         <div className="auth-buttons">
           {isAuthenticated() && user ? (
             <div className="user-info">
               <div className="user-avatar" title={user?.name || 'Usuário'}>
                 <img
-                  src={user?.avatar || '/images/default-avatar.png'}  
+                  src={user?.avatar || '/images/default-avatar.png'}
                   alt="Avatar"
                   className="avatar-img"
-                  onError={(e) => {e.target.src = '/images/default-avatar.png'}}
+                  onError={(e) => { e.target.src = '/images/default-avatar.png'; }}
                 />
               </div>
               <span className="user-name">{user?.name || 'Usuário'}</span>
-              <button 
-                onClick={handleLogout} 
-                className="logout-icon" 
+              <button
+                onClick={handleLogout}
+                className="logout-icon"
                 title="Sair"
                 aria-label="Sair"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                   <polyline points="16 17 21 12 16 7"></polyline>
                   <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -165,7 +226,7 @@ function Header() {
           )}
         </div>
       </div>
-      
+
       {mobileMenuOpen && <div className="backdrop" onClick={toggleMobileMenu}></div>}
     </header>
   );
