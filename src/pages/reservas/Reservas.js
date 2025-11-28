@@ -1,4 +1,3 @@
-// Enhanced ReservationsPage.jsx com ajustes para o backend e UX
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -13,6 +12,7 @@ function ReservationsPage() {
   const [allReservations, setAllReservations] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedCourt, setSelectedCourt] = useState(null);
+  const selectedCourtObj = courts.find((court) => court.id === selectedCourt);
   const [selectedTime, setSelectedTime] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingReservationId, setEditingReservationId] = useState(null);
@@ -20,25 +20,22 @@ function ReservationsPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  // Refs para rolagem
   const formRef = useRef(null);
   const reservationsListRef = useRef(null);
   const errorRef = useRef(null);
 
-  // Verificar e configurar token antes de cada operação API
+  const RESERVATION_LIMIT = 4; 
+
   const setupApiAuthToken = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Sessão expirada. Por favor, faça login novamente.');
       return false;
     }
-    
-    // Configurar o token no cabeçalho de autorização do Axios
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return true;
   };
 
-  // Buscar dados iniciais
   useEffect(() => {
     if (isAuthenticated()) {
       fetchData();
@@ -47,14 +44,12 @@ function ReservationsPage() {
     }
   }, [isAuthenticated]);
 
-  // Efeito para rolar até o erro quando ele é exibido
   useEffect(() => {
     if (error && errorRef.current) {
       errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [error]);
 
-  // Efeito para rolar até o formulário quando estiver editando
   useEffect(() => {
     if (isEditing && formRef.current) {
       formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -66,7 +61,6 @@ function ReservationsPage() {
     
     setLoading(true);
     try {
-      // Usando o endpoint correto para reservas do usuário atual - /reservations/me
       const [userReservationsRes, allReservationsRes, courtsRes] = await Promise.all([
         api.get('/reservations/me'),
         api.get('/reservations'),
@@ -81,7 +75,6 @@ function ReservationsPage() {
       const errorMessage = getApiErrorMessage(err);
       setError(`Erro ao carregar dados: ${errorMessage}`);
       
-      // Se o erro for de autenticação, limpar dados do usuário
       if (err.response?.status === 401) {
         handleAuthError();
       }
@@ -90,7 +83,6 @@ function ReservationsPage() {
     }
   };
 
-  // Gerar horários disponíveis (8h às 22h)
   const generateTimeSlots = () => {
     const slots = [];
     for (let i = 8; i < 22; i++) {
@@ -99,14 +91,11 @@ function ReservationsPage() {
     return slots;
   };
 
-  // Verificar se um horário está disponível
   const isTimeSlotAvailable = (courtId, time) => {
     const dateStr = format(selectedDate, 'yyyy-MM-dd');
     const timeStr = `${dateStr}T${time}:00`;
     const reservationTimeDate = new Date(timeStr);
 
-    // Se estiver editando, precisamos verificar se o horário está disponível,
-    // exceto o horário da própria reserva que está sendo editada
     if (isEditing) {
       return !allReservations.some(reservation => 
         reservation.court.id === courtId && 
@@ -115,21 +104,17 @@ function ReservationsPage() {
       );
     }
 
-    // Caso normal - verificar disponibilidade para nova reserva
     return !allReservations.some(reservation => 
       reservation.court.id === courtId && 
       new Date(reservation.startTime).getTime() === reservationTimeDate.getTime()
     );
   };
 
-  // Tratamento de erros da API
   const getApiErrorMessage = (err) => {
-    // Verificar se há uma mensagem específica da API
     if (err.response?.data?.message) {
       return err.response.data.message;
     }
     
-    // Verificar código de status
     if (err.response?.status === 400) {
       return 'Requisição inválida. Verifique os dados e tente novamente.';
     } else if (err.response?.status === 401) {
@@ -140,20 +125,16 @@ function ReservationsPage() {
       return 'Recurso não encontrado.';
     }
     
-    // Mensagem genérica
     return 'Ocorreu um erro inesperado. Por favor, tente novamente.';
   };
 
-  // Tratamento de erro de autenticação
   const handleAuthError = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     delete api.defaults.headers.common['Authorization'];
-    // Redirecionamento para login
-    window.location.href = '/login?redirect=reservas'; // Ajustado para facilitar retorno
+    window.location.href = '/login?redirect=reservas';
   };
 
-  // Criar nova reserva
   const handleCreateReservation = async () => {
     if (!setupApiAuthToken()) return;
     
@@ -161,8 +142,13 @@ function ReservationsPage() {
       setError('Por favor, selecione uma quadra e um horário.');
       return;
     }
+
+    // Verificar limite de reservas
+    if (userReservations.length >= RESERVATION_LIMIT) {
+      setError(`Você atingiu o limite de ${RESERVATION_LIMIT} reservas simultâneas.`);
+      return;
+    }
   
-    // Formatação correta para ISO 8601 com timezone
     const dateStr = format(selectedDate, 'yyyy-MM-dd');
     const startTime = new Date(`${dateStr}T${selectedTime}:00`);
     const isoStartTime = startTime.toISOString();
@@ -174,12 +160,10 @@ function ReservationsPage() {
         startTime: isoStartTime
       });
   
-      // Adicione a nova reserva a ambas as listas
       setUserReservations([...userReservations, response.data]);
       setAllReservations([...allReservations, response.data]);
       setSuccess('Reserva criada com sucesso!');
       
-      // Rolar para a lista de reservas após criar
       setTimeout(() => {
         if (reservationsListRef.current) {
           reservationsListRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -200,7 +184,6 @@ function ReservationsPage() {
     }
   };
 
-  // Atualizar reserva
   const handleUpdateReservation = async () => {
     if (!setupApiAuthToken()) return;
     
@@ -209,7 +192,6 @@ function ReservationsPage() {
       return;
     }
   
-    // Formatação correta para ISO 8601 com timezone
     const dateStr = format(selectedDate, 'yyyy-MM-dd');
     const startTime = new Date(`${dateStr}T${selectedTime}:00`);
     const isoStartTime = startTime.toISOString();
@@ -217,12 +199,10 @@ function ReservationsPage() {
     try {
       setLoading(true);
       
-      // Enviar apenas o startTime, o userId será extraído do JWT no backend
       const response = await api.put(`/reservations/${editingReservationId}`, {
         startTime: isoStartTime
       });
   
-      // Atualize a reserva em ambas as listas
       setUserReservations(userReservations.map(res => 
         res.id === editingReservationId ? response.data : res
       ));
@@ -233,7 +213,6 @@ function ReservationsPage() {
       
       setSuccess('Reserva atualizada com sucesso!');
       
-      // Rolar para a lista de reservas após atualizar
       setTimeout(() => {
         if (reservationsListRef.current) {
           reservationsListRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -254,7 +233,6 @@ function ReservationsPage() {
     }
   };
 
-  // Deletar reserva
   const handleDeleteReservation = async (id) => {
     if (!setupApiAuthToken()) return;
     
@@ -265,10 +243,8 @@ function ReservationsPage() {
     try {
       setLoading(true);
       
-      // O userId será extraído do JWT no backend
       await api.delete(`/reservations/${id}`);
       
-      // Remova a reserva de ambas as listas
       setUserReservations(userReservations.filter(res => res.id !== id));
       setAllReservations(allReservations.filter(res => res.id !== id));
       
@@ -286,9 +262,7 @@ function ReservationsPage() {
     }
   };
   
-  // Carregar dados para edição
   const handleEditReservation = (reservation) => {
-    // O backend determina as permissões com base no token JWT
     const reservationDate = parseISO(reservation.startTime);
     
     setSelectedDate(reservationDate);
@@ -297,27 +271,23 @@ function ReservationsPage() {
     setIsEditing(true);
     setEditingReservationId(reservation.id);
     
-    // Rolar para o formulário após selecionar para edição
     if (formRef.current) {
       formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
-  // Resetar formulário
   const resetForm = () => {
     setSelectedCourt(null);
     setSelectedTime('');
     setIsEditing(false);
     setEditingReservationId(null);
     
-    // Limpar mensagens após 3 segundos
     setTimeout(() => {
       setSuccess('');
       setError('');
     }, 3000);
   };
 
-  // Próximos 7 dias para seleção
   const getNextDays = () => {
     const days = [];
     const today = new Date();
@@ -330,24 +300,64 @@ function ReservationsPage() {
     return days;
   };
 
-  // Formatar data em português
   const formatDate = (date) => {
-    return format(date, "EEE, dd 'de' MMMM", { locale: ptBR });
+    return format(date, "EEE, dd 'de' MMM", { locale: ptBR });
   };
 
-  // Recarregar dados
   const handleRefresh = () => {
     fetchData();
   };
 
+  // Cálculo do progresso de reservas
+  const reservationProgress = (userReservations.length / RESERVATION_LIMIT) * 100;
+  const remainingReservations = RESERVATION_LIMIT - userReservations.length;
+
   if (loading && userReservations.length === 0) {
-    return <div className="loading">Carregando...</div>;
+    return (
+      <div className="loading">
+        <div className="loading-spinner"></div>
+        <span>Carregando reservas...</span>
+      </div>
+    );
   }
 
   return (
     <div className="reservations-container">
-      <h1>Reservas de Quadras</h1>
+      {/* Header com título e card de quota */}
+      <div className="reservations-header">
+        <h1>
+          <div className="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+            </svg>
+          </div>
+          Reservas de Quadras
+        </h1>
+        
+        <div className="reservation-quota-card">
+          <div className="quota-header">
+            <span className="quota-label">Suas Reservas</span>
+            <span className="quota-count">
+              {userReservations.length}
+              <span className="slash">/</span>
+              {RESERVATION_LIMIT}
+            </span>
+          </div>
+          <div className="quota-progress-bar">
+            <div 
+              className="quota-progress-fill" 
+              style={{ width: `${reservationProgress}%` }}
+            ></div>
+          </div>
+          <p className="quota-message">
+            {remainingReservations > 0 
+              ? `Você ainda pode fazer ${remainingReservations} ${remainingReservations === 1 ? 'reserva' : 'reservas'}`
+              : 'Limite de reservas atingido'}
+          </p>
+        </div>
+      </div>
       
+      {/* Alertas de erro e sucesso */}
       <div ref={errorRef}>
         {error && (
           <div className="alert alert-error">
@@ -374,9 +384,10 @@ function ReservationsPage() {
         )}
       </div>
       
+      {/* Botão de atualizar */}
       <div className="page-actions">
         <button 
-          className="btn btn-refresh" 
+          className="btn-refresh" 
           onClick={handleRefresh}
           disabled={loading}
         >
@@ -388,9 +399,19 @@ function ReservationsPage() {
         </button>
       </div>
       
+      {/* Grid principal com formulário e lista de reservas */}
       <div className="reservations-grid">
+        {/* Formulário de criação/edição */}
         <div className="reservations-form" ref={formRef}>
-          <h2>{isEditing ? 'Editar Reserva' : 'Nova Reserva'}</h2>
+          <h2>
+            <div className="form-header-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+              </svg>
+            </div>
+            {isEditing ? 'Editar Reserva' : 'Nova Reserva'}
+          </h2>
           
           <div className="form-group">
             <label>Data:</label>
@@ -447,40 +468,70 @@ function ReservationsPage() {
             </div>
           )}
           
-          <div className="form-actions">
-            {isEditing ? (
-              <>
-                <button 
-                  className="btn btn-primary" 
-                  onClick={handleUpdateReservation}
-                  disabled={loading}
+           <div className={`form-actions ${isEditing ? 'editing' : 'creating'}`}>
+            <div className="form-actions-info">
+              <span className="form-actions-title">
+                {isEditing ? 'Editar reserva' : 'Nova reserva'}
+              </span>
+
+              <span className="form-actions-subtitle">
+                {selectedCourtObj && selectedTime
+                  ? `${selectedCourtObj.name} • ${selectedTime}h`
+                  : 'Escolha a quadra e o horário antes de confirmar'}
+              </span>
+            </div>
+
+            <div className="form-actions-buttons">
+              {isEditing ? (
+                <>
+                  <button
+                    className="btn btn-primary btn-lg"
+                    onClick={handleUpdateReservation}
+                    disabled={loading}
+                  >
+                    {loading ? 'Salvando alterações...' : 'Salvar alterações'}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    onClick={resetForm}
+                  >
+                    Cancelar
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="btn btn-primary btn-lg"
+                  onClick={handleCreateReservation}
+                  disabled={loading || !selectedCourt || !selectedTime}
                 >
-                  {loading ? 'Atualizando...' : 'Atualizar Reserva'}
+                  {loading ? 'Criando reserva...' : 'Confirmar reserva'}
                 </button>
-                <button 
-                  className="btn btn-secondary" 
-                  onClick={resetForm}
-                >
-                  Cancelar
-                </button>
-              </>
-            ) : (
-              <button 
-                className="btn btn-primary" 
-                onClick={handleCreateReservation}
-                disabled={loading || !selectedCourt || !selectedTime}
-              >
-                {loading ? 'Criando...' : 'Criar Reserva'}
-              </button>
-            )}
+              )}
+            </div>
           </div>
         </div>
-        
+
+        {/* Lista de reservas do usuário */}
         <div className="user-reservations" ref={reservationsListRef}>
-          <h2>Minhas Reservas</h2>
+          <h2>
+            <div className="list-header-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M2.5 8a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0 6a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+              </svg>
+            </div>
+            Minhas Reservas
+          </h2>
           
           {userReservations.length === 0 ? (
             <div className="no-reservations">
+              <div className="no-reservations-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                </svg>
+              </div>
               Você não possui reservas agendadas.
             </div>
           ) : (
@@ -497,18 +548,28 @@ function ReservationsPage() {
                       className={`reservation-card ${isPast ? 'past' : ''}`}
                     >
                       <div className="reservation-info">
-                        <h3>{reservation.court.name}</h3>
+                        <h3>
+                          <div className="reservation-badge">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                              <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+                            </svg>
+                          </div>
+                          {reservation.court.name}
+                        </h3>
                         <p className="reservation-detail">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                          </svg>
                           <span className="label">Data:</span> 
                           {format(reservationDate, "dd/MM/yyyy", { locale: ptBR })}
                         </p>
                         <p className="reservation-detail">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                          </svg>
                           <span className="label">Horário:</span> 
                           {format(reservationDate, "HH:mm", { locale: ptBR })}
-                        </p>
-                        <p className="reservation-detail">
-                          <span className="label">Quadra:</span> 
-                          {reservation.court.name}
                         </p>
                       </div>
                       
@@ -538,7 +599,12 @@ function ReservationsPage() {
                       
                       {isPast && (
                         <div className="reservation-status">
-                          <span className="status past">Finalizada</span>
+                          <span className="status">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                            </svg>
+                            Finalizada
+                          </span>
                         </div>
                       )}
                     </div>
@@ -549,8 +615,17 @@ function ReservationsPage() {
         </div>
       </div>
       
+      {/* Visualização da agenda */}
       <div className="schedule-view">
-        <h2>Agenda de Reservas</h2>
+        <h2>
+          <div className="schedule-header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+            </svg>
+          </div>
+          Agenda de Reservas - {format(selectedDate, "dd 'de' MMMM", { locale: ptBR })}
+        </h2>
         <div className="court-schedule">
           {courts.map((court) => (
             <div key={court.id} className="court-timeline">
@@ -566,7 +641,6 @@ function ReservationsPage() {
                     new Date(res.startTime).getTime() === slotDate.getTime()
                   );
                   
-                  // Verificar se a reserva pertence ao usuário logado
                   const isUserReservation = reservation?.user?.id === user?.id;
                   
                   return (
