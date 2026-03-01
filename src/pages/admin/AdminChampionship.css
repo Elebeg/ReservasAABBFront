@@ -928,3 +928,25 @@
   border-color: var(--ac-primary);
   color: #fff;
 }
+
+/* ── Opção "Criar time personalizado" ────────────────────────────────────────── */
+.ac-suggestion-create {
+  border-top: 1px dashed var(--ac-gray-200);
+  margin-top: 4px;
+  padding-top: 4px !important;
+  opacity: 0.85;
+}
+
+.ac-suggestion-create:hover {
+  background: rgba(245, 184, 0, 0.08) !important;
+  opacity: 1;
+}
+
+.ac-suggestion-create .ac-suggestion-name {
+  color: var(--ac-gray-700);
+}
+
+.ac-suggestion-create .ac-suggestion-league {
+  color: var(--ac-gray-400);
+  font-style: italic;
+}

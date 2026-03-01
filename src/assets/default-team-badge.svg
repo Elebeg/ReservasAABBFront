@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110" fill="none">
+  <!-- Forma de escudo -->
+  <path d="M50 4 L94 20 L94 62 Q94 90 50 106 Q6 90 6 62 L6 20 Z"
+        fill="#1a3c6e" stroke="#F5B800" stroke-width="3"/>
+  <!-- Bola de futebol simplificada -->
+  <circle cx="50" cy="56" r="22" fill="white" opacity="0.92"/>
+  <circle cx="50" cy="56" r="22" fill="none" stroke="#1a3c6e" stroke-width="1.5" opacity="0.3"/>
+  <!-- Hexágono central -->
+  <polygon points="50,44 58,49 58,59 50,64 42,59 42,49"
+           fill="#1a3c6e" opacity="0.85"/>
+  <!-- Linhas da bola -->
+  <line x1="50" y1="34" x2="42" y2="49" stroke="#1a3c6e" stroke-width="1.2" opacity="0.35"/>
+  <line x1="50" y1="34" x2="58" y2="49" stroke="#1a3c6e" stroke-width="1.2" opacity="0.35"/>
+  <line x1="28" y1="49" x2="42" y2="49" stroke="#1a3c6e" stroke-width="1.2" opacity="0.35"/>
+  <line x1="72" y1="49" x2="58" y2="49" stroke="#1a3c6e" stroke-width="1.2" opacity="0.35"/>
+  <line x1="28" y1="63" x2="42" y2="59" stroke="#1a3c6e" stroke-width="1.2" opacity="0.35"/>
+  <line x1="72" y1="63" x2="58" y2="59" stroke="#1a3c6e" stroke-width="1.2" opacity="0.35"/>
+  <line x1="50" y1="78" x2="42" y2="59" stroke="#1a3c6e" stroke-width="1.2" opacity="0.35"/>
+  <line x1="50" y1="78" x2="58" y2="59" stroke="#1a3c6e" stroke-width="1.2" opacity="0.35"/>
+  <!-- Estrela no topo -->
+  <polygon points="50,10 52,16 58,16 53,20 55,26 50,22 45,26 47,20 42,16 48,16"
+           fill="#F5B800"/>
+</svg>

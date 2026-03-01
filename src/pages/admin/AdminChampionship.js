@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import defaultBadge from '../../assets/default-team-badge.svg';
 import { useNavigate } from 'react-router-dom';
 import './AdminChampionship.css';
 
@@ -321,33 +322,41 @@ function TeamSearch({ onSelect }) {
     loadTeamCache().then(() => { setLoading(false); setReady(true); });
   }, []);
 
+  function filter(val, tab) {
+    if (!ready || val.trim().length === 0) { setSugg([]); return; }
+    const q     = normalize(val.trim());
+    const cache = _teamCache;
+    const pool  = tab === 'clubs'
+      ? [...(cache?.serieA || []), ...(cache?.serieB || [])]
+      : (cache?.selecoes || []);
+    setSugg(pool.filter(t => normalize(t.name).includes(q)).slice(0, 8));
+  }
+
   function handleInput(e) {
     const val = e.target.value;
     setQuery(val);
-    if (!ready || val.trim().length === 0) { setSugg([]); return; }
-
-    const q = normalize(val.trim());
-    const cache = _teamCache;
-    const pool  = activeTab === 'clubs'
-      ? [...(cache?.serieA || []), ...(cache?.serieB || [])]
-      : (cache?.selecoes || []);
-
-    const results = pool.filter(t => normalize(t.name).includes(q)).slice(0, 8);
-    setSugg(results);
+    filter(val, activeTab);
   }
 
-  // Refiltra quando muda de aba
-  useEffect(() => {
-    if (query.trim()) handleInput({ target: { value: query } });
-    else setSugg([]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+  function handleTabChange(tab) {
+    setActiveTab(tab);
+    filter(query, tab);
+  }
 
   function pick(team) {
     onSelect({ name: team.name, logoUrl: team.logo || null });
     setQuery('');
     setSugg([]);
   }
+
+  function createCustom() {
+    if (!query.trim()) return;
+    onSelect({ name: query.trim(), logoUrl: null }); // null → backend usará escudo padrão
+    setQuery('');
+    setSugg([]);
+  }
+
+  const noResults = ready && query.trim().length > 0 && suggestions.length === 0;
 
   return (
     <div className="ac-team-search">
@@ -356,14 +365,14 @@ function TeamSearch({ onSelect }) {
         <button
           type="button"
           className={`ac-team-tab ${activeTab === 'clubs' ? 'active' : ''}`}
-          onClick={() => setActiveTab('clubs')}
+          onClick={() => handleTabChange('clubs')}
         >
           ⚽ Clubes
         </button>
         <button
           type="button"
           className={`ac-team-tab ${activeTab === 'selecoes' ? 'active' : ''}`}
-          onClick={() => setActiveTab('selecoes')}
+          onClick={() => handleTabChange('selecoes')}
         >
           🌎 Seleções
         </button>
@@ -385,23 +394,47 @@ function TeamSearch({ onSelect }) {
         {loading && <span className="ac-team-search-spinner" />}
       </div>
 
+      {/* Resultados da busca */}
       {suggestions.length > 0 && (
         <ul className="ac-team-suggestions">
           {suggestions.map((t) => (
             <li key={t.name + t.league} onClick={() => pick(t)}>
               {t.logo
                 ? <img src={t.logo} alt={t.name} className="ac-suggestion-logo"
-                    onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+                    onError={e => { e.target.src = defaultBadge; }}
                   />
-                : null
+                : <img src={defaultBadge} alt={t.name} className="ac-suggestion-logo" />
               }
-              <span className="ac-suggestion-logo-placeholder" style={{ display: t.logo ? 'none' : 'flex' }}>⚽</span>
               <div className="ac-suggestion-info">
                 <span className="ac-suggestion-name">{t.name}</span>
                 <span className="ac-suggestion-league">{t.league}</span>
               </div>
             </li>
           ))}
+
+          {/* Opção de criar no final da lista, se digitou algo */}
+          {query.trim() && (
+            <li className="ac-suggestion-create" onClick={createCustom}>
+              <span className="ac-suggestion-logo-placeholder">➕</span>
+              <div className="ac-suggestion-info">
+                <span className="ac-suggestion-name">Criar "{query.trim()}"</span>
+                <span className="ac-suggestion-league">Time personalizado · escudo padrão</span>
+              </div>
+            </li>
+          )}
+        </ul>
+      )}
+
+      {/* Nenhum resultado — mostra só o "Criar" */}
+      {noResults && (
+        <ul className="ac-team-suggestions">
+          <li className="ac-suggestion-create" onClick={createCustom}>
+            <img src={defaultBadge} alt="Escudo padrão" className="ac-suggestion-logo" />
+            <div className="ac-suggestion-info">
+              <span className="ac-suggestion-name">Criar "{query.trim()}"</span>
+              <span className="ac-suggestion-league">Time não encontrado · será criado com escudo padrão</span>
+            </div>
+          </li>
         </ul>
       )}
     </div>

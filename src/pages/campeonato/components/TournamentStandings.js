@@ -1,20 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 // ── Gera cor consistente a partir do nome do time ──────────────────────────
-// Mesmo time → sempre mesma cor. Baseado em hash simples do nome.
 const PALETTE = [
-  ['#1a3c6e', '#e8f0fb'], // azul marinho
-  ['#7c2d12', '#fef3ef'], // vermelho tijolo
-  ['#14532d', '#f0fdf4'], // verde escuro
-  ['#4c1d95', '#f5f3ff'], // roxo
-  ['#713f12', '#fffbeb'], // âmbar escuro
-  ['#164e63', '#ecfeff'], // ciano escuro
-  ['#881337', '#fff1f2'], // rosa escuro
-  ['#1e3a5f', '#eff6ff'], // azul aço
-  ['#3b0764', '#faf5ff'], // violeta
-  ['#052e16', '#f0fdf4'], // verde floresta
-  ['#422006', '#fefce8'], // marrom
-  ['#0c4a6e', '#f0f9ff'], // azul céu
+  ['#1a3c6e', '#e8f0fb'],
+  ['#7c2d12', '#fef3ef'],
+  ['#14532d', '#f0fdf4'],
+  ['#4c1d95', '#f5f3ff'],
+  ['#713f12', '#fffbeb'],
+  ['#164e63', '#ecfeff'],
+  ['#881337', '#fff1f2'],
+  ['#1e3a5f', '#eff6ff'],
+  ['#3b0764', '#faf5ff'],
+  ['#052e16', '#f0fdf4'],
+  ['#422006', '#fefce8'],
+  ['#0c4a6e', '#f0f9ff'],
 ];
 
 function colorFromName(name = '') {
@@ -32,19 +31,68 @@ function getInitials(name = '') {
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
 
-// ── Shield: logo real se disponível, senão iniciais ───────────────────────
+// ── Cache global de logos buscados dinamicamente ────────────────────────────
+// Evita refetch para o mesmo time em múltiplas renderizações
+const _logoCache = {}; // { teamName: url | false }
+
+async function fetchLogoFromSportsDB(name) {
+  if (name in _logoCache) return _logoCache[name];
+
+  try {
+    const r = await fetch(
+      `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(name)}`
+    );
+    const d = await r.json();
+    const team = (d.teams || []).find(t =>
+      t.strSport === 'Soccer' &&
+      t.strTeamBadge &&
+      t.strTeam.toLowerCase().includes(name.toLowerCase().split(' ')[0])
+    );
+    const url = team?.strTeamBadge ? team.strTeamBadge + '/tiny' : false;
+    _logoCache[name] = url;
+    return url;
+  } catch {
+    _logoCache[name] = false;
+    return false;
+  }
+}
+
+// ── Shield: logo real → busca dinâmica → iniciais ─────────────────────────
 function TeamShield({ name, logoUrl }) {
   const [textColor, bgColor] = colorFromName(name);
   const initials = getInitials(name);
 
-  if (logoUrl) {
+  // resolvedLogo: null=carregando, false=não encontrado, string=url
+  const [resolvedLogo, setResolvedLogo] = useState(logoUrl || null);
+  const [imgFailed, setImgFailed]       = useState(false);
+
+  useEffect(() => {
+    // Se já tem logo vinda da API, usa direto
+    if (logoUrl) { setResolvedLogo(logoUrl); return; }
+
+    // Sem logo no banco: tenta buscar pelo nome
+    let cancelled = false;
+    fetchLogoFromSportsDB(name).then(url => {
+      if (!cancelled) setResolvedLogo(url || false);
+    });
+    return () => { cancelled = true; };
+  }, [name, logoUrl]);
+
+  // Tem URL e não falhou ao carregar a imagem
+  if (resolvedLogo && !imgFailed) {
     return (
       <span className="ts-shield ts-shield--logo" style={{ background: bgColor }}>
-        <img src={logoUrl} alt={name} className="ts-shield-img" />
+        <img
+          src={resolvedLogo}
+          alt={name}
+          className="ts-shield-img"
+          onError={() => setImgFailed(true)}
+        />
       </span>
     );
   }
 
+  // Fallback: iniciais
   return (
     <span className="ts-shield" style={{ background: bgColor, color: textColor }}>
       {initials}
