@@ -601,8 +601,8 @@
   gap: 0;
   border-radius: 18px;
   overflow: hidden;
-  background: #0B0E17;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(245,184,0,0.12);
+  background: rgba(245, 184, 0, 0.04);
+  box-shadow: 0 8px 40px rgba(245,184,0,0.15), 0 0 0 1.5px rgba(245,184,0,0.2);
 }
 
 /* ── Campeão ───────────────────────────────────────────────────────────── */
@@ -612,8 +612,8 @@
   align-items: center;
   gap: 4px;
   padding: 28px 24px 20px;
-  background: linear-gradient(135deg, #1a1400 0%, #2d2000 50%, #1a1400 100%);
-  border-bottom: 1px solid rgba(245,184,0,0.25);
+  background: linear-gradient(135deg, rgba(245,184,0,0.12) 0%, rgba(245,184,0,0.22) 50%, rgba(245,184,0,0.12) 100%);
+  border-bottom: 1px solid rgba(245,184,0,0.3);
   animation: wbChampionIn 0.6s ease;
 }
 
@@ -628,13 +628,13 @@
   font-weight: 900;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: #c68b00;
+  color: #9a6800;
 }
 .wb-champion-name   {
   font-size: 1.6rem;
   font-weight: 900;
-  color: #F5B800;
-  text-shadow: 0 0 30px rgba(245,184,0,0.5);
+  color: #7a5000;
+  text-shadow: none;
 }
 
 /* ── Top bar (Chave A / Mata-Mata / Chave B) ───────────────────────────── */
@@ -643,8 +643,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  background: rgba(255,255,255,0.03);
-  border-bottom: 1px solid rgba(245,184,0,0.12);
+  background: rgba(245,184,0,0.06);
+  border-bottom: 1px solid rgba(245,184,0,0.18);
 }
 
 .wb-top-bar-side {
@@ -652,7 +652,7 @@
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(245,184,0,0.7);
+  color: rgba(140,90,0,0.85);
   flex: 1;
 }
 
@@ -676,6 +676,7 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(245,184,0,0.3) transparent;
   padding: 24px 16px 20px;
+  background: transparent;
 }
 
 .wb-scroll-wrap::-webkit-scrollbar { height: 4px; }
@@ -700,7 +701,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 10rem;
-  opacity: 0.055;
+  opacity: 0.08;
   filter: sepia(1) saturate(3) brightness(0.8);
   pointer-events: none;
   user-select: none;
@@ -732,9 +733,9 @@
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(245,184,0,0.65);
+  color: rgba(160,100,0,0.8);
   border-bottom: 1px solid rgba(245,184,0,0.14);
-  background: rgba(245,184,0,0.04);
+  background: rgba(245,184,0,0.06);
 }
 
 .wb-col--left  { border-right: 1px solid rgba(245,184,0,0.08); }
@@ -772,8 +773,8 @@
 /* ── Match Card ────────────────────────────────────────────────────────── */
 .wb-card {
   width: 100%;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(245,184,0,0.2);
   border-radius: 10px;
   overflow: hidden;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -790,8 +791,8 @@
 
 /* Card da Final — maior, mais dourado */
 .wb-card--final {
-  background: rgba(245,184,0,0.06);
-  border: 1.5px solid rgba(245,184,0,0.35);
+  background: rgba(255,255,255,0.6);
+  border: 2px solid rgba(200,140,0,0.5);
   border-radius: 12px;
   box-shadow: 0 0 40px rgba(245,184,0,0.12), 0 8px 32px rgba(0,0,0,0.4);
 }
@@ -818,7 +819,7 @@
 }
 
 .wb-row--tbd .wb-name {
-  color: rgba(255,255,255,0.25);
+  color: rgba(0,0,0,0.25);
   font-style: italic;
   font-size: 0.8rem;
 }
@@ -826,7 +827,7 @@
 .wb-name {
   font-size: 0.82rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.82);
+  color: #1a1200;
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -835,7 +836,7 @@
 }
 
 .wb-row--won .wb-name {
-  color: #F5B800;
+  color: #8a6200;
   font-weight: 800;
 }
 
@@ -844,7 +845,7 @@
 .wb-score {
   font-size: 0.88rem;
   font-weight: 900;
-  color: rgba(255,255,255,0.5);
+  color: rgba(0,0,0,0.35);
   min-width: 20px;
   text-align: right;
   flex-shrink: 0;
@@ -860,7 +861,7 @@
 /* ── Separador entre times ─────────────────────────────────────────────── */
 .wb-sep {
   height: 1px;
-  background: rgba(255,255,255,0.07);
+  background: rgba(0,0,0,0.08);
   margin: 0;
 }
 
@@ -888,7 +889,7 @@
   width: 190px;
   border-left:  2px solid rgba(245,184,0,0.15);
   border-right: 2px solid rgba(245,184,0,0.15);
-  background: radial-gradient(ellipse at center, rgba(245,184,0,0.07) 0%, transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(245,184,0,0.18) 0%, transparent 70%);
 }
 
 .wb-final-badge {
@@ -919,7 +920,7 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  color: rgba(255,255,255,0.2);
+  color: rgba(0,0,0,0.25);
   font-size: 0.8rem;
   font-style: italic;
   letter-spacing: 0.04em;
@@ -951,9 +952,9 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(245,184,0,0.15);
   font-size: 0.72rem;
-  color: rgba(255,255,255,0.35);
+  color: rgba(0,0,0,0.4);
   letter-spacing: 0.04em;
 }
 
@@ -966,7 +967,7 @@
 }
 
 .wb-legend-dot--won { background: #F5B800; box-shadow: 0 0 6px rgba(245,184,0,0.5); }
-.wb-legend-dot--tbd { background: rgba(255,255,255,0.15); }
+.wb-legend-dot--tbd { background: rgba(0,0,0,0.15); }
 
 /* ── Responsive ────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
