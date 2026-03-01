@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000', // produção: trocar para https://aabbjdsreservas.com
+  baseURL: 'https://aabbjdsreservas.com', // produção: trocar para https://aabbjdsreservas.com
   headers: {
     'Content-Type': 'application/json',
   },

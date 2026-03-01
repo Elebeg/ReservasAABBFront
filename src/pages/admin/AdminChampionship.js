@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminChampionship.css';
 
-const API = 'http://localhost:3000';
+const API = 'https://aabbjdsreservas.com';
 
 function adminHeaders() {
   return {

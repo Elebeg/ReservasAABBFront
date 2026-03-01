@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://aabbjdsreservas.com';
 
 async function fetchJSON(path) {
   const res = await fetch(`${API_URL}${path}`);

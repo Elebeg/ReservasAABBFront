@@ -10,7 +10,7 @@ export const useAuth = () => {
   return context;
 };
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://aabbjdsreservas.com';
 
 // Verifica se o token tem permissão de admin
 async function checkAdminAccess(token) {
