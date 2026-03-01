@@ -479,7 +479,8 @@ function ScheduleModal({ match, onClose, onSaved }) {
     try {
       await apiFetch(`/admin/championship/matches/${match.id}/schedule`, {
         method: 'PATCH',
-        body: JSON.stringify({ scheduledAt: value || null }),
+        // Appenda -03:00 (BRT) para o backend receber a hora correta em UTC
+        body: JSON.stringify({ scheduledAt: value ? value + ':00-03:00' : null }),
       });
       onSaved();
     } catch (err) {
