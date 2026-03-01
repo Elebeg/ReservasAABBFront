@@ -897,3 +897,34 @@
   align-items: center;
   gap: 8px;
 }
+
+/* ── Abas Clubes / Seleções ──────────────────────────────────────────────────── */
+.ac-team-search-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.ac-team-tab {
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--ac-gray-300);
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ac-gray-600);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.ac-team-tab:hover {
+  border-color: var(--ac-primary);
+  color: var(--ac-primary);
+}
+
+.ac-team-tab.active {
+  background: var(--ac-primary);
+  border-color: var(--ac-primary);
+  color: #fff;
+}

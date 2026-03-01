@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminChampionship.css';
 
@@ -267,78 +267,138 @@ function ResultModal({ match, onClose, onSaved }) {
 
 // ─── ABA: TIMES ──────────────────────────────────────────────────────────────
 
-// ─── AUTOCOMPLETE DE TIMES (TheSportsDB) ─────────────────────────────────────
+// ─── CACHE DE TIMES (carregado uma vez via TheSportsDB) ──────────────────────
+// Endpoint lista todos os times de uma liga com nome + badge URL real
+// Sem API key — chave "3" é pública e gratuita para uso com limite
+
+let _teamCache = null; // { serieA: [], serieB: [], selecoes: [] }
+
+async function loadTeamCache() {
+  if (_teamCache) return _teamCache;
+
+  const BASE = 'https://www.thesportsdb.com/api/v1/json/3';
+
+  async function fetchLeague(leagueName) {
+    try {
+      const r = await fetch(`${BASE}/search_all_teams.php?l=${encodeURIComponent(leagueName)}`);
+      const d = await r.json();
+      return (d.teams || []).map(t => ({
+        name:   t.strTeam,
+        logo:   t.strTeamBadge ? t.strTeamBadge + '/tiny' : null,
+        league: leagueName,
+      }));
+    } catch { return []; }
+  }
+
+  // Série A (ID 4351), Série B (ID 4404), Copa América para seleções
+  const [serieA, serieB, copaAm] = await Promise.all([
+    fetchLeague('Brazilian Serie A'),
+    fetchLeague('Brazilian Serie B'),
+    fetchLeague('Copa America'),
+  ]);
+
+  _teamCache = { serieA, serieB, selecoes: copaAm };
+  return _teamCache;
+}
+
+// Normaliza texto: remove acentos e lowercase para comparação
+function normalize(str) {
+  return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+
+// ─── AUTOCOMPLETE ─────────────────────────────────────────────────────────────
 
 function TeamSearch({ onSelect }) {
   const [query, setQuery]         = useState('');
   const [suggestions, setSugg]    = useState([]);
-  const [searching, setSearching] = useState(false);
-  const debounceRef               = useRef(null);
+  const [activeTab, setActiveTab] = useState('clubs');  // 'clubs' | 'selecoes'
+  const [loading, setLoading]     = useState(false);
+  const [ready, setReady]         = useState(false);
+
+  // Pré-carrega o cache ao montar
+  useEffect(() => {
+    setLoading(true);
+    loadTeamCache().then(() => { setLoading(false); setReady(true); });
+  }, []);
 
   function handleInput(e) {
     const val = e.target.value;
     setQuery(val);
-    setSugg([]);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (val.trim().length < 2) return;
+    if (!ready || val.trim().length === 0) { setSugg([]); return; }
 
-    debounceRef.current = setTimeout(async () => {
-      setSearching(true);
-      try {
-        const res  = await fetch(
-          `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(val)}`
-        );
-        const data = await res.json();
-        // Filtra apenas times de futebol brasileiros (strCountry ou strLeague)
-        const filtered = (data.teams || [])
-          .filter(t =>
-            t.strSport === 'Soccer' &&
-            (t.strCountry === 'Brazil' || (t.strLeague || '').toLowerCase().includes('brazil'))
-          )
-          .slice(0, 7);
-        // Se nenhum resultado brasileiro, mostra os 5 primeiros de futebol de qualquer país
-        if (filtered.length === 0) {
-          setSugg((data.teams || []).filter(t => t.strSport === 'Soccer').slice(0, 5));
-        } else {
-          setSugg(filtered);
-        }
-      } catch {
-        setSugg([]);
-      } finally {
-        setSearching(false);
-      }
-    }, 380);
+    const q = normalize(val.trim());
+    const cache = _teamCache;
+    const pool  = activeTab === 'clubs'
+      ? [...(cache?.serieA || []), ...(cache?.serieB || [])]
+      : (cache?.selecoes || []);
+
+    const results = pool.filter(t => normalize(t.name).includes(q)).slice(0, 8);
+    setSugg(results);
   }
 
+  // Refiltra quando muda de aba
+  useEffect(() => {
+    if (query.trim()) handleInput({ target: { value: query } });
+    else setSugg([]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
   function pick(team) {
-    onSelect({ name: team.strTeam, logoUrl: team.strTeamBadge || null });
+    onSelect({ name: team.name, logoUrl: team.logo || null });
     setQuery('');
     setSugg([]);
   }
 
   return (
     <div className="ac-team-search">
+      {/* Abas Clubes / Seleções */}
+      <div className="ac-team-search-tabs">
+        <button
+          type="button"
+          className={`ac-team-tab ${activeTab === 'clubs' ? 'active' : ''}`}
+          onClick={() => setActiveTab('clubs')}
+        >
+          ⚽ Clubes
+        </button>
+        <button
+          type="button"
+          className={`ac-team-tab ${activeTab === 'selecoes' ? 'active' : ''}`}
+          onClick={() => setActiveTab('selecoes')}
+        >
+          🌎 Seleções
+        </button>
+      </div>
+
       <div className="ac-team-search-input-wrap">
         <input
           value={query}
           onChange={handleInput}
-          placeholder="Buscar time... (ex: Flamengo, Palmeiras)"
+          placeholder={loading
+            ? 'Carregando times...'
+            : activeTab === 'clubs'
+              ? 'Digite para buscar... (ex: Fla, Pal, Cor)'
+              : 'Digite para buscar... (ex: Brasil, Argentina)'
+          }
+          disabled={loading}
           autoComplete="off"
         />
-        {searching && <span className="ac-team-search-spinner" />}
+        {loading && <span className="ac-team-search-spinner" />}
       </div>
 
       {suggestions.length > 0 && (
         <ul className="ac-team-suggestions">
           {suggestions.map((t) => (
-            <li key={t.idTeam} onClick={() => pick(t)}>
-              {t.strTeamBadge
-                ? <img src={t.strTeamBadge} alt={t.strTeam} className="ac-suggestion-logo" />
-                : <span className="ac-suggestion-logo-placeholder">⚽</span>
+            <li key={t.name + t.league} onClick={() => pick(t)}>
+              {t.logo
+                ? <img src={t.logo} alt={t.name} className="ac-suggestion-logo"
+                    onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+                  />
+                : null
               }
+              <span className="ac-suggestion-logo-placeholder" style={{ display: t.logo ? 'none' : 'flex' }}>⚽</span>
               <div className="ac-suggestion-info">
-                <span className="ac-suggestion-name">{t.strTeam}</span>
-                <span className="ac-suggestion-league">{t.strLeague || t.strCountry}</span>
+                <span className="ac-suggestion-name">{t.name}</span>
+                <span className="ac-suggestion-league">{t.league}</span>
               </div>
             </li>
           ))}
@@ -391,7 +451,7 @@ function TeamsTab({ tournament, onRefresh }) {
       {isDraft && (
         <div style={{ marginBottom: 20 }}>
           <p style={{ fontSize: '0.82rem', color: 'var(--ac-gray-600)', marginBottom: 8 }}>
-            Digite o nome do time para buscar na base de dados do TheSportsDB:
+            Série A, Série B e Seleções — busca com logo automático:
           </p>
           <TeamSearch onSelect={addTeam} />
           {loading && <p style={{ fontSize: '0.8rem', color: 'var(--ac-gray-500)', marginTop: 6 }}>Adicionando...</p>}
