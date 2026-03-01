@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://reservasaabb-production.up.railway.app',
+  baseURL: 'http://localhost:3000', // produção: trocar para https://aabbjdsreservas.com
   headers: {
     'Content-Type': 'application/json',
   },
@@ -28,7 +28,7 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-       window.location.href = '/login';
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

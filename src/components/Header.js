@@ -10,27 +10,24 @@ function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [tournamentDropdownOpen, setTournamentDropdownOpen] = useState(false);
 
-  // Fechar o menu mobile quando a rota mudar
+  // Verifica se o usuário tem token de admin
+  const isAdmin = !!localStorage.getItem('admin_token');
+  const loggedIn = isAuthenticated();
+
+  // Fecha o menu mobile quando a rota mudar
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Adicionar classe quando o usuário rolar a página
+  // Classe scrolled no header
   useEffect(() => {
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 10;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
-      }
+      setScrolled(window.scrollY > 10);
     };
-
     window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [scrolled]);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -38,23 +35,15 @@ function Header() {
   };
 
   const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-    // Fechar dropdowns quando o menu mobile é toggled
+    setMobileMenuOpen((prev) => !prev);
     setDropdownOpen(false);
-    setTournamentDropdownOpen(false);
   };
 
   const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
-    setTournamentDropdownOpen(false);
+    setDropdownOpen((prev) => !prev);
   };
 
-  const toggleTournamentDropdown = () => {
-    setTournamentDropdownOpen(!tournamentDropdownOpen);
-    setDropdownOpen(false);
-  };
-
-  // Fechar o menu quando clicar fora
+  // Fecha ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -65,11 +54,8 @@ function Header() {
         setMobileMenuOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [mobileMenuOpen]);
 
   const firstName = user?.name ? user.name.split(' ')[0] : null;
@@ -77,28 +63,30 @@ function Header() {
   return (
     <header className={`header ${scrolled ? 'scrolled' : ''}`}>
       <div className="container header-content">
+
+        {/* Logo */}
         <Link to="/" className="logo-link">
           <div className="logo-container">
-            <div className="logo">
-              <h1>AABB</h1>
-            </div>
+            <div className="logo"><h1>AABB</h1></div>
             <span className="logo-subtitle">Jandaia do Sul</span>
           </div>
         </Link>
 
-        {/* Botão hamburguer (mobile) */}
+        {/* Hamburguer */}
         <button
           className="mobile-menu-toggle"
           onClick={toggleMobileMenu}
           aria-label="Menu"
           aria-expanded={mobileMenuOpen}
         >
-          <span className={`burger-icon ${mobileMenuOpen ? 'open' : ''}`}></span>
+          <span className={`burger-icon ${mobileMenuOpen ? 'open' : ''}`} />
         </button>
 
-        {/* Navegação principal */}
+        {/* Navegação */}
         <nav className={`main-nav ${mobileMenuOpen ? 'mobile-open' : ''}`}>
           <ul className="nav-list">
+
+            {/* ── Itens sempre visíveis ── */}
             <li className="nav-item">
               <Link to="/" className="nav-link">Início</Link>
             </li>
@@ -111,7 +99,7 @@ function Header() {
                 onClick={toggleDropdown}
                 aria-expanded={dropdownOpen}
               >
-                O Clube <span className="dropdown-arrow"></span>
+                O Clube <span className="dropdown-arrow" />
               </button>
               <ul className={`dropdown-menu ${dropdownOpen ? 'show' : ''}`}>
                 <li className="dropdown-item">
@@ -132,14 +120,29 @@ function Header() {
               <Link to="/eventos" className="nav-link">Eventos</Link>
             </li>
 
-            {isAuthenticated() && (
+            {/* ── Itens para usuário logado ── */}
+            {loggedIn && (
+              <>
+                <li className="nav-item">
+                  <Link to="/reservas" className="nav-link">Minhas Reservas</Link>
+                </li>
+                <li className="nav-item">
+                  <Link to="/campeonato" className="nav-link">Campeonato</Link>
+                </li>
+              </>
+            )}
+
+            {/* ── Itens exclusivos do admin ── */}
+            {isAdmin && (
               <li className="nav-item">
-                <Link to="/reservas" className="nav-link">Minhas Reservas</Link>
+                <Link to="/admin/dashboard" className="nav-link nav-link-admin">
+                  ⚙️ Admin
+                </Link>
               </li>
             )}
 
-            {/* Área de autenticação dentro do menu (só aparece no mobile via CSS) */}
-            {isAuthenticated() && user ? (
+            {/* ── Área de auth no mobile ── */}
+            {loggedIn && user ? (
               <li className="nav-item nav-auth-mobile">
                 <div className="nav-mobile-user">
                   <div className="nav-mobile-avatar">
@@ -153,10 +156,7 @@ function Header() {
                     <span className="nav-mobile-user-name">
                       Olá{firstName ? `, ${firstName}` : ''}!
                     </span>
-                    <button
-                      onClick={handleLogout}
-                      className="nav-mobile-logout"
-                    >
+                    <button onClick={handleLogout} className="nav-mobile-logout">
                       Sair
                     </button>
                   </div>
@@ -165,26 +165,21 @@ function Header() {
             ) : (
               <li className="nav-item nav-auth-mobile">
                 <div className="nav-mobile-auth">
-                  <span className="nav-mobile-auth-title">
-                    Acesse sua conta
-                  </span>
+                  <span className="nav-mobile-auth-title">Acesse sua conta</span>
                   <div className="nav-mobile-auth-buttons">
-                    <Link to="/login" className="btn-mobile-login">
-                      Entrar
-                    </Link>
-                    <Link to="/register" className="btn-mobile-register">
-                      Criar conta
-                    </Link>
+                    <Link to="/login"    className="btn-mobile-login">Entrar</Link>
+                    <Link to="/register" className="btn-mobile-register">Criar conta</Link>
                   </div>
                 </div>
               </li>
             )}
+
           </ul>
         </nav>
 
-        {/* Área de autenticação no desktop */}
+        {/* Auth desktop */}
         <div className="auth-buttons">
-          {isAuthenticated() && user ? (
+          {loggedIn && user ? (
             <div className="user-info">
               <div className="user-avatar" title={user?.name || 'Usuário'}>
                 <img
@@ -201,33 +196,25 @@ function Header() {
                 title="Sair"
                 aria-label="Sair"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                  fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
                 </svg>
               </button>
             </div>
           ) : (
             <div className="auth-buttons-container">
-              <Link to="/login" className="btn-login">Entrar</Link>
+              <Link to="/login"    className="btn-login">Entrar</Link>
               <Link to="/register" className="btn-register">Registre-se</Link>
             </div>
           )}
         </div>
+
       </div>
 
-      {mobileMenuOpen && <div className="backdrop" onClick={toggleMobileMenu}></div>}
+      {mobileMenuOpen && <div className="backdrop" onClick={toggleMobileMenu} />}
     </header>
   );
 }
