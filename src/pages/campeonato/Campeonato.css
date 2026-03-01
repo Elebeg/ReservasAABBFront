@@ -1130,3 +1130,53 @@
   background: var(--ac-gray-100);
   border-color: var(--ac-gray-300);
 }
+
+/* ── Logo real no shield da tabela ─────────────────────────────────────────── */
+.ts-shield--logo {
+  clip-path: polygon(50% 0%, 100% 18%, 100% 65%, 50% 100%, 0% 65%, 0% 18%);
+  padding: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ts-shield-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+/* ── Logo nas partidas ──────────────────────────────────────────────────────── */
+.camp-match-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.camp-match-team-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* ── Logo no bracket ────────────────────────────────────────────────────────── */
+.wb-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.wb-team-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+.wb-card--final .wb-team-logo {
+  width: 26px;
+  height: 26px;
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminChampionship.css';
 
@@ -267,11 +267,91 @@ function ResultModal({ match, onClose, onSaved }) {
 
 // ─── ABA: TIMES ──────────────────────────────────────────────────────────────
 
+// ─── AUTOCOMPLETE DE TIMES (TheSportsDB) ─────────────────────────────────────
+
+function TeamSearch({ onSelect }) {
+  const [query, setQuery]         = useState('');
+  const [suggestions, setSugg]    = useState([]);
+  const [searching, setSearching] = useState(false);
+  const debounceRef               = useRef(null);
+
+  function handleInput(e) {
+    const val = e.target.value;
+    setQuery(val);
+    setSugg([]);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (val.trim().length < 2) return;
+
+    debounceRef.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const res  = await fetch(
+          `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(val)}`
+        );
+        const data = await res.json();
+        // Filtra apenas times de futebol brasileiros (strCountry ou strLeague)
+        const filtered = (data.teams || [])
+          .filter(t =>
+            t.strSport === 'Soccer' &&
+            (t.strCountry === 'Brazil' || (t.strLeague || '').toLowerCase().includes('brazil'))
+          )
+          .slice(0, 7);
+        // Se nenhum resultado brasileiro, mostra os 5 primeiros de futebol de qualquer país
+        if (filtered.length === 0) {
+          setSugg((data.teams || []).filter(t => t.strSport === 'Soccer').slice(0, 5));
+        } else {
+          setSugg(filtered);
+        }
+      } catch {
+        setSugg([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 380);
+  }
+
+  function pick(team) {
+    onSelect({ name: team.strTeam, logoUrl: team.strTeamBadge || null });
+    setQuery('');
+    setSugg([]);
+  }
+
+  return (
+    <div className="ac-team-search">
+      <div className="ac-team-search-input-wrap">
+        <input
+          value={query}
+          onChange={handleInput}
+          placeholder="Buscar time... (ex: Flamengo, Palmeiras)"
+          autoComplete="off"
+        />
+        {searching && <span className="ac-team-search-spinner" />}
+      </div>
+
+      {suggestions.length > 0 && (
+        <ul className="ac-team-suggestions">
+          {suggestions.map((t) => (
+            <li key={t.idTeam} onClick={() => pick(t)}>
+              {t.strTeamBadge
+                ? <img src={t.strTeamBadge} alt={t.strTeam} className="ac-suggestion-logo" />
+                : <span className="ac-suggestion-logo-placeholder">⚽</span>
+              }
+              <div className="ac-suggestion-info">
+                <span className="ac-suggestion-name">{t.strTeam}</span>
+                <span className="ac-suggestion-league">{t.strLeague || t.strCountry}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function TeamsTab({ tournament, onRefresh }) {
-  const [teams, setTeams] = useState([]);
-  const [newTeam, setNewTeam] = useState('');
+  const [teams, setTeams]   = useState([]);
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState(null);
+  const [alert, setAlert]   = useState(null);
   const isDraft = tournament.status === 'DRAFT';
 
   const loadTeams = useCallback(async () => {
@@ -281,15 +361,13 @@ function TeamsTab({ tournament, onRefresh }) {
 
   useEffect(() => { loadTeams(); }, [loadTeams]);
 
-  async function addTeam(e) {
-    e.preventDefault();
-    if (!newTeam.trim()) return;
+  async function addTeam(team) {
     setLoading(true);
     try {
       await apiFetch(`/admin/championship/tournaments/${tournament.id}/teams`, {
-        method: 'POST', body: JSON.stringify({ name: newTeam.trim() }),
+        method: 'POST',
+        body: JSON.stringify({ name: team.name, logoUrl: team.logoUrl || null }),
       });
-      setNewTeam('');
       loadTeams();
     } catch (err) {
       setAlert({ type: 'error', msg: err.message });
@@ -311,30 +389,30 @@ function TeamsTab({ tournament, onRefresh }) {
       <Alert type={alert?.type} message={alert?.msg} onClose={() => setAlert(null)} />
 
       {isDraft && (
-        <form className="ac-inline-form" onSubmit={addTeam}>
-          <input
-            value={newTeam}
-            onChange={(e) => setNewTeam(e.target.value)}
-            placeholder="Nome do time..."
-            required
-          />
-          <button className="ac-btn ac-btn-primary" type="submit" disabled={loading}>
-            {loading ? <span className="ac-spinner" /> : '+ Adicionar'}
-          </button>
-        </form>
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ fontSize: '0.82rem', color: 'var(--ac-gray-600)', marginBottom: 8 }}>
+            Digite o nome do time para buscar na base de dados do TheSportsDB:
+          </p>
+          <TeamSearch onSelect={addTeam} />
+          {loading && <p style={{ fontSize: '0.8rem', color: 'var(--ac-gray-500)', marginTop: 6 }}>Adicionando...</p>}
+        </div>
       )}
 
       {teams.length === 0 ? (
         <div className="ac-empty">
           <div className="ac-empty-icon">⚽</div>
           <h3>Nenhum time cadastrado</h3>
-          <p>Adicione os times que vão participar do torneio.</p>
+          <p>Busque e adicione os times que vão participar do torneio.</p>
         </div>
       ) : (
         <div className="ac-teams-grid">
           {teams.map((t) => (
             <div className="ac-team-chip" key={t.id}>
-              <span>⚽ {t.name}</span>
+              {t.logoUrl
+                ? <img src={t.logoUrl} alt={t.name} className="ac-team-chip-logo" />
+                : <span className="ac-team-chip-placeholder">⚽</span>
+              }
+              <span>{t.name}</span>
               {isDraft && (
                 <button onClick={() => removeTeam(t.id)} title="Remover">×</button>
               )}
@@ -418,7 +496,15 @@ function GroupsTab({ tournament, onRefresh }) {
           <tbody>
             {teams.map((t) => (
               <tr key={t.id}>
-                <td><strong>⚽ {t.name}</strong></td>
+                <td>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {t.logoUrl
+                      ? <img src={t.logoUrl} alt={t.name} style={{ width: 24, height: 24, objectFit: 'contain' }} />
+                      : <span>⚽</span>
+                    }
+                    <strong>{t.name}</strong>
+                  </span>
+                </td>
                 <td>
                   <select className="ac-select-sm" value={assignments[t.id] ?? 0}
                     onChange={(e) => assign(t.id, e.target.value)}>
@@ -440,7 +526,13 @@ function GroupsTab({ tournament, onRefresh }) {
             {g.teams.length === 0
               ? <span style={{ fontSize: '0.8rem', color: 'var(--ac-gray-500)' }}>Nenhum time</span>
               : g.teams.map((t) => (
-                  <div className="ac-assign-team-row" key={t.id}>⚽ {t.name}</div>
+                  <div className="ac-assign-team-row" key={t.id}>
+                    {t.logoUrl
+                      ? <img src={t.logoUrl} alt={t.name} className="ac-assign-team-logo" />
+                      : <span>⚽</span>
+                    }
+                    {t.name}
+                  </div>
                 ))
             }
           </div>

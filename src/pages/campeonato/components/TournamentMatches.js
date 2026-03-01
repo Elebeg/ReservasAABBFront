@@ -42,6 +42,9 @@ function MatchCard({ match }) {
 
       <div className="camp-match-teams">
         <div className={`camp-match-team home ${finished && match.homeScore > match.awayScore ? 'won' : ''}`}>
+          {match.homeTeam?.logoUrl && (
+            <img src={match.homeTeam.logoUrl} alt={match.homeTeam.name} className="camp-match-team-logo" />
+          )}
           <span className="camp-match-team-name">
             {match.homeTeam?.name || <em className="tbd">A definir</em>}
           </span>
@@ -68,6 +71,9 @@ function MatchCard({ match }) {
           <span className="camp-match-team-name">
             {match.awayTeam?.name || <em className="tbd">A definir</em>}
           </span>
+          {match.awayTeam?.logoUrl && (
+            <img src={match.awayTeam.logoUrl} alt={match.awayTeam.name} className="camp-match-team-logo" />
+          )}
         </div>
       </div>
 

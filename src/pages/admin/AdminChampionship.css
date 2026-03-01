@@ -760,3 +760,140 @@
   .ac-bracket { flex-direction: column; }
   .ac-bracket-round { min-width: unset; }
 }
+
+/* ── Team Search Autocomplete ──────────────────────────────────────────────── */
+.ac-team-search {
+  position: relative;
+  max-width: 460px;
+}
+
+.ac-team-search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.ac-team-search-input-wrap input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid var(--ac-gray-300);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.15s;
+  background: var(--ac-white);
+}
+
+.ac-team-search-input-wrap input:focus {
+  outline: none;
+  border-color: var(--ac-primary);
+  box-shadow: 0 0 0 3px rgba(8, 92, 166, 0.08);
+}
+
+.ac-team-search-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--ac-gray-200);
+  border-top-color: var(--ac-primary);
+  border-radius: 50%;
+  animation: acSpin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
+.ac-team-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--ac-white);
+  border: 1.5px solid var(--ac-gray-200);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  z-index: 100;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.ac-team-suggestions li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.ac-team-suggestions li:hover {
+  background: rgba(8, 92, 166, 0.06);
+}
+
+.ac-suggestion-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+
+.ac-suggestion-logo-placeholder {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ac-gray-100);
+  border-radius: 4px;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.ac-suggestion-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ac-suggestion-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ac-gray-900);
+}
+
+.ac-suggestion-league {
+  font-size: 0.72rem;
+  color: var(--ac-gray-500);
+}
+
+/* ── Team chip com logo ────────────────────────────────────────────────────── */
+.ac-team-chip-logo {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 3px;
+}
+
+.ac-team-chip-placeholder {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Logo na prévia de grupos ─────────────────────────────────────────────── */
+.ac-assign-team-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 3px;
+}
+
+.ac-assign-team-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
