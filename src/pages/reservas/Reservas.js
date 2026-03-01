@@ -16,6 +16,9 @@ function ReservationsPage() {
   const [selectedTime, setSelectedTime] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingReservationId, setEditingReservationId] = useState(null);
+
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -37,12 +40,38 @@ function ReservationsPage() {
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+      if (!setupApiAuthToken()) return;
+
+      setLoading(true);
+      try {
+        const [userReservationsRes, allReservationsRes, courtsRes] = await Promise.all([
+          api.get('/reservations/me'),
+          api.get('/reservations'),
+          api.get('/courts'),
+        ]);
+
+        setUserReservations(userReservationsRes.data);
+        setAllReservations(allReservationsRes.data);
+        setCourts(courtsRes.data);
+      } catch (err) {
+        const errorMessage = getApiErrorMessage(err);
+        setError(`Erro ao carregar dados: ${errorMessage}`);
+
+        if (err.response?.status === 401) {
+          handleAuthError();
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (isAuthenticated()) {
       fetchData();
     } else {
       setError('Você precisa estar autenticado para acessar esta página.');
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, refreshKey]);
 
   useEffect(() => {
     if (error && errorRef.current) {
@@ -305,7 +334,7 @@ function ReservationsPage() {
   };
 
   const handleRefresh = () => {
-    fetchData();
+    setRefreshKey((k) => k + 1);
   };
 
   // Cálculo do progresso de reservas
