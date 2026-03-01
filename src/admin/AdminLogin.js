@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'https://aabbjdsreservas.com';
+const API_URL = 'https://reservasaabb-production.up.railway.app';
 
 export default function AdminLogin() {
   const navigate = useNavigate();

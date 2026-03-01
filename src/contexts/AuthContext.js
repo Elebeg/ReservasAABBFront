@@ -10,7 +10,7 @@ export const useAuth = () => {
   return context;
 };
 
-const API_URL = 'https://aabbjdsreservas.com';
+const API_URL = 'https://reservasaabb-production.up.railway.app';
 
 // Verifica acesso admin silenciosamente — nunca lança exceção, timeout 3s
 async function checkAdminAccess(token) {

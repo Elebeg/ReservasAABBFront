@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'https://aabbjdsreservas.com';
+const API_URL = 'https://reservasaabb-production.up.railway.app';
 
 function authHeader() {
   return { Authorization: `Bearer ${localStorage.getItem('admin_token')}` };

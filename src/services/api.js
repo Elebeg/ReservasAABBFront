@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://aabbjdsreservas.com', // produção: trocar para https://aabbjdsreservas.com
+  baseURL: process.env.REACT_APP_API_URL || 'https://reservasaabb-production.up.railway.app',
   headers: {
     'Content-Type': 'application/json',
   },
