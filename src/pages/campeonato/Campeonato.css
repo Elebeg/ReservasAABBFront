@@ -1180,3 +1180,32 @@
   width: 26px;
   height: 26px;
 }
+
+/* ── TeamLogo (ts-team-cell alignment) ───────────────────────────────────── */
+.ts-team-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ts-team-name {
+  font-weight: 650;
+}
+
+/* Partidas: logo ao lado do nome */
+.camp-match-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.camp-match-team.home { justify-content: flex-end; flex-direction: row; }
+.camp-match-team.away { justify-content: flex-start; flex-direction: row-reverse; }
+
+/* Bracket: logo na wb-row */
+.wb-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}

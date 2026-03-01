@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import TeamLogo from './TeamLogo';
 
 const PHASE_LABELS = {
   GROUP:         'Fase de Grupos',
@@ -42,9 +43,10 @@ function MatchCard({ match }) {
 
       <div className="camp-match-teams">
         <div className={`camp-match-team home ${finished && match.homeScore > match.awayScore ? 'won' : ''}`}>
-          {match.homeTeam?.logoUrl && (
-            <img src={match.homeTeam.logoUrl} alt={match.homeTeam.name} className="camp-match-team-logo" />
-          )}
+          {match.homeTeam
+            ? <TeamLogo name={match.homeTeam.name} logoUrl={match.homeTeam.logoUrl} size={28} shape="circle" />
+            : <TeamLogo name="?" logoUrl={null} size={28} shape="circle" />
+          }
           <span className="camp-match-team-name">
             {match.homeTeam?.name || <em className="tbd">A definir</em>}
           </span>
@@ -71,9 +73,10 @@ function MatchCard({ match }) {
           <span className="camp-match-team-name">
             {match.awayTeam?.name || <em className="tbd">A definir</em>}
           </span>
-          {match.awayTeam?.logoUrl && (
-            <img src={match.awayTeam.logoUrl} alt={match.awayTeam.name} className="camp-match-team-logo" />
-          )}
+          {match.awayTeam
+            ? <TeamLogo name={match.awayTeam.name} logoUrl={match.awayTeam.logoUrl} size={28} shape="circle" />
+            : <TeamLogo name="?" logoUrl={null} size={28} shape="circle" />
+          }
         </div>
       </div>
 

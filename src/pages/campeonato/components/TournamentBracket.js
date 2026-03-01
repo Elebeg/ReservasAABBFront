@@ -1,4 +1,5 @@
 import React from 'react';
+import TeamLogo from './TeamLogo';
 
 const PHASE_ORDER = ['ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'FINAL'];
 const PHASE_SHORT = {
@@ -21,13 +22,13 @@ function MatchCard({ match, isFinal = false }) {
   return (
     <div className={`wb-card${isFinal ? ' wb-card--final' : ''}${finished ? ' wb-card--done' : ''}`}>
       <div className={`wb-row${homeWon ? ' wb-row--won' : ''}${!match.homeTeam ? ' wb-row--tbd' : ''}`}>
-        {match.homeTeam?.logoUrl && <img src={match.homeTeam.logoUrl} alt={match.homeTeam.name} className="wb-team-logo" />}
+        <TeamLogo name={match.homeTeam?.name || '?'} logoUrl={match.homeTeam?.logoUrl || null} size={20} shape="shield" style={{ marginRight: 6 }} />
       <span className="wb-name">{match.homeTeam?.name || 'A definir'}</span>
         {finished && <span className={`wb-score${homeWon ? ' wb-score--won' : ''}`}>{match.homeScore}</span>}
       </div>
       <div className="wb-sep" />
       <div className={`wb-row${awayWon ? ' wb-row--won' : ''}${!match.awayTeam ? ' wb-row--tbd' : ''}`}>
-        {match.awayTeam?.logoUrl && <img src={match.awayTeam.logoUrl} alt={match.awayTeam.name} className="wb-team-logo" />}
+        <TeamLogo name={match.awayTeam?.name || '?'} logoUrl={match.awayTeam?.logoUrl || null} size={20} shape="shield" style={{ marginRight: 6 }} />
       <span className="wb-name">{match.awayTeam?.name || 'A definir'}</span>
         {finished && <span className={`wb-score${awayWon ? ' wb-score--won' : ''}`}>{match.awayScore}</span>}
       </div>
