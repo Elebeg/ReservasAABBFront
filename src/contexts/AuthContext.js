@@ -12,13 +12,27 @@ export const useAuth = () => {
 
 const API_URL = 'https://aabbjdsreservas.com';
 
-// Verifica se o token tem permissão de admin
+// Verifica acesso admin silenciosamente — nunca lança exceção, timeout 3s
 async function checkAdminAccess(token) {
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3000);
     const res = await fetch(`${API_URL}/admin/dashboard`, {
       headers: { Authorization: `Bearer ${token}` },
+      signal: controller.signal,
     });
+    clearTimeout(timer);
     return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+// Valida JWT localmente sem chamada de rede
+function isTokenValid(token) {
+  try {
+    const decoded = jwtDecode(token);
+    return decoded.exp > Date.now() / 1000;
   } catch {
     return false;
   }
@@ -29,35 +43,29 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
 
-  // Verifica token existente ao iniciar
+  // Inicializa sessão a partir do localStorage — SEM chamadas de rede
   useEffect(() => {
-    const checkToken = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) { setUser(null); return; }
+    const token = localStorage.getItem('token');
 
-        const decoded = jwtDecode(token);
-        if (decoded.exp < Date.now() / 1000) { logout(); return; }
+    if (!token || !isTokenValid(token)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('admin_token');
+      setUser(null);
+      setLoading(false);
+      return;
+    }
 
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const response = await api.get(`/users/${decoded.sub}`);
-        setUser(response.data);
+    // Token válido: restaura usuário salvo
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) setUser(JSON.parse(stored));
+    } catch {
+      setUser(null);
+    }
 
-        // Re-verifica acesso admin (ex: após refresh da página)
-        const isAdmin = await checkAdminAccess(token);
-        if (isAdmin) {
-          localStorage.setItem('admin_token', token);
-        } else {
-          localStorage.removeItem('admin_token');
-        }
-      } catch {
-        logout();
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkToken();
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    setLoading(false);
   }, []);
 
   const login = async (email, password) => {
@@ -68,16 +76,15 @@ export const AuthProvider = ({ children }) => {
       const { access_token, user: userData } = response.data;
 
       localStorage.setItem('token', access_token);
+      localStorage.setItem('user', JSON.stringify(userData));
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       setUser(userData);
 
-      // Detecta se é admin e salva o token de admin
-      const isAdmin = await checkAdminAccess(access_token);
-      if (isAdmin) {
-        localStorage.setItem('admin_token', access_token);
-      } else {
-        localStorage.removeItem('admin_token');
-      }
+      // Detecta admin em background (não bloqueia o login)
+      checkAdminAccess(access_token).then((isAdmin) => {
+        if (isAdmin) localStorage.setItem('admin_token', access_token);
+        else localStorage.removeItem('admin_token');
+      });
 
       return true;
     } catch (err) {
@@ -99,16 +106,14 @@ export const AuthProvider = ({ children }) => {
       if (!access_token) throw new Error('Token não recebido do servidor');
 
       localStorage.setItem('token', access_token);
+      localStorage.setItem('user', JSON.stringify(userData));
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       setUser(userData);
 
-      // Detecta admin no Google login também
-      const isAdmin = await checkAdminAccess(access_token);
-      if (isAdmin) {
-        localStorage.setItem('admin_token', access_token);
-      } else {
-        localStorage.removeItem('admin_token');
-      }
+      checkAdminAccess(access_token).then((isAdmin) => {
+        if (isAdmin) localStorage.setItem('admin_token', access_token);
+        else localStorage.removeItem('admin_token');
+      });
 
       return true;
     } catch (err) {
@@ -138,27 +143,19 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    localStorage.removeItem('admin_token'); // limpa admin junto
+    localStorage.removeItem('admin_token');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
   };
 
   const isAuthenticated = () => {
     const token = localStorage.getItem('token');
-    if (!token) return false;
-    try {
-      const decoded = jwtDecode(token);
-      if (decoded.exp < Date.now() / 1000) { logout(); return false; }
-      return true;
-    } catch {
-      logout();
-      return false;
-    }
+    return token ? isTokenValid(token) : false;
   };
 
-  const getUserId  = () => user?.id ?? null;
-  const getToken   = () => localStorage.getItem('token');
-  const hasRole    = (role) => user?.roles?.includes(role) ?? false;
+  const getUserId = () => user?.id ?? null;
+  const getToken  = () => localStorage.getItem('token');
+  const hasRole   = (role) => user?.roles?.includes(role) ?? false;
 
   return (
     <AuthContext.Provider value={{
