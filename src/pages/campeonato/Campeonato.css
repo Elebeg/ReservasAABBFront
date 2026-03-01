@@ -1017,3 +1017,116 @@
 .camp-tr.advancing .ts-team-name {
   font-weight: 700;
 }
+
+/* ── Filtro por dia ─────────────────────────────────────────────────────────── */
+.camp-day-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+
+.camp-day-btn {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--camp-gray-700);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.camp-day-btn:hover {
+  border-color: var(--camp-primary);
+  color: var(--camp-primary);
+  background: rgba(8, 92, 166, 0.05);
+}
+
+.camp-day-btn.active {
+  background: var(--camp-primary);
+  border-color: var(--camp-primary);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(8, 92, 166, 0.25);
+}
+
+/* ── Título com data ─────────────────────────────────────────────────────────── */
+.camp-phase-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.camp-phase-title--date {
+  color: var(--camp-gray-900);
+}
+
+.camp-phase-title--date::first-letter {
+  text-transform: uppercase;
+}
+
+.camp-day-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(8, 92, 166, 0.08);
+  color: var(--camp-primary);
+  border: 1px solid rgba(8, 92, 166, 0.14);
+  border-radius: 999px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+/* ── Hora dentro do match card ───────────────────────────────────────────────── */
+.camp-match-time {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--camp-primary);
+  letter-spacing: 0.04em;
+  padding: 4px 0 6px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  margin-bottom: 4px;
+}
+
+/* ── Fase label no rodapé do card ────────────────────────────────────────────── */
+.camp-match-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.camp-match-phase-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--camp-gray-700);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* ── Data tag no admin ───────────────────────────────────────────────────────── */
+.ac-match-date-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ac-primary);
+  background: rgba(8, 92, 166, 0.07);
+  border: 1px solid rgba(8, 92, 166, 0.14);
+  border-radius: 6px;
+  padding: 3px 8px;
+  display: inline-block;
+}
+
+.ac-match-date-tag--empty {
+  color: var(--ac-gray-500);
+  background: var(--ac-gray-100);
+  border-color: var(--ac-gray-300);
+}

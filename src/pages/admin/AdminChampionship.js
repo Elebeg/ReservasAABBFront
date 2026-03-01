@@ -458,11 +458,101 @@ function GroupsTab({ tournament, onRefresh }) {
   );
 }
 
+// ─── AGENDAMENTO DE PARTIDA ───────────────────────────────────────────────────
+
+function ScheduleModal({ match, onClose, onSaved }) {
+  // Converte timestamp ISO para formato datetime-local (YYYY-MM-DDTHH:mm)
+  const toLocal = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const [value, setValue] = useState(toLocal(match.scheduledAt));
+  const [loading, setLoading] = useState(false);
+  const [error, setError]   = useState('');
+
+  async function submit(e) {
+    e.preventDefault();
+    setLoading(true); setError('');
+    try {
+      await apiFetch(`/admin/championship/matches/${match.id}/schedule`, {
+        method: 'PATCH',
+        body: JSON.stringify({ scheduledAt: value || null }),
+      });
+      onSaved();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function clear() {
+    setLoading(true); setError('');
+    try {
+      await apiFetch(`/admin/championship/matches/${match.id}/schedule`, {
+        method: 'PATCH',
+        body: JSON.stringify({ scheduledAt: null }),
+      });
+      onSaved();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const homeLabel = match.homeTeam?.name || 'A definir';
+  const awayLabel = match.awayTeam?.name || 'A definir';
+
+  return (
+    <Modal title="📅 Agendar Partida" onClose={onClose}>
+      <form className="ac-form" onSubmit={submit}>
+        <Alert type="error" message={error} onClose={() => setError('')} />
+
+        <p style={{ textAlign: 'center', fontWeight: 700, marginBottom: 16, color: 'var(--ac-gray-700)' }}>
+          {homeLabel} <span style={{ color: 'var(--ac-gray-400)', fontWeight: 400 }}>vs</span> {awayLabel}
+        </p>
+
+        <div className="ac-form-group">
+          <label>Data e Hora</label>
+          <input
+            type="datetime-local"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+        </div>
+
+        <div className="ac-form-actions" style={{ flexWrap: 'wrap', gap: 8 }}>
+          {match.scheduledAt && (
+            <button
+              type="button"
+              className="ac-btn ac-btn-ghost"
+              onClick={clear}
+              disabled={loading}
+              style={{ color: 'var(--ac-danger)' }}
+            >
+              🗑 Remover Data
+            </button>
+          )}
+          <button type="button" className="ac-btn ac-btn-ghost" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="ac-btn ac-btn-primary" disabled={loading}>
+            {loading ? <span className="ac-spinner" /> : '💾 Salvar'}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
 // ─── ABA: PARTIDAS ────────────────────────────────────────────────────────────
 
 function MatchesTab({ tournament, onRefresh }) {
   const [matches, setMatches] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [scheduleMatch, setScheduleMatch] = useState(null);
   const [alert, setAlert] = useState(null);
 
   const loadMatches = useCallback(async () => {
@@ -479,6 +569,14 @@ function MatchesTab({ tournament, onRefresh }) {
     return acc;
   }, {});
 
+  const fmtDate = (iso) => {
+    if (!iso) return null;
+    return new Date(iso).toLocaleString('pt-BR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
+  };
+
   return (
     <div>
       <Alert type={alert?.type} message={alert?.msg} onClose={() => setAlert(null)} />
@@ -488,6 +586,14 @@ function MatchesTab({ tournament, onRefresh }) {
           match={selectedMatch}
           onClose={() => setSelectedMatch(null)}
           onSaved={() => { setSelectedMatch(null); loadMatches(); onRefresh(); }}
+        />
+      )}
+
+      {scheduleMatch && (
+        <ScheduleModal
+          match={scheduleMatch}
+          onClose={() => setScheduleMatch(null)}
+          onSaved={() => { setScheduleMatch(null); loadMatches(); }}
         />
       )}
 
@@ -532,18 +638,40 @@ function MatchesTab({ tournament, onRefresh }) {
                     </span>
                   )}
 
+                  {/* Data agendada */}
+                  {m.scheduledAt ? (
+                    <span className="ac-match-date-tag">
+                      📅 {fmtDate(m.scheduledAt)}
+                    </span>
+                  ) : (
+                    <span className="ac-match-date-tag ac-match-date-tag--empty">
+                      📅 Sem data
+                    </span>
+                  )}
+
                   <span className={`ac-match-status-tag ${m.status === 'FINISHED' ? 'finished' : 'scheduled'}`}>
                     {m.status === 'FINISHED' ? '✓ Encerrada' : 'Agendada'}
                   </span>
 
-                  {m.homeTeam && m.awayTeam && (
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {/* Botão de data — sempre disponível */}
                     <button
                       className="ac-btn ac-btn-sm ac-btn-ghost"
-                      onClick={() => setSelectedMatch(m)}
+                      onClick={() => setScheduleMatch(m)}
                     >
-                      {m.status === 'FINISHED' ? '✏️ Corrigir' : '📝 Resultado'}
+                      📅 {m.scheduledAt ? 'Alterar Data' : 'Definir Data'}
                     </button>
-                  )}
+
+                    {/* Botão de resultado — só se times definidos */}
+                    {m.homeTeam && m.awayTeam && (
+                      <button
+                        className="ac-btn ac-btn-sm ac-btn-ghost"
+                        onClick={() => setSelectedMatch(m)}
+                      >
+                        {m.status === 'FINISHED' ? '✏️ Corrigir' : '📝 Resultado'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
