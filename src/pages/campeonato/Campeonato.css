@@ -977,3 +977,43 @@
   .wb-top-bar-center { font-size: 0.7rem; padding: 0 10px; }
   .wb-champion-name { font-size: 1.3rem; }
 }
+
+/* ── Team Shield (escudo gerado por iniciais) ────────────────────────────── */
+.ts-team-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ts-shield {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  /* Forma de escudo via clip-path */
+  clip-path: polygon(50% 0%, 100% 18%, 100% 65%, 50% 100%, 0% 65%, 0% 18%);
+  /* Fallback sem clip-path: border-radius arredondado */
+}
+
+/* Navegadores que não suportam clip-path: usa border-radius */
+@supports not (clip-path: polygon(0 0)) {
+  .ts-shield {
+    border-radius: 6px;
+  }
+}
+
+.ts-team-name {
+  font-weight: 650;
+  color: var(--camp-gray-900);
+}
+
+/* Linha advancing — mantém o escudo com cor mas fundo da linha amarelado */
+.camp-tr.advancing .ts-team-name {
+  font-weight: 700;
+}
