@@ -42,6 +42,7 @@ function ReservationsPage() {
     } else {
       setError('Você precisa estar autenticado para acessar esta página.');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   useEffect(() => {
