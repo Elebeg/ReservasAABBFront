@@ -590,3 +590,389 @@
   .camp-matches-grid { grid-template-columns: 1fr; }
   .camp-match-teams { grid-template-columns: 1fr auto 1fr; }
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORLD CUP BRACKET  (prefixo wb-)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Wrapper geral ─────────────────────────────────────────────────────── */
+.wb-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #0B0E17;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(245,184,0,0.12);
+}
+
+/* ── Campeão ───────────────────────────────────────────────────────────── */
+.wb-champion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 28px 24px 20px;
+  background: linear-gradient(135deg, #1a1400 0%, #2d2000 50%, #1a1400 100%);
+  border-bottom: 1px solid rgba(245,184,0,0.25);
+  animation: wbChampionIn 0.6s ease;
+}
+
+@keyframes wbChampionIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.wb-champion-trophy { font-size: 3rem; filter: drop-shadow(0 0 18px rgba(255,200,0,0.7)); }
+.wb-champion-label  {
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #c68b00;
+}
+.wb-champion-name   {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #F5B800;
+  text-shadow: 0 0 30px rgba(245,184,0,0.5);
+}
+
+/* ── Top bar (Chave A / Mata-Mata / Chave B) ───────────────────────────── */
+.wb-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(245,184,0,0.12);
+}
+
+.wb-top-bar-side {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245,184,0,0.7);
+  flex: 1;
+}
+
+.wb-top-bar-side:last-child { text-align: right; }
+
+.wb-top-bar-center {
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #F5B800;
+  text-shadow: 0 0 20px rgba(245,184,0,0.4);
+  padding: 0 16px;
+}
+
+/* ── Scroll wrap (mobile) ──────────────────────────────────────────────── */
+.wb-scroll-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245,184,0,0.3) transparent;
+  padding: 24px 16px 20px;
+}
+
+.wb-scroll-wrap::-webkit-scrollbar { height: 4px; }
+.wb-scroll-wrap::-webkit-scrollbar-track { background: transparent; }
+.wb-scroll-wrap::-webkit-scrollbar-thumb { background: rgba(245,184,0,0.3); border-radius: 999px; }
+
+/* ── Arena (layout flex horizontal) ───────────────────────────────────── */
+.wb-arena {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: fit-content;
+  margin: 0 auto;
+}
+
+/* ── Troféu de fundo ───────────────────────────────────────────────────── */
+.wb-trophy-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10rem;
+  opacity: 0.055;
+  filter: sepia(1) saturate(3) brightness(0.8);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+/* ── Lados (left / right) ──────────────────────────────────────────────── */
+.wb-side {
+  display: flex;
+  gap: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Coluna de round ───────────────────────────────────────────────────── */
+.wb-col {
+  width: 168px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.wb-col-header {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245,184,0,0.65);
+  border-bottom: 1px solid rgba(245,184,0,0.14);
+  background: rgba(245,184,0,0.04);
+}
+
+.wb-col--left  { border-right: 1px solid rgba(245,184,0,0.08); }
+.wb-col--right { border-left:  1px solid rgba(245,184,0,0.08); }
+
+.wb-col-matches {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Slot (espaço de uma partida) ──────────────────────────────────────── */
+.wb-slot {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  position: relative;
+}
+
+/* Linha de conexão horizontal sutil */
+.wb-col--left  .wb-slot::after,
+.wb-col--right .wb-slot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 1px;
+  background: rgba(245,184,0,0.2);
+}
+
+.wb-col--left  .wb-slot::after { right: -8px; }
+.wb-col--right .wb-slot::after { left: -8px; }
+
+/* ── Match Card ────────────────────────────────────────────────────────── */
+.wb-card {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.wb-card:hover {
+  border-color: rgba(245,184,0,0.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.wb-card--done {
+  border-color: rgba(255,255,255,0.07);
+}
+
+/* Card da Final — maior, mais dourado */
+.wb-card--final {
+  background: rgba(245,184,0,0.06);
+  border: 1.5px solid rgba(245,184,0,0.35);
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(245,184,0,0.12), 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.wb-card--final:hover {
+  border-color: rgba(245,184,0,0.6);
+  box-shadow: 0 0 60px rgba(245,184,0,0.2), 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* ── Row (time) ────────────────────────────────────────────────────────── */
+.wb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  gap: 6px;
+  transition: background 0.15s;
+}
+
+.wb-card--final .wb-row { padding: 12px 14px; }
+
+.wb-row--won {
+  background: linear-gradient(90deg, rgba(245,184,0,0.18) 0%, rgba(245,184,0,0.06) 100%);
+}
+
+.wb-row--tbd .wb-name {
+  color: rgba(255,255,255,0.25);
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+.wb-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.82);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.01em;
+}
+
+.wb-row--won .wb-name {
+  color: #F5B800;
+  font-weight: 800;
+}
+
+.wb-card--final .wb-name { font-size: 0.9rem; }
+
+.wb-score {
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: rgba(255,255,255,0.5);
+  min-width: 20px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.wb-score--won {
+  color: #F5B800;
+  text-shadow: 0 0 12px rgba(245,184,0,0.5);
+}
+
+.wb-card--final .wb-score { font-size: 1rem; }
+
+/* ── Separador entre times ─────────────────────────────────────────────── */
+.wb-sep {
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+  margin: 0;
+}
+
+.wb-card--final .wb-sep { background: rgba(245,184,0,0.15); }
+
+/* ── Pênaltis ──────────────────────────────────────────────────────────── */
+.wb-pen {
+  padding: 5px 10px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #c68b00;
+  background: rgba(245,184,0,0.08);
+  border-top: 1px solid rgba(245,184,0,0.15);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+/* ── Zona da Final (centro) ────────────────────────────────────────────── */
+.wb-final-zone {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: 190px;
+  border-left:  2px solid rgba(245,184,0,0.15);
+  border-right: 2px solid rgba(245,184,0,0.15);
+  background: radial-gradient(ellipse at center, rgba(245,184,0,0.07) 0%, transparent 70%);
+}
+
+.wb-final-badge {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #F5B800;
+  text-shadow: 0 0 16px rgba(245,184,0,0.5);
+  background: rgba(245,184,0,0.07);
+  border-bottom: 1px solid rgba(245,184,0,0.2);
+}
+
+.wb-final-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 12px;
+}
+
+/* Final pendente */
+.wb-final-tbd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255,255,255,0.2);
+  font-size: 0.8rem;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.wb-final-tbd-icon {
+  font-size: 2rem;
+  opacity: 0.3;
+  display: block;
+}
+
+/* ── Só Final (2 times) ────────────────────────────────────────────────── */
+.wb-final-only {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 24px;
+}
+
+.wb-final-only .wb-card--final {
+  width: 280px;
+}
+
+/* ── Legenda ───────────────────────────────────────────────────────────── */
+.wb-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.04em;
+}
+
+.wb-legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.wb-legend-dot--won { background: #F5B800; box-shadow: 0 0 6px rgba(245,184,0,0.5); }
+.wb-legend-dot--tbd { background: rgba(255,255,255,0.15); }
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .wb-col { width: 148px; }
+  .wb-final-zone { width: 160px; }
+  .wb-top-bar-side { font-size: 0.62rem; }
+  .wb-top-bar-center { font-size: 0.7rem; padding: 0 10px; }
+  .wb-champion-name { font-size: 1.3rem; }
+}
