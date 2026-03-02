@@ -31,9 +31,15 @@ function toDateKey(iso) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-function MatchCard({ match }) {
+function MatchCard({ match, onTeamClick }) {
   const finished = match.status === 'FINISHED';
   const time     = match.scheduledAt ? formatTime(match.scheduledAt) : null;
+
+  function handleTeamClick(team) {
+    if (onTeamClick && team) onTeamClick({ name: team.name, logoUrl: team.logoUrl });
+  }
+
+  const teamNameStyle = onTeamClick ? { cursor: 'pointer', textDecoration: 'underline', textDecorationStyle: 'dotted' } : {};
 
   return (
     <div className={`camp-match-card ${finished ? 'finished' : ''}`}>
@@ -47,7 +53,7 @@ function MatchCard({ match }) {
             ? <TeamLogo name={match.homeTeam.name} logoUrl={match.homeTeam.logoUrl} size={28} shape="circle" />
             : <TeamLogo name="?" logoUrl={null} size={28} shape="circle" />
           }
-          <span className="camp-match-team-name">
+          <span className="camp-match-team-name" style={match.homeTeam ? teamNameStyle : {}} onClick={() => handleTeamClick(match.homeTeam)}>
             {match.homeTeam?.name || <em className="tbd">A definir</em>}
           </span>
         </div>
@@ -70,7 +76,7 @@ function MatchCard({ match }) {
         </div>
 
         <div className={`camp-match-team away ${finished && match.awayScore > match.homeScore ? 'won' : ''}`}>
-          <span className="camp-match-team-name">
+          <span className="camp-match-team-name" style={match.awayTeam ? teamNameStyle : {}} onClick={() => handleTeamClick(match.awayTeam)}>
             {match.awayTeam?.name || <em className="tbd">A definir</em>}
           </span>
           {match.awayTeam
@@ -90,7 +96,7 @@ function MatchCard({ match }) {
   );
 }
 
-export default function TournamentMatches({ matches }) {
+export default function TournamentMatches({ matches, onTeamClick }) {
   const [activeDay, setActiveDay] = useState(null);
 
   if (!matches || matches.length === 0) {
@@ -166,7 +172,7 @@ export default function TournamentMatches({ matches }) {
           </h3>
           <div className="camp-matches-grid">
             {byDay[day].map(m => (
-              <MatchCard key={m.id} match={m} />
+              <MatchCard key={m.id} match={m} onTeamClick={onTeamClick} />
             ))}
           </div>
         </div>
@@ -181,7 +187,7 @@ export default function TournamentMatches({ matches }) {
           </h3>
           <div className="camp-matches-grid">
             {byPhase[phase].map(m => (
-              <MatchCard key={m.id} match={m} />
+              <MatchCard key={m.id} match={m} onTeamClick={onTeamClick} />
             ))}
           </div>
         </div>

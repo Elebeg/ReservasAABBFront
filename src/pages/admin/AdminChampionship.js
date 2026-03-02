@@ -196,6 +196,8 @@ function ResultModal({ match, tid, onClose, onSaved }) {
   const [error, setError]         = useState('');
   const [homePlayers, setHomePlayers] = useState([]);
   const [awayPlayers, setAwayPlayers] = useState([]);
+  const [homePending, setHomePending] = useState('');  // playerId selecionado p/ novo gol do time da casa
+  const [awayPending, setAwayPending] = useState('');  // playerId selecionado p/ novo gol do visitante
 
   const homeGoals = goals.filter(g => g.teamId === match.homeTeam?.id);
   const awayGoals = goals.filter(g => g.teamId === match.awayTeam?.id);
@@ -216,14 +218,18 @@ function ResultModal({ match, tid, onClose, onSaved }) {
   }, [match.id, tid, match.homeTeam?.id, match.awayTeam?.id]);
 
   // Cada ação persiste imediatamente no banco
-  async function addGoal(teamId) {
+  async function addGoal(teamId, playerId) {
+    if (!playerId) return;
     setGoalLoading(true);
     try {
       const created = await apiFetch(`/admin/championship/matches/${match.id}/goals`, {
         method: 'POST',
-        body: JSON.stringify({ teamId }),
+        body: JSON.stringify({ teamId, playerId: Number(playerId) }),
       });
       setGoals(prev => [...prev, created]);
+      // Reseta o select de "novo gol" do time correspondente
+      if (teamId === match.homeTeam?.id) setHomePending('');
+      else setAwayPending('');
     } catch (err) { setError(err.message); }
     finally { setGoalLoading(false); }
   }
@@ -278,8 +284,8 @@ function ResultModal({ match, tid, onClose, onSaved }) {
   }
 
   const sides = [
-    { teamId: match.homeTeam?.id, goals: homeGoals, players: homePlayers, label: match.homeTeam?.name || 'Casa' },
-    { teamId: match.awayTeam?.id, goals: awayGoals, players: awayPlayers, label: match.awayTeam?.name || 'Visitante' },
+    { teamId: match.homeTeam?.id, goals: homeGoals, players: homePlayers, label: match.homeTeam?.name || 'Casa',       pending: homePending, setPending: setHomePending },
+    { teamId: match.awayTeam?.id, goals: awayGoals, players: awayPlayers, label: match.awayTeam?.name || 'Visitante', pending: awayPending, setPending: setAwayPending },
   ];
 
   return (
@@ -302,9 +308,11 @@ function ResultModal({ match, tid, onClose, onSaved }) {
 
         {/* Listas de gols por time */}
         <div style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'flex-start' }}>
-          {sides.map(({ teamId, goals: sideGoals, players, label }) => (
+          {sides.map(({ teamId, goals: sideGoals, players, label, pending, setPending }) => (
             <div key={teamId} style={{ flex: 1 }}>
               <p className="ac-score-team-label" style={{ marginBottom: 6 }}>{label}</p>
+
+              {/* Gols já adicionados */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {sideGoals.map((g, i) => (
                   <div key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -327,15 +335,30 @@ function ResultModal({ match, tid, onClose, onSaved }) {
                   </div>
                 ))}
               </div>
-              <button
-                type="button"
-                className="ac-btn ac-btn-sm ac-btn-ghost"
-                onClick={() => addGoal(teamId)}
-                disabled={goalLoading}
-                style={{ marginTop: sideGoals.length ? 8 : 0, width: '100%', fontSize: '0.8rem' }}
-              >
-                {goalLoading ? '...' : `+ Gol ${label}`}
-              </button>
+
+              {/* Linha para adicionar novo gol: select jogador + botão */}
+              <div style={{ display: 'flex', gap: 5, marginTop: sideGoals.length ? 8 : 0 }}>
+                <select
+                  value={pending}
+                  onChange={e => setPending(e.target.value)}
+                  disabled={goalLoading || players.length === 0}
+                  style={{ flex: 1, fontSize: '0.78rem', padding: '3px 5px', borderRadius: 4, border: '1px solid var(--ac-gray-300)' }}
+                >
+                  <option value="">— Quem marcou? —</option>
+                  {players.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="ac-btn ac-btn-sm ac-btn-primary"
+                  onClick={() => addGoal(teamId, pending)}
+                  disabled={!pending || goalLoading}
+                  style={{ fontSize: '0.78rem', whiteSpace: 'nowrap' }}
+                >
+                  + Gol
+                </button>
+              </div>
             </div>
           ))}
         </div>

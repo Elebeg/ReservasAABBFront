@@ -8,7 +8,7 @@ const POSITION_SHORT = {
   FORWARD:    'ATA',
 };
 
-export default function TournamentPlayers({ players }) {
+export default function TournamentPlayers({ players, onTeamClick }) {
   if (!players || players.length === 0) {
     return (
       <div className="camp-empty">
@@ -47,11 +47,15 @@ export default function TournamentPlayers({ players }) {
                   <td className="camp-td pos">{i + 1}</td>
                   <td className="camp-td" style={{ fontWeight: 600 }}>{p.name}</td>
                   <td className="camp-td">
-                    <span className="ts-team-cell">
+                    <span
+                      className="ts-team-cell"
+                      onClick={onTeamClick && p.team ? () => onTeamClick({ name: p.team.name, logoUrl: p.team.logoUrl }) : undefined}
+                      style={onTeamClick && p.team ? { cursor: 'pointer' } : undefined}
+                    >
                       {p.team && (
                         <TeamLogo name={p.team.name} logoUrl={p.team.logoUrl} size={24} shape="shield" />
                       )}
-                      <span style={{ fontSize: '0.875rem' }}>{p.team?.name ?? '—'}</span>
+                      <span style={{ fontSize: '0.875rem', ...(onTeamClick && p.team ? { textDecoration: 'underline', textDecorationStyle: 'dotted' } : {}) }}>{p.team?.name ?? '—'}</span>
                     </span>
                   </td>
                   <td className="camp-td center">

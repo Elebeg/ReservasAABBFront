@@ -4,6 +4,7 @@ import TournamentStandings from './components/TournamentStandings';
 import TournamentBracket   from './components/TournamentBracket';
 import TournamentMatches   from './components/TournamentMatches';
 import TournamentPlayers   from './components/TournamentPlayers';
+import TeamProfile         from './components/TeamProfile';
 import './Campeonato.css';
 
 const FORMAT_LABELS = {
@@ -44,6 +45,7 @@ function EmptyState() {
 export default function Campeonato() {
   const { tournament, standings, bracket, matches, players, loading, error } = useChampionship();
   const [tab, setTab] = useState('matches');
+  const [selectedTeam, setSelectedTeam] = useState(null);
 
   const showStandings  = tournament && ['GROUPS', 'LEAGUE'].includes(tournament.format);
   const hasBracketData = bracket && bracket.rounds && bracket.rounds.length > 0;
@@ -88,6 +90,16 @@ export default function Campeonato() {
 
   return (
     <div className="camp-page">
+      {selectedTeam && (
+        <TeamProfile
+          team={selectedTeam}
+          players={players}
+          standings={standings}
+          matches={matches}
+          onClose={() => setSelectedTeam(null)}
+        />
+      )}
+
       {/* Hero */}
       <div className="camp-hero">
         <div className="camp-container">
@@ -131,19 +143,20 @@ export default function Campeonato() {
 
         <div className="camp-tab-content">
           {tab === 'matches' && (
-            <TournamentMatches matches={matches} />
+            <TournamentMatches matches={matches} onTeamClick={setSelectedTeam} />
           )}
           {tab === 'standings' && (
             <TournamentStandings
               standings={standings}
               teamsAdvancing={tournament.teamsAdvancing}
+              onTeamClick={setSelectedTeam}
             />
           )}
           {tab === 'bracket' && (
             <TournamentBracket bracket={hasBracketData ? bracket : null} />
           )}
           {tab === 'players' && (
-            <TournamentPlayers players={players} />
+            <TournamentPlayers players={players} onTeamClick={setSelectedTeam} />
           )}
         </div>
       </div>

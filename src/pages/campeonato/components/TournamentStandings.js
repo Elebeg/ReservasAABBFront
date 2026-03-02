@@ -1,7 +1,7 @@
 import React from 'react';
 import TeamLogo from './TeamLogo';
 
-export default function TournamentStandings({ standings, teamsAdvancing }) {
+export default function TournamentStandings({ standings, teamsAdvancing, onTeamClick }) {
   if (!standings || standings.length === 0) {
     return (
       <div className="camp-empty">
@@ -44,9 +44,13 @@ export default function TournamentStandings({ standings, teamsAdvancing }) {
                         {s.position}
                       </td>
                       <td className="camp-td team-name">
-                        <span className="ts-team-cell">
+                        <span
+                          className="ts-team-cell"
+                          onClick={onTeamClick ? () => onTeamClick({ name: s.team, logoUrl: s.teamLogo }) : undefined}
+                          style={onTeamClick ? { cursor: 'pointer' } : undefined}
+                        >
                           <TeamLogo name={s.team} logoUrl={s.teamLogo} size={32} shape="shield" />
-                          <span className="ts-team-name">{s.team}</span>
+                          <span className="ts-team-name" style={onTeamClick ? { textDecoration: 'underline', textDecorationStyle: 'dotted' } : undefined}>{s.team}</span>
                         </span>
                       </td>
                       <td className="camp-td center">{s.played}</td>
