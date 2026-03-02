@@ -188,47 +188,70 @@ function CreateTournamentModal({ onClose, onCreated }) {
 function ResultModal({ match, tid, onClose, onSaved }) {
   const isEdit = match.status === 'FINISHED';
 
-  const makeGoals = (n) => Array.from({ length: n }, (_, i) => ({ id: i + 1, playerId: '' }));
-
-  const [homeGoals, setHomeGoals] = useState(() => makeGoals(isEdit ? (match.homeScore ?? 0) : 0));
-  const [awayGoals, setAwayGoals] = useState(() => makeGoals(isEdit ? (match.awayScore ?? 0) : 0));
+  const [goals, setGoals]         = useState([]);  // [{ id, teamId, playerId, player? }]
   const [homePen, setHomePen]     = useState(match.homePenalties ?? '');
   const [awayPen, setAwayPen]     = useState(match.awayPenalties ?? '');
-  const [loading, setLoading]     = useState(false);
+  const [goalLoading, setGoalLoading] = useState(false);
+  const [saving, setSaving]       = useState(false);
   const [error, setError]         = useState('');
   const [homePlayers, setHomePlayers] = useState([]);
   const [awayPlayers, setAwayPlayers] = useState([]);
 
+  const homeGoals = goals.filter(g => g.teamId === match.homeTeam?.id);
+  const awayGoals = goals.filter(g => g.teamId === match.awayTeam?.id);
   const homeScore = homeGoals.length;
   const awayScore = awayGoals.length;
   const showPenalties = homeScore === awayScore && match.phase !== 'GROUP' && (homeScore > 0 || awayScore > 0);
 
+  // Carrega gols salvos + jogadores ao abrir o modal
   useEffect(() => {
-    if (!tid) return;
-    if (match.homeTeam?.id)
+    apiFetch(`/admin/championship/matches/${match.id}/goals`)
+      .then(d => setGoals(d || [])).catch(() => {});
+    if (tid && match.homeTeam?.id)
       apiFetch(`/admin/championship/tournaments/${tid}/teams/${match.homeTeam.id}/players`)
         .then(d => setHomePlayers(d || [])).catch(() => {});
-    if (match.awayTeam?.id)
+    if (tid && match.awayTeam?.id)
       apiFetch(`/admin/championship/tournaments/${tid}/teams/${match.awayTeam.id}/players`)
         .then(d => setAwayPlayers(d || [])).catch(() => {});
-  }, [tid, match.homeTeam?.id, match.awayTeam?.id]);
+  }, [match.id, tid, match.homeTeam?.id, match.awayTeam?.id]);
 
-  function addGoal(side) {
-    const setter = side === 'home' ? setHomeGoals : setAwayGoals;
-    setter(prev => [...prev, { id: Date.now() + Math.random(), playerId: '' }]);
+  // Cada ação persiste imediatamente no banco
+  async function addGoal(teamId) {
+    setGoalLoading(true);
+    try {
+      const created = await apiFetch(`/admin/championship/matches/${match.id}/goals`, {
+        method: 'POST',
+        body: JSON.stringify({ teamId }),
+      });
+      setGoals(prev => [...prev, created]);
+    } catch (err) { setError(err.message); }
+    finally { setGoalLoading(false); }
   }
-  function removeGoal(side, id) {
-    const setter = side === 'home' ? setHomeGoals : setAwayGoals;
-    setter(prev => prev.filter(g => g.id !== id));
+
+  async function removeGoal(goalId) {
+    setGoalLoading(true);
+    try {
+      await apiFetch(`/admin/championship/matches/${match.id}/goals/${goalId}`, { method: 'DELETE' });
+      setGoals(prev => prev.filter(g => g.id !== goalId));
+    } catch (err) { setError(err.message); }
+    finally { setGoalLoading(false); }
   }
-  function setScorer(side, id, playerId) {
-    const setter = side === 'home' ? setHomeGoals : setAwayGoals;
-    setter(prev => prev.map(g => g.id === id ? { ...g, playerId } : g));
+
+  async function setScorer(goalId, playerId) {
+    setGoalLoading(true);
+    try {
+      const updated = await apiFetch(`/admin/championship/matches/${match.id}/goals/${goalId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ playerId: playerId || null }),
+      });
+      setGoals(prev => prev.map(g => g.id === goalId ? updated : g));
+    } catch (err) { setError(err.message); }
+    finally { setGoalLoading(false); }
   }
 
   async function submit(e) {
     e.preventDefault();
-    setLoading(true); setError('');
+    setSaving(true); setError('');
     try {
       const payload = {
         homeScore,
@@ -237,53 +260,26 @@ function ResultModal({ match, tid, onClose, onSaved }) {
       };
       const method = isEdit ? 'PATCH' : 'POST';
       await apiFetch(`/admin/championship/matches/${match.id}/result`, { method, body: JSON.stringify(payload) });
-
-      const scorers = [...homeGoals, ...awayGoals].filter(g => g.playerId);
-      await Promise.allSettled(
-        scorers.map(g =>
-          apiFetch(`/admin/championship/players/${g.playerId}/stat/goals/increment`, {
-            method: 'PATCH',
-            body: JSON.stringify({ delta: 1 }),
-          })
-        )
-      );
-
       onSaved();
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setSaving(false); }
   }
 
   async function cancelMatch() {
-    const assigned = [...homeGoals, ...awayGoals].filter(g => g.playerId);
-    const msg = assigned.length > 0
-      ? `Cancelar esta partida? O resultado será removido e ${assigned.length} gol(s) serão decrementados da artilharia.`
-      : 'Cancelar esta partida? O resultado será removido.\n\nAtenção: nenhum artilheiro foi selecionado — os gols na artilharia NÃO serão decrementados automaticamente.';
-    if (!window.confirm(msg)) return;
-    setLoading(true); setError('');
+    if (!window.confirm('Cancelar esta partida? O resultado e os gols da artilharia serão removidos automaticamente.')) return;
+    setSaving(true); setError('');
     try {
-      await Promise.allSettled(
-        assigned.map(g =>
-          apiFetch(`/admin/championship/players/${g.playerId}/stat/goals/increment`, {
-            method: 'PATCH',
-            body: JSON.stringify({ delta: -1 }),
-          })
-        )
-      );
       await apiFetch(`/admin/championship/matches/${match.id}/result`, { method: 'DELETE' });
       onSaved();
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setSaving(false); }
   }
 
   const sides = [
-    { key: 'home', goals: homeGoals, players: homePlayers, label: match.homeTeam?.name || 'Casa' },
-    { key: 'away', goals: awayGoals, players: awayPlayers, label: match.awayTeam?.name || 'Visitante' },
+    { teamId: match.homeTeam?.id, goals: homeGoals, players: homePlayers, label: match.homeTeam?.name || 'Casa' },
+    { teamId: match.awayTeam?.id, goals: awayGoals, players: awayPlayers, label: match.awayTeam?.name || 'Visitante' },
   ];
 
   return (
@@ -306,16 +302,17 @@ function ResultModal({ match, tid, onClose, onSaved }) {
 
         {/* Listas de gols por time */}
         <div style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'flex-start' }}>
-          {sides.map(({ key, goals, players, label }) => (
-            <div key={key} style={{ flex: 1 }}>
+          {sides.map(({ teamId, goals: sideGoals, players, label }) => (
+            <div key={teamId} style={{ flex: 1 }}>
               <p className="ac-score-team-label" style={{ marginBottom: 6 }}>{label}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {goals.map((g, i) => (
+                {sideGoals.map((g, i) => (
                   <div key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--ac-gray-500)', minWidth: 22 }}>⚽{i + 1}</span>
                     <select
-                      value={g.playerId}
-                      onChange={e => setScorer(key, g.id, e.target.value)}
+                      value={g.playerId ?? ''}
+                      onChange={e => setScorer(g.id, e.target.value)}
+                      disabled={goalLoading}
                       style={{ flex: 1, fontSize: '0.78rem', padding: '3px 5px', borderRadius: 4, border: '1px solid var(--ac-gray-300)' }}
                     >
                       <option value="">— Jogador —</option>
@@ -324,7 +321,8 @@ function ResultModal({ match, tid, onClose, onSaved }) {
                       ))}
                     </select>
                     <button type="button" className="ac-btn-icon danger"
-                      onClick={() => removeGoal(key, g.id)}
+                      onClick={() => removeGoal(g.id)}
+                      disabled={goalLoading}
                       style={{ fontSize: '0.7rem', padding: '2px 5px' }}>×</button>
                   </div>
                 ))}
@@ -332,20 +330,15 @@ function ResultModal({ match, tid, onClose, onSaved }) {
               <button
                 type="button"
                 className="ac-btn ac-btn-sm ac-btn-ghost"
-                onClick={() => addGoal(key)}
-                style={{ marginTop: goals.length ? 8 : 0, width: '100%', fontSize: '0.8rem' }}
+                onClick={() => addGoal(teamId)}
+                disabled={goalLoading}
+                style={{ marginTop: sideGoals.length ? 8 : 0, width: '100%', fontSize: '0.8rem' }}
               >
-                + Gol {label}
+                {goalLoading ? '...' : `+ Gol ${label}`}
               </button>
             </div>
           ))}
         </div>
-
-        {isEdit && (
-          <p style={{ fontSize: '0.73rem', color: 'var(--ac-gray-500)', textAlign: 'center', marginBottom: 8 }}>
-            ⚠️ Para cancelar a partida, selecione os artilheiros acima antes de clicar em "Cancelar Partida" — assim os gols serão decrementados automaticamente.
-          </p>
-        )}
 
         {showPenalties && (
           <div>
@@ -370,13 +363,13 @@ function ResultModal({ match, tid, onClose, onSaved }) {
 
         <div className="ac-form-actions">
           {isEdit && (
-            <button type="button" className="ac-btn ac-btn-danger" onClick={cancelMatch} disabled={loading}>
+            <button type="button" className="ac-btn ac-btn-danger" onClick={cancelMatch} disabled={saving || goalLoading}>
               🚫 Cancelar Partida
             </button>
           )}
           <button type="button" className="ac-btn ac-btn-ghost" onClick={onClose}>Fechar</button>
-          <button type="submit" className="ac-btn ac-btn-primary" disabled={loading}>
-            {loading ? <span className="ac-spinner" /> : 'Salvar Resultado'}
+          <button type="submit" className="ac-btn ac-btn-primary" disabled={saving || goalLoading}>
+            {saving ? <span className="ac-spinner" /> : 'Salvar Resultado'}
           </button>
         </div>
       </form>
