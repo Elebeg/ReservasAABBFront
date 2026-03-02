@@ -1192,6 +1192,15 @@
   font-weight: 650;
 }
 
+/* Nome de time clicável (sem sublinhado) */
+.camp-team-clickable {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.camp-team-clickable:hover {
+  color: var(--camp-primary);
+}
+
 /* Partidas: logo ao lado do nome */
 .camp-match-team {
   display: flex;

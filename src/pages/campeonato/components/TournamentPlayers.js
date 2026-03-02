@@ -55,7 +55,7 @@ export default function TournamentPlayers({ players, onTeamClick }) {
                       {p.team && (
                         <TeamLogo name={p.team.name} logoUrl={p.team.logoUrl} size={24} shape="shield" />
                       )}
-                      <span style={{ fontSize: '0.875rem', ...(onTeamClick && p.team ? { textDecoration: 'underline', textDecorationStyle: 'dotted' } : {}) }}>{p.team?.name ?? '—'}</span>
+                      <span className={onTeamClick && p.team ? 'camp-team-clickable' : ''} style={{ fontSize: '0.875rem' }}>{p.team?.name ?? '—'}</span>
                     </span>
                   </td>
                   <td className="camp-td center">

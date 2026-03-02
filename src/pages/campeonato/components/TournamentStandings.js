@@ -50,7 +50,7 @@ export default function TournamentStandings({ standings, teamsAdvancing, onTeamC
                           style={onTeamClick ? { cursor: 'pointer' } : undefined}
                         >
                           <TeamLogo name={s.team} logoUrl={s.teamLogo} size={32} shape="shield" />
-                          <span className="ts-team-name" style={onTeamClick ? { textDecoration: 'underline', textDecorationStyle: 'dotted' } : undefined}>{s.team}</span>
+                          <span className={`ts-team-name${onTeamClick ? ' camp-team-clickable' : ''}`}>{s.team}</span>
                         </span>
                       </td>
                       <td className="camp-td center">{s.played}</td>

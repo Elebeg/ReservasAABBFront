@@ -39,7 +39,7 @@ function MatchCard({ match, onTeamClick }) {
     if (onTeamClick && team) onTeamClick({ name: team.name, logoUrl: team.logoUrl });
   }
 
-  const teamNameStyle = onTeamClick ? { cursor: 'pointer', textDecoration: 'underline', textDecorationStyle: 'dotted' } : {};
+  const teamNameClass = onTeamClick ? 'camp-team-clickable' : '';
 
   return (
     <div className={`camp-match-card ${finished ? 'finished' : ''}`}>
@@ -50,10 +50,10 @@ function MatchCard({ match, onTeamClick }) {
       <div className="camp-match-teams">
         <div className={`camp-match-team home ${finished && match.homeScore > match.awayScore ? 'won' : ''}`}>
           {match.homeTeam
-            ? <TeamLogo name={match.homeTeam.name} logoUrl={match.homeTeam.logoUrl} size={28} shape="circle" />
-            : <TeamLogo name="?" logoUrl={null} size={28} shape="circle" />
+            ? <TeamLogo name={match.homeTeam.name} logoUrl={match.homeTeam.logoUrl} size={28} shape="shield" />
+            : <TeamLogo name="?" logoUrl={null} size={28} shape="shield" />
           }
-          <span className="camp-match-team-name" style={match.homeTeam ? teamNameStyle : {}} onClick={() => handleTeamClick(match.homeTeam)}>
+          <span className={`camp-match-team-name${match.homeTeam ? ` ${teamNameClass}` : ''}`} onClick={() => handleTeamClick(match.homeTeam)}>
             {match.homeTeam?.name || <em className="tbd">A definir</em>}
           </span>
         </div>
@@ -76,12 +76,12 @@ function MatchCard({ match, onTeamClick }) {
         </div>
 
         <div className={`camp-match-team away ${finished && match.awayScore > match.homeScore ? 'won' : ''}`}>
-          <span className="camp-match-team-name" style={match.awayTeam ? teamNameStyle : {}} onClick={() => handleTeamClick(match.awayTeam)}>
+          <span className={`camp-match-team-name${match.awayTeam ? ` ${teamNameClass}` : ''}`} onClick={() => handleTeamClick(match.awayTeam)}>
             {match.awayTeam?.name || <em className="tbd">A definir</em>}
           </span>
           {match.awayTeam
-            ? <TeamLogo name={match.awayTeam.name} logoUrl={match.awayTeam.logoUrl} size={28} shape="circle" />
-            : <TeamLogo name="?" logoUrl={null} size={28} shape="circle" />
+            ? <TeamLogo name={match.awayTeam.name} logoUrl={match.awayTeam.logoUrl} size={28} shape="shield" />
+            : <TeamLogo name="?" logoUrl={null} size={28} shape="shield" />
           }
         </div>
       </div>
