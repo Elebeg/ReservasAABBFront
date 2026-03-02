@@ -1280,12 +1280,6 @@ function PlayersTab({ tournament }) {
                       onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))}
                       required placeholder="Nome do jogador" />
                   </div>
-                  <div className="ac-form-group" style={{ width: 80 }}>
-                    <label>Nº Camisa</label>
-                    <input type="number" min={1} max={99} value={addForm.number}
-                      onChange={e => setAddForm(f => ({ ...f, number: e.target.value }))}
-                      placeholder="10" />
-                  </div>
                   <div className="ac-form-group" style={{ width: 130 }}>
                     <label>Posição</label>
                     <select value={addForm.position}
