@@ -1156,6 +1156,16 @@ function PlayersTab({ tournament }) {
     } catch (err) { setAlert({ type: 'error', msg: err.message }); }
   }
 
+  async function updatePosition(playerId, position) {
+    try {
+      await apiFetch(`/admin/championship/players/${playerId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ position: position || null }),
+      });
+      loadTeamPlayers(); loadAllPlayers();
+    } catch (err) { setAlert({ type: 'error', msg: err.message }); }
+  }
+
   async function doBulkImport() {
     if (!selectedTeamId || !bulkText.trim()) return;
     const lines = bulkText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -1324,11 +1334,17 @@ function PlayersTab({ tournament }) {
                             </td>
                             <td style={{ fontWeight: 600 }}>{p.name}</td>
                             <td className="center">
-                              {p.position ? (
-                                <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'var(--ac-gray-200)', color: 'var(--ac-gray-700)' }}>
-                                  {POSITION_SHORT[p.position] || p.position}
-                                </span>
-                              ) : '—'}
+                              <select
+                                value={p.position || ''}
+                                onChange={e => updatePosition(p.id, e.target.value)}
+                                style={{ fontSize: '0.75rem', padding: '2px 4px', borderRadius: 4, border: '1px solid var(--ac-gray-300)', background: 'var(--ac-gray-100)', cursor: 'pointer' }}
+                              >
+                                <option value="">—</option>
+                                <option value="GOALKEEPER">GOL</option>
+                                <option value="DEFENDER">DEF</option>
+                                <option value="MIDFIELDER">MEI</option>
+                                <option value="FORWARD">ATA</option>
+                              </select>
                             </td>
                             <td className="center">
                               <StatCtrl value={p.goals} minusDisabled={p.goals === 0}
