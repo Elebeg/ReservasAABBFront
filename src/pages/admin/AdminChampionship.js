@@ -256,6 +256,31 @@ function ResultModal({ match, tid, onClose, onSaved }) {
     }
   }
 
+  async function cancelMatch() {
+    const assigned = [...homeGoals, ...awayGoals].filter(g => g.playerId);
+    const msg = assigned.length > 0
+      ? `Cancelar esta partida? O resultado será removido e ${assigned.length} gol(s) serão decrementados da artilharia.`
+      : 'Cancelar esta partida? O resultado será removido.\n\nAtenção: nenhum artilheiro foi selecionado — os gols na artilharia NÃO serão decrementados automaticamente.';
+    if (!window.confirm(msg)) return;
+    setLoading(true); setError('');
+    try {
+      await Promise.allSettled(
+        assigned.map(g =>
+          apiFetch(`/admin/championship/players/${g.playerId}/stat/goals/increment`, {
+            method: 'PATCH',
+            body: JSON.stringify({ delta: -1 }),
+          })
+        )
+      );
+      await apiFetch(`/admin/championship/matches/${match.id}/result`, { method: 'DELETE' });
+      onSaved();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const sides = [
     { key: 'home', goals: homeGoals, players: homePlayers, label: match.homeTeam?.name || 'Casa' },
     { key: 'away', goals: awayGoals, players: awayPlayers, label: match.awayTeam?.name || 'Visitante' },
@@ -318,7 +343,7 @@ function ResultModal({ match, tid, onClose, onSaved }) {
 
         {isEdit && (
           <p style={{ fontSize: '0.73rem', color: 'var(--ac-gray-500)', textAlign: 'center', marginBottom: 8 }}>
-            ⚠️ Ao corrigir, apenas artilheiros selecionados agora serão adicionados à artilharia.
+            ⚠️ Para cancelar a partida, selecione os artilheiros acima antes de clicar em "Cancelar Partida" — assim os gols serão decrementados automaticamente.
           </p>
         )}
 
@@ -344,7 +369,12 @@ function ResultModal({ match, tid, onClose, onSaved }) {
         )}
 
         <div className="ac-form-actions">
-          <button type="button" className="ac-btn ac-btn-ghost" onClick={onClose}>Cancelar</button>
+          {isEdit && (
+            <button type="button" className="ac-btn ac-btn-danger" onClick={cancelMatch} disabled={loading}>
+              🚫 Cancelar Partida
+            </button>
+          )}
+          <button type="button" className="ac-btn ac-btn-ghost" onClick={onClose}>Fechar</button>
           <button type="submit" className="ac-btn ac-btn-primary" disabled={loading}>
             {loading ? <span className="ac-spinner" /> : 'Salvar Resultado'}
           </button>
