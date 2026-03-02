@@ -3,16 +3,24 @@ import React, { useState, useEffect } from 'react';
 // ── Forma do escudo (compartilhada) ───────────────────────────────────────────
 const S = 'M50 5 L93 20 L93 67 Q93 95 50 111 Q7 95 7 67 L7 20 Z';
 
-// ── 8 temas de cor (primária, secundária, destaque) ───────────────────────────
+// ── 16 temas de cor (primária, secundária, destaque) ──────────────────────────
 const THEMES = [
-  { p: '#1a2b6d', s: '#ffffff', a: '#e8b800' }, // azul-marinho / branco / ouro
-  { p: '#8b0000', s: '#ffffff', a: '#ffd700' }, // vermelho escuro / branco / ouro
-  { p: '#005c1e', s: '#ffffff', a: '#ffd700' }, // verde floresta / branco / ouro
-  { p: '#4a0080', s: '#ffd700', a: '#ffd700' }, // roxo / ouro / ouro
-  { p: '#0d3349', s: '#e8a200', a: '#e8a200' }, // azul-profundo / âmbar / âmbar
-  { p: '#111111', s: '#e8b800', a: '#e8b800' }, // preto / ouro / ouro
-  { p: '#005f5f', s: '#ffffff', a: '#ffd700' }, // verde-azulado / branco / ouro
-  { p: '#6b1010', s: '#ffffff', a: '#e8c000' }, // bordô / branco / ouro
+  { p: '#1a2b6d', s: '#ffffff', a: '#e8b800' }, // 00 · azul-marinho / branco / ouro
+  { p: '#8b0000', s: '#ffffff', a: '#ffd700' }, // 01 · vermelho escuro / branco / ouro
+  { p: '#005c1e', s: '#ffffff', a: '#ffd700' }, // 02 · verde floresta / branco / ouro
+  { p: '#4a0080', s: '#ffd700', a: '#ffd700' }, // 03 · roxo / ouro / ouro
+  { p: '#0d3349', s: '#e8a200', a: '#e8a200' }, // 04 · azul-profundo / âmbar / âmbar
+  { p: '#111111', s: '#e8b800', a: '#e8b800' }, // 05 · preto / ouro / ouro
+  { p: '#005f5f', s: '#ffffff', a: '#ffd700' }, // 06 · verde-azulado / branco / ouro
+  { p: '#6b1010', s: '#ffffff', a: '#e8c000' }, // 07 · bordô / branco / ouro
+  { p: '#c04000', s: '#111111', a: '#ffd700' }, // 08 · laranja-queimado / preto / ouro
+  { p: '#002366', s: '#cc0000', a: '#ffffff' }, // 09 · azul-real / vermelho / branco
+  { p: '#1a5e00', s: '#f5c518', a: '#f5c518' }, // 10 · verde-grama / amarelo-ouro / amarelo-ouro
+  { p: '#7c3800', s: '#f5deb3', a: '#ffd700' }, // 11 · marrom-cobre / trigo / ouro
+  { p: '#1c1c2e', s: '#00b4d8', a: '#00b4d8' }, // 12 · azul-noite / ciano / ciano
+  { p: '#3d1a00', s: '#c9a84c', a: '#c9a84c' }, // 13 · marrom-escuro / ouro-âmbar / ouro-âmbar
+  { p: '#880e4f', s: '#ffffff', a: '#f8bbd0' }, // 14 · magenta-escuro / branco / rosa
+  { p: '#004d40', s: '#e0f2f1', a: '#ffd700' }, // 15 · esmeralda-escuro / menta-clara / ouro
 ];
 
 // ── Determinístico: mesmo time → mesmo hash → mesmo escudo ───────────────────
@@ -22,10 +30,10 @@ function hashName(name = '') {
   return Math.abs(h);
 }
 
-// ── 8 designs de escudo ───────────────────────────────────────────────────────
+// ── 16 designs de escudo ──────────────────────────────────────────────────────
 // Cada função recebe (primary, secondary, accent, clipId) e retorna elementos SVG
 const DESIGNS = [
-  // 0 · Divisão horizontal (cima = secundária, baixo = primária)
+  // 00 · Divisão horizontal (cima = secundária, baixo = primária)
   (p, s, a, id) => <>
     <rect x="0" y="0" width="100" height="116" fill={p} clipPath={`url(#${id})`} />
     <rect x="0" y="0" width="100" height="54"  fill={s} clipPath={`url(#${id})`} />
@@ -33,7 +41,7 @@ const DESIGNS = [
     <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
   </>,
 
-  // 1 · Divisão vertical (esquerda = primária, direita = secundária)
+  // 01 · Divisão vertical (esquerda = primária, direita = secundária)
   (p, s, a, id) => <>
     <rect x="0"  y="0" width="100" height="116" fill={s} clipPath={`url(#${id})`} />
     <rect x="0"  y="0" width="50"  height="116" fill={p} clipPath={`url(#${id})`} />
@@ -41,7 +49,7 @@ const DESIGNS = [
     <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
   </>,
 
-  // 2 · Divisão diagonal (primária no topo-esquerdo, secundária no baixo-direito)
+  // 02 · Diagonal (primária topo-esquerdo, secundária baixo-direito)
   (p, s, a, id) => <>
     <rect x="0" y="0" width="100" height="116" fill={p}  clipPath={`url(#${id})`} />
     <polygon points="0,116 100,0 100,116"       fill={s}  clipPath={`url(#${id})`} />
@@ -49,14 +57,14 @@ const DESIGNS = [
     <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
   </>,
 
-  // 3 · Chevron (faixa em V apontando para baixo)
+  // 03 · Chevron apontando para BAIXO
   (p, s, a, id) => <>
     <rect x="0" y="0" width="100" height="116" fill={p} clipPath={`url(#${id})`} />
     <polygon points="0,28 50,78 100,28 100,42 50,92 0,42" fill={s} clipPath={`url(#${id})`} />
     <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
   </>,
 
-  // 4 · Quatro quadrantes em cruz
+  // 04 · Quatro quadrantes em cruz
   (p, s, a, id) => <>
     <rect x="0"  y="0"  width="100" height="116" fill={p} clipPath={`url(#${id})`} />
     <rect x="50" y="0"  width="50"  height="58"  fill={s} clipPath={`url(#${id})`} />
@@ -66,14 +74,14 @@ const DESIGNS = [
     <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
   </>,
 
-  // 5 · Três faixas verticais (primária | secundária | primária)
+  // 05 · Três faixas verticais (primária | secundária | primária)
   (p, s, a, id) => <>
     <rect x="0"  y="0" width="100" height="116" fill={p} clipPath={`url(#${id})`} />
     <rect x="34" y="0" width="32"  height="116" fill={s} clipPath={`url(#${id})`} />
     <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
   </>,
 
-  // 6 · Estrela central em fundo sólido
+  // 06 · Estrela central em fundo sólido
   (p, s, a, id) => <>
     <rect x="0" y="0" width="100" height="116" fill={p} clipPath={`url(#${id})`} />
     <circle cx="50" cy="63" r="26" fill={s} clipPath={`url(#${id})`} />
@@ -83,7 +91,7 @@ const DESIGNS = [
     <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
   </>,
 
-  // 7 · Escudo interno (concêntrico) + círculo central
+  // 07 · Escudo interno concêntrico + círculo central
   (p, s, a, id) => <>
     <rect x="0" y="0" width="100" height="116" fill={p} clipPath={`url(#${id})`} />
     <path d="M50 18 L81 30 L81 67 Q81 90 50 103 Q19 90 19 67 L19 30 Z"
@@ -91,14 +99,79 @@ const DESIGNS = [
     <circle cx="50" cy="62" r="13" fill={a} clipPath={`url(#${id})`} />
     <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
   </>,
+
+  // 08 · Três faixas horizontais (secundária | primária | secundária) com linhas de destaque
+  (p, s, a, id) => <>
+    <rect x="0" y="0"  width="100" height="116" fill={s} clipPath={`url(#${id})`} />
+    <rect x="0" y="38" width="100" height="40"  fill={p} clipPath={`url(#${id})`} />
+    <rect x="0" y="36" width="100" height="4"   fill={a} clipPath={`url(#${id})`} />
+    <rect x="0" y="76" width="100" height="4"   fill={a} clipPath={`url(#${id})`} />
+    <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
+  </>,
+
+  // 09 · Diagonal oposta — espelho do 02 (secundária topo-esquerdo, primária baixo-direito)
+  (p, s, a, id) => <>
+    <rect x="0" y="0" width="100" height="116" fill={s} clipPath={`url(#${id})`} />
+    <polygon points="0,0 100,116 0,116"          fill={p}  clipPath={`url(#${id})`} />
+    <line x1="0" y1="0" x2="100" y2="116"       stroke={a} strokeWidth="5" clipPath={`url(#${id})`} />
+    <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
+  </>,
+
+  // 10 · Chevron apontando para CIMA (V invertido)
+  (p, s, a, id) => <>
+    <rect x="0" y="0" width="100" height="116" fill={p} clipPath={`url(#${id})`} />
+    <polygon points="0,62 50,12 100,62 100,76 50,26 0,76" fill={s} clipPath={`url(#${id})`} />
+    <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
+  </>,
+
+  // 11 · Losango central
+  (p, s, a, id) => <>
+    <rect x="0" y="0" width="100" height="116" fill={p} clipPath={`url(#${id})`} />
+    <polygon points="50,16 88,58 50,100 12,58"  fill={s} clipPath={`url(#${id})`} />
+    <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
+  </>,
+
+  // 12 · Saltire (X cruzado, estilo Saint Andrew)
+  (p, s, a, id) => <>
+    <rect x="0"   y="0"   width="100" height="116" fill={p} clipPath={`url(#${id})`} />
+    <line x1="0"  y1="0"   x2="100" y2="116" stroke={s} strokeWidth="22" clipPath={`url(#${id})`} />
+    <line x1="100" y1="0"  x2="0"   y2="116" stroke={s} strokeWidth="22" clipPath={`url(#${id})`} />
+    <line x1="0"  y1="0"   x2="100" y2="116" stroke={a} strokeWidth="5"  clipPath={`url(#${id})`} />
+    <line x1="100" y1="0"  x2="0"   y2="116" stroke={a} strokeWidth="5"  clipPath={`url(#${id})`} />
+    <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
+  </>,
+
+  // 13 · Cruz (+ estilo Saint George)
+  (p, s, a, id) => <>
+    <rect x="0"  y="0"  width="100" height="116" fill={p} clipPath={`url(#${id})`} />
+    <rect x="40" y="0"  width="20"  height="116" fill={s} clipPath={`url(#${id})`} />
+    <rect x="0"  y="48" width="100" height="20"  fill={s} clipPath={`url(#${id})`} />
+    <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
+  </>,
+
+  // 14 · Faixa diagonal larga (sash) de cima-esq a baixo-dir
+  (p, s, a, id) => <>
+    <rect x="0" y="0" width="100" height="116"   fill={p} clipPath={`url(#${id})`} />
+    <polygon points="0,0 65,0 100,116 35,116"     fill={s} clipPath={`url(#${id})`} />
+    <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
+  </>,
+
+  // 15 · Três escudos concêntricos (rings)
+  (p, s, a, id) => <>
+    <rect x="0" y="0" width="100" height="116" fill={p} clipPath={`url(#${id})`} />
+    <path d="M50 14 L86 27 L86 66 Q86 91 50 106 Q14 91 14 66 L14 27 Z" fill={s} clipPath={`url(#${id})`} />
+    <path d="M50 30 L72 39 L72 66 Q72 83 50 95 Q28 83 28 66 L28 39 Z"  fill={p} clipPath={`url(#${id})`} />
+    <path d="M50 46 L58 51 L58 66 Q58 74 50 80 Q42 74 42 66 L42 51 Z"  fill={a} clipPath={`url(#${id})`} />
+    <path d={S} fill="none" stroke={a} strokeWidth="2.5" />
+  </>,
 ];
 
 // ── Componente de escudo SVG ──────────────────────────────────────────────────
 function BadgeSVG({ name, size }) {
   const h   = hashName(name);
-  const idx = h % 8;
+  const idx = h % 16;
   const { p, s, a } = THEMES[idx];
-  // ID único por time para o clipPath (baseado no hash — sem colisão por aleatoriedade)
+  // ID único por time para o clipPath (baseado no hash)
   const id  = `bc${h}`;
 
   return (
@@ -160,7 +233,7 @@ async function fetchLogo(name) {
  * TeamLogo — 3 camadas de fallback:
  *   1. logoUrl do banco
  *   2. Busca automática na TheSportsDB
- *   3a. shape="shield" → escudo SVG único por time (8 designs)
+ *   3a. shape="shield" → escudo SVG único por time (16 designs × 16 temas)
  *   3b. shape="circle" → avatar circular com iniciais coloridas
  */
 export default function TeamLogo({ name = '', logoUrl = null, size = 32, shape = 'shield', style = {} }) {
