@@ -30,6 +30,8 @@ export default function TournamentStandings({ standings, teamsAdvancing }) {
                   <th className="camp-th center" title="Gols Contra">GC</th>
                   <th className="camp-th center" title="Saldo">SG</th>
                   <th className="camp-th center pts" title="Pontos">Pts</th>
+                  <th className="camp-th center" title="Cartões Amarelos">🟡</th>
+                  <th className="camp-th center" title="Cartões Vermelhos">🔴</th>
                 </tr>
               </thead>
               <tbody>
@@ -57,6 +59,12 @@ export default function TournamentStandings({ standings, teamsAdvancing }) {
                         {s.goalDiff > 0 ? `+${s.goalDiff}` : s.goalDiff}
                       </td>
                       <td className="camp-td center pts">{s.points}</td>
+                      <td className="camp-td center" style={{ color: s.yellowCards > 0 ? '#d68910' : undefined }}>
+                        {s.yellowCards ?? 0}
+                      </td>
+                      <td className="camp-td center" style={{ color: s.redCards > 0 ? '#c0392b' : undefined }}>
+                        {s.redCards ?? 0}
+                      </td>
                     </tr>
                   );
                 })}

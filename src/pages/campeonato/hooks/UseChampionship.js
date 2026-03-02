@@ -13,6 +13,7 @@ export function useChampionship() {
   const [standings, setStandings]   = useState([]);
   const [bracket, setBracket]       = useState(null);
   const [matches, setMatches]       = useState([]);
+  const [players, setPlayers]       = useState([]);
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState(null);
 
@@ -23,15 +24,17 @@ export function useChampionship() {
       const t = await fetchJSON('/championship/active');
       setTournament(t);
 
-      const [s, b, m] = await Promise.allSettled([
+      const [s, b, m, p] = await Promise.allSettled([
         fetchJSON('/championship/active/standings'),
         fetchJSON('/championship/active/bracket'),
         fetchJSON('/championship/active/matches'),
+        fetchJSON('/championship/active/players'),
       ]);
 
       if (s.status === 'fulfilled') setStandings(s.value || []);
       if (b.status === 'fulfilled') setBracket(b.value || null);
       if (m.status === 'fulfilled') setMatches(m.value || []);
+      if (p.status === 'fulfilled') setPlayers(p.value || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -41,5 +44,5 @@ export function useChampionship() {
 
   useEffect(() => { load(); }, [load]);
 
-  return { tournament, standings, bracket, matches, loading, error, reload: load };
+  return { tournament, standings, bracket, matches, players, loading, error, reload: load };
 }

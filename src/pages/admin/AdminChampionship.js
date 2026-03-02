@@ -48,6 +48,13 @@ const PHASE_LABELS = {
   FINAL:         'Final',
 };
 
+const POSITION_SHORT = {
+  GOALKEEPER: 'GOL',
+  DEFENDER:   'DEF',
+  MIDFIELDER: 'MEI',
+  FORWARD:    'ATA',
+};
+
 function StatusBadge({ status }) {
   const cls = {
     DRAFT:          'ac-status-draft',
@@ -907,6 +914,8 @@ function StandingsTab({ tournament }) {
                   <th className="center">GC</th>
                   <th className="center">SG</th>
                   <th className="center bold">Pts</th>
+                  <th className="center" title="Cartões Amarelos">🟡</th>
+                  <th className="center" title="Cartões Vermelhos">🔴</th>
                 </tr>
               </thead>
               <tbody>
@@ -925,6 +934,8 @@ function StandingsTab({ tournament }) {
                     <td className="center">{s.goalsAgainst}</td>
                     <td className="center">{s.goalDiff > 0 ? `+${s.goalDiff}` : s.goalDiff}</td>
                     <td className="center bold" style={{ color: 'var(--ac-primary)' }}>{s.points}</td>
+                    <td className="center" style={{ color: s.yellowCards > 0 ? '#d68910' : undefined }}>{s.yellowCards ?? 0}</td>
+                    <td className="center" style={{ color: s.redCards > 0 ? '#c0392b' : undefined }}>{s.redCards ?? 0}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1070,6 +1081,398 @@ function ActionsTab({ tournament, onRefresh }) {
   );
 }
 
+// ─── ABA: JOGADORES ───────────────────────────────────────────────────────────
+
+function PlayersTab({ tournament }) {
+  const [view, setView]                 = useState('manage');
+  const [teams, setTeams]               = useState([]);
+  const [selectedTeamId, setTeamId]     = useState(null);
+  const [teamPlayers, setTeamPlayers]   = useState([]);
+  const [allPlayers, setAllPlayers]     = useState([]);
+  const [addForm, setAddForm]           = useState({ name: '', number: '', position: '' });
+  const [bulkText, setBulkText]         = useState('');
+  const [showBulk, setShowBulk]         = useState(false);
+  const [alert, setAlert]               = useState(null);
+  const [saving, setSaving]             = useState(false);
+  const tid = tournament.id;
+
+  const loadAllPlayers = useCallback(async () => {
+    try {
+      const d = await apiFetch(`/admin/championship/tournaments/${tid}/players`);
+      setAllPlayers(d || []);
+    } catch {}
+  }, [tid]);
+
+  const loadTeamPlayers = useCallback(async () => {
+    if (!selectedTeamId) { setTeamPlayers([]); return; }
+    try {
+      const d = await apiFetch(`/admin/championship/tournaments/${tid}/teams/${selectedTeamId}/players`);
+      setTeamPlayers(d || []);
+    } catch {}
+  }, [tid, selectedTeamId]);
+
+  useEffect(() => {
+    apiFetch(`/admin/championship/tournaments/${tid}/teams`).then(d => setTeams(d || []));
+    loadAllPlayers();
+  }, [tid, loadAllPlayers]);
+
+  useEffect(() => { loadTeamPlayers(); }, [loadTeamPlayers]);
+
+  async function addPlayer(e) {
+    e.preventDefault();
+    if (!selectedTeamId) return;
+    setSaving(true); setAlert(null);
+    try {
+      await apiFetch(`/admin/championship/tournaments/${tid}/teams/${selectedTeamId}/players`, {
+        method: 'POST',
+        body: JSON.stringify({
+          name:     addForm.name,
+          number:   addForm.number ? Number(addForm.number) : undefined,
+          position: addForm.position || undefined,
+        }),
+      });
+      setAddForm({ name: '', number: '', position: '' });
+      loadTeamPlayers(); loadAllPlayers();
+    } catch (err) {
+      setAlert({ type: 'error', msg: err.message });
+    } finally { setSaving(false); }
+  }
+
+  async function removePlayer(playerId) {
+    if (!window.confirm('Remover este jogador?')) return;
+    try {
+      await apiFetch(`/admin/championship/players/${playerId}`, { method: 'DELETE' });
+      loadTeamPlayers(); loadAllPlayers();
+    } catch (err) { setAlert({ type: 'error', msg: err.message }); }
+  }
+
+  async function incrStat(playerId, stat, delta) {
+    try {
+      await apiFetch(`/admin/championship/players/${playerId}/stat/${stat}/increment`, {
+        method: 'PATCH',
+        body: JSON.stringify({ delta }),
+      });
+      loadTeamPlayers(); loadAllPlayers();
+    } catch (err) { setAlert({ type: 'error', msg: err.message }); }
+  }
+
+  async function doBulkImport() {
+    if (!selectedTeamId || !bulkText.trim()) return;
+    const lines = bulkText.split('\n').map(l => l.trim()).filter(Boolean);
+    setSaving(true); setAlert(null);
+    try {
+      await apiFetch(`/admin/championship/tournaments/${tid}/teams/${selectedTeamId}/players/import-lines`, {
+        method: 'POST',
+        body: JSON.stringify({ lines }),
+      });
+      setBulkText(''); setShowBulk(false);
+      setAlert({ type: 'success', msg: `${lines.length} jogador(es) importado(s) com sucesso!` });
+      loadTeamPlayers(); loadAllPlayers();
+    } catch (err) {
+      setAlert({ type: 'error', msg: err.message });
+    } finally { setSaving(false); }
+  }
+
+  const selectedTeam = teams.find(t => t.id === selectedTeamId);
+
+  /* helper: stat increment control */
+  function StatCtrl({ value, onMinus, onPlus, minusDisabled }) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center' }}>
+        <button className="ac-btn-icon" style={{ fontSize: '0.7rem', padding: '2px 6px' }}
+          onClick={onMinus} disabled={minusDisabled}>−</button>
+        <span style={{ minWidth: 20, textAlign: 'center', fontWeight: 700 }}>{value}</span>
+        <button className="ac-btn-icon" style={{ fontSize: '0.7rem', padding: '2px 6px' }}
+          onClick={onPlus}>+</button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Alert type={alert?.type} message={alert?.msg} onClose={() => setAlert(null)} />
+
+      {/* Subview toggle */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        <button className={`ac-btn ac-btn-sm ${view === 'manage' ? 'ac-btn-primary' : 'ac-btn-ghost'}`}
+          onClick={() => setView('manage')}>👤 Gerenciar Elencos</button>
+        <button className={`ac-btn ac-btn-sm ${view === 'ranking' ? 'ac-btn-primary' : 'ac-btn-ghost'}`}
+          onClick={() => { setView('ranking'); loadAllPlayers(); }}>⚽ Artilharia & Cartões</button>
+      </div>
+
+      {/* ── GERENCIAR ELENCOS ── */}
+      {view === 'manage' && (
+        <div>
+          {/* Team selector */}
+          <p style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--ac-gray-700)', marginBottom: 8 }}>
+            Selecione um time para gerenciar seu elenco:
+          </p>
+          <div className="ac-teams-grid" style={{ marginBottom: 20 }}>
+            {teams.length === 0 && (
+              <span style={{ fontSize: '0.85rem', color: 'var(--ac-gray-500)' }}>Nenhum time cadastrado.</span>
+            )}
+            {teams.map(t => (
+              <div key={t.id} className="ac-team-chip"
+                style={{ cursor: 'pointer',
+                  borderColor: selectedTeamId === t.id ? 'var(--ac-primary)' : undefined,
+                  background:  selectedTeamId === t.id ? 'var(--ac-primary-light)' : undefined,
+                }}
+                onClick={() => setTeamId(t.id)}
+              >
+                {t.logoUrl
+                  ? <img src={t.logoUrl} alt={t.name} className="ac-team-chip-logo" onError={e => { e.target.src = defaultBadge; }} />
+                  : <span className="ac-team-chip-placeholder">⚽</span>
+                }
+                <span>{t.name}</span>
+              </div>
+            ))}
+          </div>
+
+          {selectedTeam && (
+            <div className="ac-card">
+              <div className="ac-card-header">
+                <h2>
+                  {selectedTeam.logoUrl && (
+                    <img src={selectedTeam.logoUrl} alt={selectedTeam.name}
+                      style={{ width: 24, height: 24, objectFit: 'contain', marginRight: 8, verticalAlign: 'middle' }}
+                      onError={e => { e.target.src = defaultBadge; }}
+                    />
+                  )}
+                  {selectedTeam.name}
+                  <span style={{ fontSize: '0.8rem', fontWeight: 400, color: 'var(--ac-gray-500)', marginLeft: 8 }}>
+                    {teamPlayers.length} jogador(es)
+                  </span>
+                </h2>
+                <button className="ac-btn ac-btn-sm ac-btn-ghost" onClick={() => setShowBulk(v => !v)}>
+                  {showBulk ? '✕ Fechar Import' : '📋 Importar em Lote'}
+                </button>
+              </div>
+              <div className="ac-card-body">
+
+                {/* Bulk import */}
+                {showBulk && (
+                  <div style={{ background: 'var(--ac-gray-100)', border: '1px solid var(--ac-gray-200)', borderRadius: 8, padding: 16, marginBottom: 16 }}>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--ac-gray-700)', marginBottom: 8 }}>
+                      Uma linha por jogador: <strong>Nome;Número;Posição</strong><br />
+                      Posições: <code>GK</code> · <code>DEF</code> · <code>MID</code> · <code>FWD</code> (Número e Posição são opcionais)<br />
+                      <span style={{ color: 'var(--ac-danger)', fontWeight: 600 }}>⚠️ Substitui todo o elenco atual do time.</span>
+                    </p>
+                    <textarea
+                      value={bulkText}
+                      onChange={e => setBulkText(e.target.value)}
+                      placeholder={"Pelé;10;FWD\nTaffarel;1;GK\nSó o Nome"}
+                      style={{ width: '100%', minHeight: 110, padding: '10px 12px', border: '1.5px solid var(--ac-gray-300)', borderRadius: 6, fontFamily: 'monospace', fontSize: '0.875rem', resize: 'vertical', boxSizing: 'border-box' }}
+                    />
+                    <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
+                      <button className="ac-btn ac-btn-ghost ac-btn-sm" onClick={() => setShowBulk(false)}>Cancelar</button>
+                      <button className="ac-btn ac-btn-primary ac-btn-sm" onClick={doBulkImport} disabled={saving || !bulkText.trim()}>
+                        {saving ? <span className="ac-spinner" /> : '📥 Importar'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Add player inline form */}
+                <form onSubmit={addPlayer} style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                  <div className="ac-form-group" style={{ flex: 2, minWidth: 140 }}>
+                    <label>Nome *</label>
+                    <input value={addForm.name}
+                      onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))}
+                      required placeholder="Nome do jogador" />
+                  </div>
+                  <div className="ac-form-group" style={{ width: 80 }}>
+                    <label>Nº Camisa</label>
+                    <input type="number" min={1} max={99} value={addForm.number}
+                      onChange={e => setAddForm(f => ({ ...f, number: e.target.value }))}
+                      placeholder="10" />
+                  </div>
+                  <div className="ac-form-group" style={{ width: 130 }}>
+                    <label>Posição</label>
+                    <select value={addForm.position}
+                      onChange={e => setAddForm(f => ({ ...f, position: e.target.value }))}>
+                      <option value="">—</option>
+                      <option value="GOALKEEPER">Goleiro</option>
+                      <option value="DEFENDER">Defensor</option>
+                      <option value="MIDFIELDER">Meio-campo</option>
+                      <option value="FORWARD">Atacante</option>
+                    </select>
+                  </div>
+                  <button type="submit" className="ac-btn ac-btn-primary ac-btn-sm" disabled={saving} style={{ height: 38 }}>
+                    {saving ? <span className="ac-spinner" /> : '+ Adicionar'}
+                  </button>
+                </form>
+
+                {/* Players table */}
+                {teamPlayers.length === 0 ? (
+                  <div className="ac-empty" style={{ padding: 24 }}>
+                    <div className="ac-empty-icon">👤</div>
+                    <p>Nenhum jogador cadastrado. Use o formulário acima ou importe em lote.</p>
+                  </div>
+                ) : (
+                  <div className="ac-table-wrap">
+                    <table className="ac-table">
+                      <thead>
+                        <tr>
+                          <th className="center">#</th>
+                          <th>Nome</th>
+                          <th className="center">Pos.</th>
+                          <th className="center" title="Gols">⚽ Gols</th>
+                          <th className="center" title="Cartões Amarelos">🟡 Amarelos</th>
+                          <th className="center" title="Cartões Vermelhos">🔴 Vermelhos</th>
+                          <th className="center"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {teamPlayers.map(p => (
+                          <tr key={p.id}>
+                            <td className="center" style={{ color: 'var(--ac-gray-500)', fontWeight: 600 }}>
+                              {p.number ?? '—'}
+                            </td>
+                            <td style={{ fontWeight: 600 }}>{p.name}</td>
+                            <td className="center">
+                              {p.position ? (
+                                <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'var(--ac-gray-200)', color: 'var(--ac-gray-700)' }}>
+                                  {POSITION_SHORT[p.position] || p.position}
+                                </span>
+                              ) : '—'}
+                            </td>
+                            <td className="center">
+                              <StatCtrl value={p.goals} minusDisabled={p.goals === 0}
+                                onMinus={() => incrStat(p.id, 'goals', -1)}
+                                onPlus={() => incrStat(p.id, 'goals', 1)} />
+                            </td>
+                            <td className="center">
+                              <StatCtrl value={p.yellowCards} minusDisabled={p.yellowCards === 0}
+                                onMinus={() => incrStat(p.id, 'yellowCards', -1)}
+                                onPlus={() => incrStat(p.id, 'yellowCards', 1)} />
+                            </td>
+                            <td className="center">
+                              <StatCtrl value={p.redCards} minusDisabled={p.redCards === 0}
+                                onMinus={() => incrStat(p.id, 'redCards', -1)}
+                                onPlus={() => incrStat(p.id, 'redCards', 1)} />
+                            </td>
+                            <td className="center">
+                              <button className="ac-btn-icon danger" title="Remover jogador"
+                                onClick={() => removePlayer(p.id)}>🗑</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── ARTILHARIA & CARTÕES ── */}
+      {view === 'ranking' && (
+        <div>
+          {allPlayers.length === 0 ? (
+            <div className="ac-empty">
+              <div className="ac-empty-icon">⚽</div>
+              <h3>Nenhum jogador cadastrado</h3>
+              <p>Adicione jogadores aos times para ver os rankings.</p>
+            </div>
+          ) : (
+            <>
+              {/* Artilharia */}
+              <div className="ac-group-section" style={{ marginBottom: 28 }}>
+                <h3>⚽ Artilharia</h3>
+                <div className="ac-table-wrap">
+                  <table className="ac-table">
+                    <thead>
+                      <tr>
+                        <th className="center">#</th>
+                        <th>Jogador</th>
+                        <th>Time</th>
+                        <th className="center">Pos.</th>
+                        <th className="center bold">Gols</th>
+                        <th className="center">🟡</th>
+                        <th className="center">🔴</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...allPlayers]
+                        .sort((a, b) => b.goals - a.goals || a.yellowCards - b.yellowCards || a.name.localeCompare(b.name))
+                        .map((p, i) => (
+                          <tr key={p.id}>
+                            <td className="center bold">{i + 1}</td>
+                            <td style={{ fontWeight: 600 }}>{p.name}</td>
+                            <td style={{ fontSize: '0.875rem', color: 'var(--ac-gray-700)' }}>
+                              {p.team?.name ?? '—'}
+                            </td>
+                            <td className="center">
+                              {p.position ? (
+                                <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'var(--ac-gray-200)', color: 'var(--ac-gray-700)' }}>
+                                  {POSITION_SHORT[p.position] || p.position}
+                                </span>
+                              ) : '—'}
+                            </td>
+                            <td className="center bold" style={{ color: 'var(--ac-primary)', fontSize: '1rem' }}>{p.goals}</td>
+                            <td className="center">{p.yellowCards || '—'}</td>
+                            <td className="center">{p.redCards || '—'}</td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Ranking disciplinar */}
+              {allPlayers.some(p => p.yellowCards > 0 || p.redCards > 0) && (
+                <div className="ac-group-section">
+                  <h3>🟡 Ranking Disciplinar</h3>
+                  <div className="ac-table-wrap">
+                    <table className="ac-table">
+                      <thead>
+                        <tr>
+                          <th>Jogador</th>
+                          <th>Time</th>
+                          <th className="center">🟡 Amarelos</th>
+                          <th className="center">🔴 Vermelhos</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...allPlayers]
+                          .filter(p => p.yellowCards > 0 || p.redCards > 0)
+                          .sort((a, b) => b.redCards - a.redCards || b.yellowCards - a.yellowCards)
+                          .map(p => (
+                            <tr key={p.id}>
+                              <td style={{ fontWeight: 600 }}>{p.name}</td>
+                              <td style={{ fontSize: '0.875rem', color: 'var(--ac-gray-700)' }}>{p.team?.name ?? '—'}</td>
+                              <td className="center">
+                                {p.yellowCards > 0
+                                  ? <span style={{ color: '#d68910', fontWeight: 700 }}>{p.yellowCards}</span>
+                                  : '—'
+                                }
+                              </td>
+                              <td className="center">
+                                {p.redCards > 0
+                                  ? <span style={{ color: '#c0392b', fontWeight: 700 }}>{p.redCards}</span>
+                                  : '—'
+                                }
+                              </td>
+                            </tr>
+                          ))
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── DETALHE DO TORNEIO ───────────────────────────────────────────────────────
 
 function TournamentDetail({ tournament, onBack, onRefresh }) {
@@ -1078,6 +1481,7 @@ function TournamentDetail({ tournament, onBack, onRefresh }) {
     { key: 'actions',   label: '⚙️ Ações' },
     { key: 'teams',     label: '⚽ Times' },
     { key: 'groups',    label: '📋 Grupos', hide: tournament.format !== 'GROUPS' },
+    { key: 'players',   label: '👤 Jogadores' },
     { key: 'matches',   label: '🗓️ Partidas' },
     { key: 'standings', label: '📊 Classificação' },
     { key: 'bracket',   label: '🏆 Bracket' },
@@ -1109,6 +1513,7 @@ function TournamentDetail({ tournament, onBack, onRefresh }) {
       {tab === 'actions'   && <ActionsTab   tournament={tournament} onRefresh={onRefresh} />}
       {tab === 'teams'     && <TeamsTab     tournament={tournament} onRefresh={onRefresh} />}
       {tab === 'groups'    && <GroupsTab    tournament={tournament} onRefresh={onRefresh} />}
+      {tab === 'players'   && <PlayersTab   tournament={tournament} />}
       {tab === 'matches'   && <MatchesTab   tournament={tournament} onRefresh={onRefresh} />}
       {tab === 'standings' && <StandingsTab tournament={tournament} />}
       {tab === 'bracket'   && <BracketTab   tournament={tournament} />}

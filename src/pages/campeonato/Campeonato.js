@@ -3,6 +3,7 @@ import { useChampionship } from './hooks/UseChampionship';
 import TournamentStandings from './components/TournamentStandings';
 import TournamentBracket   from './components/TournamentBracket';
 import TournamentMatches   from './components/TournamentMatches';
+import TournamentPlayers   from './components/TournamentPlayers';
 import './Campeonato.css';
 
 const FORMAT_LABELS = {
@@ -41,16 +42,18 @@ function EmptyState() {
 }
 
 export default function Campeonato() {
-  const { tournament, standings, bracket, matches, loading, error } = useChampionship();
+  const { tournament, standings, bracket, matches, players, loading, error } = useChampionship();
   const [tab, setTab] = useState('matches');
 
-  const showStandings = tournament && ['GROUPS', 'LEAGUE'].includes(tournament.format);
+  const showStandings  = tournament && ['GROUPS', 'LEAGUE'].includes(tournament.format);
   const hasBracketData = bracket && bracket.rounds && bracket.rounds.length > 0;
+  const hasPlayers     = players && players.length > 0;
 
   const tabs = [
     { key: 'matches',   label: '🗓️ Partidas',      show: true },
     { key: 'standings', label: '📊 Classificação', show: showStandings },
     { key: 'bracket',   label: '🏆 Bracket',       show: true },
+    { key: 'players',   label: '⚽ Artilharia',    show: hasPlayers },
   ].filter((t) => t.show);
 
   if (loading) {
@@ -138,6 +141,9 @@ export default function Campeonato() {
           )}
           {tab === 'bracket' && (
             <TournamentBracket bracket={hasBracketData ? bracket : null} />
+          )}
+          {tab === 'players' && (
+            <TournamentPlayers players={players} />
           )}
         </div>
       </div>
