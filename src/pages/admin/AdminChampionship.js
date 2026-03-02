@@ -1166,6 +1166,18 @@ function PlayersTab({ tournament }) {
     } catch (err) { setAlert({ type: 'error', msg: err.message }); }
   }
 
+  async function updateNumber(playerId, value) {
+    const number = value === '' ? null : Number(value);
+    if (value !== '' && (isNaN(number) || number < 1 || number > 99)) return;
+    try {
+      await apiFetch(`/admin/championship/players/${playerId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ number }),
+      });
+      loadTeamPlayers(); loadAllPlayers();
+    } catch (err) { setAlert({ type: 'error', msg: err.message }); }
+  }
+
   async function doBulkImport() {
     if (!selectedTeamId || !bulkText.trim()) return;
     const lines = bulkText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -1329,8 +1341,14 @@ function PlayersTab({ tournament }) {
                       <tbody>
                         {teamPlayers.map(p => (
                           <tr key={p.id}>
-                            <td className="center" style={{ color: 'var(--ac-gray-500)', fontWeight: 600 }}>
-                              {p.number ?? '—'}
+                            <td className="center">
+                              <input
+                                type="number" min={1} max={99}
+                                defaultValue={p.number ?? ''}
+                                placeholder="—"
+                                onBlur={e => updateNumber(p.id, e.target.value)}
+                                style={{ width: 48, fontSize: '0.75rem', padding: '2px 4px', borderRadius: 4, border: '1px solid var(--ac-gray-300)', background: 'var(--ac-gray-100)', textAlign: 'center' }}
+                              />
                             </td>
                             <td style={{ fontWeight: 600 }}>{p.name}</td>
                             <td className="center">
