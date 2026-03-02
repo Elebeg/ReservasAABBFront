@@ -23,11 +23,38 @@ const THEMES = [
   { p: '#004d40', s: '#e0f2f1', a: '#ffd700' }, // 15 · esmeralda-escuro / menta-clara / ouro
 ];
 
-// ── Determinístico: mesmo time → mesmo hash → mesmo escudo ───────────────────
+// ── Determinístico: mesmo time → mesmo hash ───────────────────────────────────
 function hashName(name = '') {
   let h = 0;
   for (let i = 0; i < name.length; i++) { h = name.charCodeAt(i) + ((h << 5) - h); h |= 0; }
   return Math.abs(h);
+}
+
+// ── Registro global: garante que nenhum par (design, tema) se repita ──────────
+// Persiste durante toda a sessão; mesmo time sempre recebe o mesmo escudo.
+const _teamBadge = {}; // { teamName: { di, ti } }
+const _taken     = new Set(); // "di-ti"
+
+function assignBadge(name) {
+  if (_teamBadge[name] !== undefined) return _teamBadge[name];
+  const h  = hashName(name);
+  let di   = h % 16;                       // índice de design (forma)
+  let ti   = Math.floor(h / 16) % 16;     // índice de tema   (cores)
+
+  // Procura o primeiro par livre mais próximo do hash original
+  outer: for (let dd = 0; dd < 16; dd++) {
+    for (let dt = 0; dt < 16; dt++) {
+      const cd  = (di + dd) % 16;
+      const ct  = (ti + dt) % 16;
+      const key = `${cd}-${ct}`;
+      if (!_taken.has(key)) { di = cd; ti = ct; break outer; }
+    }
+  }
+
+  const key = `${di}-${ti}`;
+  _taken.add(key);
+  _teamBadge[name] = { di, ti };
+  return _teamBadge[name];
 }
 
 // ── 16 designs de escudo ──────────────────────────────────────────────────────
@@ -168,11 +195,10 @@ const DESIGNS = [
 
 // ── Componente de escudo SVG ──────────────────────────────────────────────────
 function BadgeSVG({ name, size }) {
-  const h   = hashName(name);
-  const idx = h % 16;
-  const { p, s, a } = THEMES[idx];
+  const { di, ti } = assignBadge(name);
+  const { p, s, a } = THEMES[ti];
   // ID único por time para o clipPath (baseado no hash)
-  const id  = `bc${h}`;
+  const id = `bc${hashName(name)}`;
 
   return (
     <svg viewBox="0 0 100 116" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -180,7 +206,7 @@ function BadgeSVG({ name, size }) {
       <defs>
         <clipPath id={id}><path d={S} /></clipPath>
       </defs>
-      {DESIGNS[idx](p, s, a, id)}
+      {DESIGNS[di](p, s, a, id)}
     </svg>
   );
 }
