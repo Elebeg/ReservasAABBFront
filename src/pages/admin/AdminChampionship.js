@@ -457,7 +457,7 @@ function SumulaModal({ match, tournament, onClose }) {
       const foulBoxes = Array(5).fill(BOX).join('');
       const numBox    = `<span style="display:inline-block;width:20px;height:14px;border:1.5px solid #444;border-radius:2px;vertical-align:middle"></span>`;
       if (players.length === 0)
-        return `<tr><td colspan="8" style="color:#999;font-style:italic;text-align:center;padding:8px">Nenhum jogador cadastrado</td></tr>`;
+        return `<tr><td colspan="7" style="color:#999;font-style:italic;text-align:center;padding:8px">Nenhum jogador cadastrado</td></tr>`;
       return players.map(p => {
         const pos     = POSITION_SHORT[p.position] || '—';
         const numCell = p.number != null ? p.number : numBox;
@@ -465,7 +465,6 @@ function SumulaModal({ match, tournament, onClose }) {
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;width:24px;font-size:11px">${numCell}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;font-size:12px">${p.name}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;width:28px;font-size:11px">${pos}</td>
-          <td style="padding:3px 4px;border-bottom:1px solid #eee;min-width:36px"></td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;white-space:nowrap">${foulBoxes}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${YELLOW_BOX}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${RED_BOX}</td>
@@ -488,10 +487,9 @@ function SumulaModal({ match, tournament, onClose }) {
                 <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Nº</th>
                 <th style="padding:3px 4px;text-align:left;border-bottom:2px solid #ddd;font-size:9px">Jogador</th>
                 <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Pos.</th>
-                <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Gols</th>
                 <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Faltas</th>
-                <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">🟡</th>
-                <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">🔴</th>
+                <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Amarelo</th>
+                <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Vermelho</th>
                 <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Assinatura</th>
               </tr>
             </thead>
@@ -545,28 +543,28 @@ function SumulaModal({ match, tournament, onClose }) {
   <span class="team-name">${awayName}</span>
 </div>
 <div style="border:1.5px solid #aaa;border-radius:4px;padding:10px 14px;margin:10px 0">
-  <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Gols por Tempo</p>
-  <table style="width:100%;border-collapse:collapse;font-size:12px">
+  <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Gols por Tempo <span style="font-weight:400;font-style:italic">(nº da camisa e nome)</span></p>
+  <table style="width:100%;border-collapse:separate;border-spacing:0 6px;font-size:12px">
     <thead>
       <tr>
         <th style="width:72px"></th>
-        <th style="text-align:center;padding:3px 6px;border-bottom:1px solid #ccc;font-size:11px">${homeName}</th>
-        <th style="width:18px;text-align:center;padding:3px;border-bottom:1px solid #ccc"></th>
-        <th style="text-align:center;padding:3px 6px;border-bottom:1px solid #ccc;font-size:11px">${awayName}</th>
+        <th style="text-align:center;padding:2px 6px;border-bottom:1px solid #bbb;font-size:11px">${homeName}</th>
+        <th style="width:22px"></th>
+        <th style="text-align:center;padding:2px 6px;border-bottom:1px solid #bbb;font-size:11px">${awayName}</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td style="font-size:11px;font-weight:600;padding:6px 3px">1º Tempo</td>
-        <td style="text-align:center;padding:6px"><span style="display:inline-block;width:36px;border-bottom:1.5px solid #444"></span></td>
-        <td style="text-align:center;font-size:14px;font-weight:bold">×</td>
-        <td style="text-align:center;padding:6px"><span style="display:inline-block;width:36px;border-bottom:1.5px solid #444"></span></td>
+        <td style="font-size:11px;font-weight:600;padding:0 3px;vertical-align:middle">1º Tempo</td>
+        <td style="border:1px solid #888;height:52px;vertical-align:top;padding:4px;border-radius:2px"></td>
+        <td style="text-align:center;font-size:14px;font-weight:bold;vertical-align:middle;padding:0 4px">×</td>
+        <td style="border:1px solid #888;height:52px;vertical-align:top;padding:4px;border-radius:2px"></td>
       </tr>
       <tr>
-        <td style="font-size:11px;font-weight:600;padding:6px 3px">2º Tempo</td>
-        <td style="text-align:center;padding:6px"><span style="display:inline-block;width:36px;border-bottom:1.5px solid #444"></span></td>
-        <td style="text-align:center;font-size:14px;font-weight:bold">×</td>
-        <td style="text-align:center;padding:6px"><span style="display:inline-block;width:36px;border-bottom:1.5px solid #444"></span></td>
+        <td style="font-size:11px;font-weight:600;padding:0 3px;vertical-align:middle">2º Tempo</td>
+        <td style="border:1px solid #888;height:52px;vertical-align:top;padding:4px;border-radius:2px"></td>
+        <td style="text-align:center;font-size:14px;font-weight:bold;vertical-align:middle;padding:0 4px">×</td>
+        <td style="border:1px solid #888;height:52px;vertical-align:top;padding:4px;border-radius:2px"></td>
       </tr>
     </tbody>
   </table>
