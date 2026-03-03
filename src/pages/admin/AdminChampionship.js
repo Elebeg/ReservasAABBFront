@@ -403,15 +403,13 @@ function ResultModal({ match, tid, onClose, onSaved }) {
 // ─── MODAL SÚMULA ─────────────────────────────────────────────────────────────
 
 function SumulaModal({ match, tournament, onClose }) {
-  const [goals, setGoals]           = useState([]);
   const [homePlayers, setHomePlayers] = useState([]);
   const [awayPlayers, setAwayPlayers] = useState([]);
-  const [loading, setLoading]       = useState(true);
+  const [loading, setLoading]         = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [g, hp, ap] = await Promise.all([
-        apiFetch(`/admin/championship/matches/${match.id}/goals`).catch(() => []),
+      const [hp, ap] = await Promise.all([
         match.homeTeam?.id && tournament?.id
           ? apiFetch(`/admin/championship/tournaments/${tournament.id}/teams/${match.homeTeam.id}/players`).catch(() => [])
           : Promise.resolve([]),
@@ -419,57 +417,75 @@ function SumulaModal({ match, tournament, onClose }) {
           ? apiFetch(`/admin/championship/tournaments/${tournament.id}/teams/${match.awayTeam.id}/players`).catch(() => [])
           : Promise.resolve([]),
       ]);
-      setGoals(g || []);
       setHomePlayers(hp || []);
       setAwayPlayers(ap || []);
       setLoading(false);
     }
     load();
-  }, [match.id, tournament?.id, match.homeTeam?.id, match.awayTeam?.id]);
-
-  function getPlayerName(playerId, teamId) {
-    const isHome = teamId === match.homeTeam?.id;
-    const players = isHome ? homePlayers : awayPlayers;
-    return players.find(p => p.id === playerId)?.name || '—';
-  }
+  }, [tournament?.id, match.homeTeam?.id, match.awayTeam?.id]);
 
   function printSumula() {
-    const homeGoals  = goals.filter(g => g.teamId === match.homeTeam?.id);
-    const awayGoals  = goals.filter(g => g.teamId === match.awayTeam?.id);
-    const homeScore  = homeGoals.length;
-    const awayScore  = awayGoals.length;
-    const homeName   = match.homeTeam?.name || 'A definir';
-    const awayName   = match.awayTeam?.name || 'A definir';
-    const phase      = PHASE_LABELS[match.phase] || match.phase || '';
-    const tournName  = tournament?.name || '';
-    const fmtDate    = match.scheduledAt
+    const homeName  = match.homeTeam?.name || 'A definir';
+    const awayName  = match.awayTeam?.name || 'A definir';
+    const phase     = PHASE_LABELS[match.phase] || match.phase || '';
+    const tournName = tournament?.name || '';
+    const fmtDate   = match.scheduledAt
       ? new Date(match.scheduledAt).toLocaleString('pt-BR', {
           day: '2-digit', month: '2-digit', year: 'numeric',
           hour: '2-digit', minute: '2-digit',
         })
-      : '___/___/______  ___:___';
+      : '___/___/______  ___h___';
 
-    function goalRows(goalList) {
-      if (goalList.length === 0)
-        return '<tr><td colspan="2" style="color:#999;font-style:italic;text-align:center;padding:8px">Nenhum gol registrado</td></tr>';
-      return goalList.map((g, i) => {
-        const name = getPlayerName(g.playerId, g.teamId);
-        return `<tr><td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center;width:40px">${i + 1}º</td><td style="padding:4px 8px;border-bottom:1px solid #eee">${name}</td></tr>`;
-      }).join('');
+    // caixinha vazia para marcar com X à caneta
+    const BOX = `<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #444;margin:0 2px;vertical-align:middle;border-radius:2px"></span>`;
+
+    // 6 caixas para faltas de equipe por tempo + aviso da 7ª
+    function teamFoulRow(label) {
+      return `
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+          <span style="font-size:11px;font-weight:600;min-width:62px">${label}:</span>
+          ${Array(6).fill(BOX).join('')}
+          <span style="font-size:10px;color:#c0392b;font-weight:700;margin-left:4px">→ 7ª = TLD</span>
+        </div>`;
     }
 
+    // tabela de jogadores com 5 caixas de falta individual
     function playerRows(players) {
+      const foulBoxes = Array(5).fill(BOX).join('');
       if (players.length === 0)
-        return '<tr><td colspan="3" style="color:#999;font-style:italic;text-align:center;padding:8px">Nenhum jogador cadastrado</td></tr>';
+        return `<tr><td colspan="4" style="color:#999;font-style:italic;text-align:center;padding:8px">Nenhum jogador cadastrado</td></tr>`;
       return players.map(p => {
         const pos = POSITION_SHORT[p.position] || '—';
-        return `<tr><td style="padding:3px 6px;border-bottom:1px solid #eee;text-align:center;width:36px">${p.number ?? '—'}</td><td style="padding:3px 6px;border-bottom:1px solid #eee">${p.name}</td><td style="padding:3px 6px;border-bottom:1px solid #eee;text-align:center;width:46px">${pos}</td></tr>`;
+        return `<tr>
+          <td style="padding:3px 5px;border-bottom:1px solid #eee;text-align:center;width:26px;font-size:11px">${p.number ?? '—'}</td>
+          <td style="padding:3px 5px;border-bottom:1px solid #eee;font-size:12px">${p.name}</td>
+          <td style="padding:3px 5px;border-bottom:1px solid #eee;text-align:center;width:32px;font-size:11px">${pos}</td>
+          <td style="padding:3px 5px;border-bottom:1px solid #eee;text-align:center;white-space:nowrap">${foulBoxes}</td>
+        </tr>`;
       }).join('');
     }
 
-    const penSection = match.homePenalties !== null
-      ? `<p style="text-align:center;margin:6px 0;font-size:13px;color:#b8860b;font-weight:700">Disputa de Pênaltis: ${homeName} ${match.homePenalties} × ${match.awayPenalties} ${awayName}</p>`
-      : '';
+    function teamBlock(name, players) {
+      return `
+        <div>
+          <div style="font-size:13px;font-weight:700;text-align:center;padding:5px 8px;background:#eeeeee;border:1px solid #ccc;margin-bottom:8px;border-radius:3px">${name}</div>
+          <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#555;margin-bottom:5px">Faltas por tempo da equipe</p>
+          ${teamFoulRow('1º Tempo')}
+          ${teamFoulRow('2º Tempo')}
+          <p style="font-size:10px;color:#aaa;margin-bottom:10px">TLD = Tiro Livre Direto (a partir da 7ª falta no tempo)</p>
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr style="background:#f7f7f7">
+                <th style="padding:3px 5px;text-align:center;border-bottom:2px solid #ddd;font-size:10px">Nº</th>
+                <th style="padding:3px 5px;text-align:left;border-bottom:2px solid #ddd;font-size:10px">Jogador</th>
+                <th style="padding:3px 5px;text-align:center;border-bottom:2px solid #ddd;font-size:10px">Pos.</th>
+                <th style="padding:3px 5px;text-align:center;border-bottom:2px solid #ddd;font-size:10px">Faltas (máx. 5)</th>
+              </tr>
+            </thead>
+            <tbody>${playerRows(players)}</tbody>
+          </table>
+        </div>`;
+    }
 
     const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -478,27 +494,24 @@ function SumulaModal({ match, tournament, onClose }) {
 <title>Súmula — ${homeName} × ${awayName}</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Arial,sans-serif;font-size:13px;color:#222;padding:24px;max-width:800px;margin:0 auto}
-  h1{font-size:17px;text-align:center;text-transform:uppercase;letter-spacing:2px;margin-bottom:2px}
-  h2{font-size:12px;text-align:center;color:#666;margin-bottom:14px}
-  .divider{border:none;border-top:2px solid #222;margin:12px 0}
-  .divider-thin{border:none;border-top:1px solid #ccc;margin:10px 0}
-  .meta-row{display:flex;gap:16px;font-size:12px;margin-bottom:10px;flex-wrap:wrap}
-  .meta-item{display:flex;flex-direction:column;min-width:100px}
+  body{font-family:Arial,sans-serif;font-size:13px;color:#222;padding:20px;max-width:820px;margin:0 auto}
+  h1{font-size:16px;text-align:center;text-transform:uppercase;letter-spacing:2px;margin-bottom:2px}
+  h2{font-size:12px;text-align:center;color:#666;margin-bottom:12px}
+  .divider{border:none;border-top:2px solid #222;margin:10px 0}
+  .divider-thin{border:none;border-top:1px solid #ccc;margin:8px 0}
+  .meta-row{display:flex;gap:20px;font-size:12px;margin-bottom:8px;flex-wrap:wrap}
+  .meta-item{display:flex;flex-direction:column;min-width:90px}
   .meta-label{font-size:10px;text-transform:uppercase;color:#888;letter-spacing:0.5px}
   .meta-value{font-weight:bold}
-  .score-box{display:flex;justify-content:center;align-items:center;gap:20px;margin:14px 0}
-  .team-name{font-size:15px;font-weight:bold;text-align:center;flex:1}
-  .score{font-size:44px;font-weight:900;min-width:56px;text-align:center;line-height:1}
-  .score-sep{font-size:28px;color:#777}
-  .section-title{font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;background:#f0f0f0;padding:5px 10px;border-left:4px solid #333;margin:14px 0 6px}
-  .two-col{display:flex;gap:20px}
+  .score-box{display:flex;justify-content:center;align-items:center;gap:20px;margin:10px 0;padding:10px 16px;border:1px solid #ddd;background:#fafafa;border-radius:4px}
+  .team-name{font-size:15px;font-weight:bold;flex:1;text-align:center}
+  .score-blank{font-size:28px;font-weight:900;min-width:40px;text-align:center;color:#ccc;border-bottom:2px solid #777;padding:0 10px;letter-spacing:4px}
+  .score-sep{font-size:22px;color:#777;font-weight:bold}
+  .two-col{display:flex;gap:18px}
   .two-col>div{flex:1;min-width:0}
-  table{width:100%;border-collapse:collapse}
-  th{background:#f7f7f7;padding:4px 8px;text-align:left;font-size:11px;border-bottom:2px solid #ddd}
-  .sig-row{display:flex;gap:32px;margin-top:12px}
+  .sig-row{display:flex;gap:24px;margin-top:14px}
   .sig-item{flex:1;padding-top:6px;text-align:center;font-size:11px;color:#555;border-top:1px solid #444}
-  @media print{body{padding:10px}button{display:none}}
+  @media print{body{padding:8px}button{display:none}}
 </style>
 </head>
 <body>
@@ -514,49 +527,31 @@ function SumulaModal({ match, tournament, onClose }) {
 <hr class="divider">
 <div class="score-box">
   <span class="team-name">${homeName}</span>
-  <span class="score">${homeScore}</span>
+  <span class="score-blank">&nbsp;&nbsp;&nbsp;</span>
   <span class="score-sep">×</span>
-  <span class="score">${awayScore}</span>
+  <span class="score-blank">&nbsp;&nbsp;&nbsp;</span>
   <span class="team-name">${awayName}</span>
 </div>
-${penSection}
 <hr class="divider-thin">
 <div class="two-col">
-  <div>
-    <div class="section-title">Gols — ${homeName}</div>
-    <table><thead><tr><th>#</th><th>Jogador</th></tr></thead><tbody>${goalRows(homeGoals)}</tbody></table>
-  </div>
-  <div>
-    <div class="section-title">Gols — ${awayName}</div>
-    <table><thead><tr><th>#</th><th>Jogador</th></tr></thead><tbody>${goalRows(awayGoals)}</tbody></table>
-  </div>
+  ${teamBlock(homeName, homePlayers)}
+  ${teamBlock(awayName, awayPlayers)}
 </div>
-<hr class="divider-thin">
-<div class="two-col">
-  <div>
-    <div class="section-title">Elenco — ${homeName}</div>
-    <table><thead><tr><th>Nº</th><th>Nome</th><th>Pos.</th></tr></thead><tbody>${playerRows(homePlayers)}</tbody></table>
-  </div>
-  <div>
-    <div class="section-title">Elenco — ${awayName}</div>
-    <table><thead><tr><th>Nº</th><th>Nome</th><th>Pos.</th></tr></thead><tbody>${playerRows(awayPlayers)}</tbody></table>
-  </div>
-</div>
-<hr class="divider" style="margin-top:28px">
-<div class="section-title">Assinaturas</div>
+<hr class="divider" style="margin-top:22px">
+<div style="font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;background:#f0f0f0;padding:4px 10px;border-left:3px solid #333;margin-bottom:12px">Assinaturas</div>
 <div class="sig-row">
   <div class="sig-item">Árbitro</div>
   <div class="sig-item">Capitão — ${homeName}</div>
   <div class="sig-item">Capitão — ${awayName}</div>
   <div class="sig-item">Responsável AABB</div>
 </div>
-<p style="text-align:center;font-size:10px;color:#bbb;margin-top:28px">
+<p style="text-align:center;font-size:10px;color:#bbb;margin-top:20px">
   Documento gerado em ${new Date().toLocaleString('pt-BR')} — Sistema de Reservas AABB
 </p>
 </body>
 </html>`;
 
-    const w = window.open('', '_blank', 'width=840,height=940');
+    const w = window.open('', '_blank', 'width=860,height=960');
     if (!w) { window.alert('Permita pop-ups neste site para gerar a súmula.'); return; }
     w.document.write(html);
     w.document.close();
@@ -564,10 +559,8 @@ ${penSection}
     setTimeout(() => w.print(), 500);
   }
 
-  const homeGoals = goals.filter(g => g.teamId === match.homeTeam?.id);
-  const awayGoals = goals.filter(g => g.teamId === match.awayTeam?.id);
-  const homeName  = match.homeTeam?.name || 'A definir';
-  const awayName  = match.awayTeam?.name || 'A definir';
+  const homeName = match.homeTeam?.name || 'A definir';
+  const awayName = match.awayTeam?.name || 'A definir';
 
   return (
     <Modal title="📄 Súmula da Partida" onClose={onClose}>
@@ -575,43 +568,20 @@ ${penSection}
         <div style={{ textAlign: 'center', padding: 32 }}><span className="ac-spinner" /></div>
       ) : (
         <div>
-          <p style={{ fontSize: '0.82rem', color: 'var(--ac-gray-600)', marginBottom: 12 }}>
-            Prévia da súmula. Clique em <strong>Imprimir</strong> para abrir o documento formatado pronto para impressão ou salvar como PDF.
-          </p>
-
           <div style={{ border: '1px solid var(--ac-gray-200)', borderRadius: 8, padding: 16, marginBottom: 16, background: 'var(--ac-gray-50)' }}>
-            <p style={{ textAlign: 'center', fontWeight: 800, fontSize: '0.9rem', marginBottom: 4, color: 'var(--ac-gray-700)' }}>
+            <p style={{ textAlign: 'center', fontWeight: 800, fontSize: '0.9rem', marginBottom: 6, color: 'var(--ac-gray-700)' }}>
               {PHASE_LABELS[match.phase] || match.phase} — {tournament?.name}
             </p>
-            <p style={{ textAlign: 'center', fontSize: '1.8rem', fontWeight: 900, margin: '8px 0' }}>
-              {homeName} <span style={{ color: 'var(--ac-gray-400)', fontSize: '1.3rem' }}>{homeGoals.length} × {awayGoals.length}</span> {awayName}
+            <p style={{ textAlign: 'center', fontSize: '1.3rem', fontWeight: 900, margin: '6px 0', color: 'var(--ac-gray-800)' }}>
+              {homeName} <span style={{ color: 'var(--ac-gray-300)', fontWeight: 400, fontSize: '1rem' }}>___ × ___</span> {awayName}
             </p>
-            {match.homePenalties !== null && (
-              <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--ac-warning)', fontWeight: 700 }}>
-                Pênaltis: {match.homePenalties} × {match.awayPenalties}
-              </p>
-            )}
             <hr style={{ margin: '10px 0', border: 'none', borderTop: '1px solid var(--ac-gray-200)' }} />
-            <div style={{ display: 'flex', gap: 16 }}>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--ac-gray-700)', marginBottom: 4 }}>⚽ Gols {homeName}</p>
-                {homeGoals.length === 0
-                  ? <p style={{ fontSize: '0.75rem', color: 'var(--ac-gray-400)', fontStyle: 'italic' }}>Nenhum</p>
-                  : homeGoals.map((g, i) => (
-                      <p key={g.id} style={{ fontSize: '0.75rem', marginBottom: 2 }}>{i + 1}. {getPlayerName(g.playerId, g.teamId)}</p>
-                    ))
-                }
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--ac-gray-700)', marginBottom: 4 }}>⚽ Gols {awayName}</p>
-                {awayGoals.length === 0
-                  ? <p style={{ fontSize: '0.75rem', color: 'var(--ac-gray-400)', fontStyle: 'italic' }}>Nenhum</p>
-                  : awayGoals.map((g, i) => (
-                      <p key={g.id} style={{ fontSize: '0.75rem', marginBottom: 2 }}>{i + 1}. {getPlayerName(g.playerId, g.teamId)}</p>
-                    ))
-                }
-              </div>
-            </div>
+            <p style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--ac-gray-500)' }}>
+              {homePlayers.length} jogador(es) · {awayPlayers.length} jogador(es)
+            </p>
+            <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'var(--ac-gray-400)', marginTop: 4 }}>
+              Placar, gols, cartões e faltas são preenchidos à mão na folha impressa.
+            </p>
           </div>
 
           <div className="ac-form-actions">
