@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // useEffect: reset imgFailed on logoUrl change
 
 // ── Forma do escudo (compartilhada) ───────────────────────────────────────────
 const S = 'M50 5 L93 20 L93 67 Q93 95 50 111 Q7 95 7 67 L7 20 Z';
@@ -227,54 +227,19 @@ function getInitials(name = '') {
   return w.length === 1 ? w[0].slice(0, 2).toUpperCase() : (w[0][0] + w[w.length - 1][0]).toUpperCase();
 }
 
-// ── Cache global (null = não buscou, false = não encontrou, string = URL) ─────
-const _cache = {};
-
-async function fetchLogo(name) {
-  if (_cache[name] !== undefined) return _cache[name];
-  try {
-    const r = await fetch(
-      `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(name)}`
-    );
-    const d = await r.json();
-    const teams = d.teams || [];
-    const norm  = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    const q     = norm(name);
-    const word  = q.split(' ')[0];
-    const exact   = teams.find(t => (t.strSport === 'Soccer' || t.strSport === 'Football') && norm(t.strTeam) === q);
-    const partial = teams.find(t => (t.strSport === 'Soccer' || t.strSport === 'Football') && norm(t.strTeam).includes(word));
-    const match = exact || partial;
-    const badge = match?.strTeamBadge || match?.strBadge || null;
-    const url   = badge ? badge + '/tiny' : false;
-    _cache[name] = url;
-    return url;
-  } catch {
-    _cache[name] = false;
-    return false;
-  }
-}
-
 // ── Componente principal ──────────────────────────────────────────────────────
 /**
- * TeamLogo — 3 camadas de fallback:
+ * TeamLogo — 2 camadas de fallback:
  *   1. logoUrl do banco
- *   2. Busca automática na TheSportsDB
- *   3a. shape="shield" → escudo SVG único por time (16 designs × 16 temas)
- *   3b. shape="circle" → avatar circular com iniciais coloridas
+ *   2a. shape="shield" → escudo SVG único por time (16 designs × 16 temas)
+ *   2b. shape="circle" → avatar circular com iniciais coloridas
  */
 export default function TeamLogo({ name = '', logoUrl = null, size = 32, shape = 'shield', style = {} }) {
-  const [resolved, setResolved] = useState(
-    logoUrl ? logoUrl : (_cache[name] !== undefined ? _cache[name] : null)
-  );
   const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
-    if (logoUrl) { setResolved(logoUrl); setImgFailed(false); return; }
-    if (_cache[name] !== undefined) { setResolved(_cache[name]); return; }
-    let live = true;
-    fetchLogo(name).then(url => { if (live) setResolved(url); });
-    return () => { live = false; };
-  }, [name, logoUrl]);
+    setImgFailed(false);
+  }, [logoUrl]);
 
   const clipMap    = { shield: 'polygon(50% 0%, 100% 18%, 100% 65%, 50% 100%, 0% 65%, 0% 18%)', circle: 'none', square: 'none' };
   const radiusMap  = { shield: 0, circle: '50%', square: 4 };
@@ -288,11 +253,11 @@ export default function TeamLogo({ name = '', logoUrl = null, size = 32, shape =
     ...style,
   };
 
-  // ① URL resolvida com imagem carregada
-  if (resolved && !imgFailed) {
+  // ① logoUrl do banco com imagem carregada
+  if (logoUrl && !imgFailed) {
     return (
       <span style={containerStyle}>
-        <img src={resolved} alt={name}
+        <img src={logoUrl} alt={name}
              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
              onError={() => setImgFailed(true)} />
       </span>
