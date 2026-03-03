@@ -259,10 +259,26 @@ function ResultModal({ match, tid, onClose, onSaved }) {
     e.preventDefault();
     setSaving(true); setError('');
     try {
+      if (showPenalties && homePen === '' && awayPen === '') {
+        setError('Informe o resultado dos pênaltis.');
+        setSaving(false);
+        return;
+      }
+      if (showPenalties) {
+        const hp = Number(homePen || '0');
+        const ap = Number(awayPen || '0');
+        if (hp === ap) {
+          setError('Pênaltis não podem terminar empatados.');
+          setSaving(false);
+          return;
+        }
+      }
       const payload = {
         homeScore,
         awayScore,
-        ...(showPenalties && homePen !== '' ? { homePenalties: Number(homePen), awayPenalties: Number(awayPen) } : {}),
+        ...(showPenalties
+          ? { homePenalties: Number(homePen || '0'), awayPenalties: Number(awayPen || '0') }
+          : {}),
       };
       const method = isEdit ? 'PATCH' : 'POST';
       await apiFetch(`/admin/championship/matches/${match.id}/result`, { method, body: JSON.stringify(payload) });
