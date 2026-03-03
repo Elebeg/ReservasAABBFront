@@ -203,7 +203,7 @@ function ResultModal({ match, tid, onClose, onSaved }) {
   const awayGoals = goals.filter(g => g.teamId === match.awayTeam?.id);
   const homeScore = homeGoals.length;
   const awayScore = awayGoals.length;
-  const showPenalties = homeScore === awayScore && match.phase !== 'GROUP' && (homeScore > 0 || awayScore > 0);
+  const showPenalties = homeScore === awayScore && match.phase !== 'GROUP';
 
   // Carrega gols salvos + jogadores ao abrir o modal
   useEffect(() => {
