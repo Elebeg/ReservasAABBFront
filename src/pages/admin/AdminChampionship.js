@@ -445,13 +445,13 @@ function SumulaModal({ match, tournament, onClose }) {
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
           <span style="font-size:11px;font-weight:600;min-width:62px">${label}:</span>
           ${Array(6).fill(BOX).join('')}
-          <span style="font-size:10px;color:#c0392b;font-weight:700;margin-left:4px">→ 7ª = TLD</span>
+          <span style="font-size:10px;font-weight:700;margin-left:4px">→ 7ª = TLD</span>
         </div>`;
     }
 
     // tabela de jogadores: nº · nome · pos · gols · faltas · amarelo · vermelho · assinatura
-    const YELLOW_BOX = `<span style="display:inline-block;width:13px;height:17px;border:1.5px solid #b8860b;background:#fffbe6;border-radius:2px;vertical-align:middle"></span>`;
-    const RED_BOX    = `<span style="display:inline-block;width:13px;height:17px;border:1.5px solid #c0392b;background:#fff5f5;border-radius:2px;vertical-align:middle"></span>`;
+    const YELLOW_BOX = `<span style="display:inline-block;width:13px;height:17px;border:1.5px solid #444;border-radius:2px;vertical-align:middle"></span>`;
+    const RED_BOX    = `<span style="display:inline-block;width:13px;height:17px;border:1.5px solid #444;border-radius:2px;vertical-align:middle"></span>`;
 
     function playerRows(players) {
       const foulBoxes = Array(5).fill(BOX).join('');
@@ -543,6 +543,33 @@ function SumulaModal({ match, tournament, onClose }) {
   <span class="score-sep">×</span>
   <span class="score-blank">&nbsp;&nbsp;&nbsp;</span>
   <span class="team-name">${awayName}</span>
+</div>
+<div style="border:1.5px solid #aaa;border-radius:4px;padding:10px 14px;margin:10px 0">
+  <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Gols por Tempo</p>
+  <table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead>
+      <tr>
+        <th style="width:72px"></th>
+        <th style="text-align:center;padding:3px 6px;border-bottom:1px solid #ccc;font-size:11px">${homeName}</th>
+        <th style="width:18px;text-align:center;padding:3px;border-bottom:1px solid #ccc"></th>
+        <th style="text-align:center;padding:3px 6px;border-bottom:1px solid #ccc;font-size:11px">${awayName}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-size:11px;font-weight:600;padding:6px 3px">1º Tempo</td>
+        <td style="text-align:center;padding:6px"><span style="display:inline-block;width:36px;border-bottom:1.5px solid #444"></span></td>
+        <td style="text-align:center;font-size:14px;font-weight:bold">×</td>
+        <td style="text-align:center;padding:6px"><span style="display:inline-block;width:36px;border-bottom:1.5px solid #444"></span></td>
+      </tr>
+      <tr>
+        <td style="font-size:11px;font-weight:600;padding:6px 3px">2º Tempo</td>
+        <td style="text-align:center;padding:6px"><span style="display:inline-block;width:36px;border-bottom:1.5px solid #444"></span></td>
+        <td style="text-align:center;font-size:14px;font-weight:bold">×</td>
+        <td style="text-align:center;padding:6px"><span style="display:inline-block;width:36px;border-bottom:1.5px solid #444"></span></td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 <hr class="divider-thin">
 <div class="two-col">
