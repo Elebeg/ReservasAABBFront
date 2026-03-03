@@ -19,17 +19,25 @@ function MatchCard({ match, isFinal = false }) {
   const awayWon  = !!(winnerId && match.awayTeam?.id === winnerId);
   const finished = match.status === 'FINISHED';
 
+  const fmtDate = match.scheduledAt
+    ? new Date(match.scheduledAt).toLocaleString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      })
+    : null;
+
   return (
     <div className={`wb-card${isFinal ? ' wb-card--final' : ''}${finished ? ' wb-card--done' : ''}`}>
+      {fmtDate && <div className="wb-date">📅 {fmtDate}</div>}
       <div className={`wb-row${homeWon ? ' wb-row--won' : ''}${!match.homeTeam ? ' wb-row--tbd' : ''}`}>
         <TeamLogo name={match.homeTeam?.name || '?'} logoUrl={match.homeTeam?.logoUrl || null} size={20} shape="shield" style={{ marginRight: 6 }} />
-      <span className="wb-name">{match.homeTeam?.name || 'A definir'}</span>
+        <span className="wb-name">{match.homeTeam?.name || 'A definir'}</span>
         {finished && <span className={`wb-score${homeWon ? ' wb-score--won' : ''}`}>{match.homeScore}</span>}
       </div>
       <div className="wb-sep" />
       <div className={`wb-row${awayWon ? ' wb-row--won' : ''}${!match.awayTeam ? ' wb-row--tbd' : ''}`}>
         <TeamLogo name={match.awayTeam?.name || '?'} logoUrl={match.awayTeam?.logoUrl || null} size={20} shape="shield" style={{ marginRight: 6 }} />
-      <span className="wb-name">{match.awayTeam?.name || 'A definir'}</span>
+        <span className="wb-name">{match.awayTeam?.name || 'A definir'}</span>
         {finished && <span className={`wb-score${awayWon ? ' wb-score--won' : ''}`}>{match.awayScore}</span>}
       </div>
       {match.homePenalties != null && (
@@ -115,6 +123,7 @@ export default function TournamentBracket({ bracket }) {
         <div className="wb-champion">
           <span className="wb-champion-trophy">🏆</span>
           <span className="wb-champion-label">CAMPEÃO</span>
+          <TeamLogo name={champion.name} logoUrl={champion.logoUrl || null} size={72} shape="shield" />
           <span className="wb-champion-name">{champion.name}</span>
         </div>
       )}

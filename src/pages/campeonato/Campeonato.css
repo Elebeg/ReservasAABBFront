@@ -858,6 +858,22 @@
 
 .wb-card--final .wb-score { font-size: 1rem; }
 
+/* ── Data da partida ───────────────────────────────────────────────────── */
+.wb-date {
+  padding: 4px 10px 3px;
+  font-size: 0.65rem;
+  color: #888;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  background: rgba(0,0,0,0.02);
+}
+
+.wb-card--final .wb-date {
+  color: #c68b00;
+  border-bottom-color: rgba(245,184,0,0.15);
+  background: rgba(245,184,0,0.04);
+}
+
 /* ── Separador entre times ─────────────────────────────────────────────── */
 .wb-sep {
   height: 1px;
