@@ -400,6 +400,232 @@ function ResultModal({ match, tid, onClose, onSaved }) {
   );
 }
 
+// ─── MODAL SÚMULA ─────────────────────────────────────────────────────────────
+
+function SumulaModal({ match, tournament, onClose }) {
+  const [goals, setGoals]           = useState([]);
+  const [homePlayers, setHomePlayers] = useState([]);
+  const [awayPlayers, setAwayPlayers] = useState([]);
+  const [loading, setLoading]       = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const [g, hp, ap] = await Promise.all([
+        apiFetch(`/admin/championship/matches/${match.id}/goals`).catch(() => []),
+        match.homeTeam?.id && tournament?.id
+          ? apiFetch(`/admin/championship/tournaments/${tournament.id}/teams/${match.homeTeam.id}/players`).catch(() => [])
+          : Promise.resolve([]),
+        match.awayTeam?.id && tournament?.id
+          ? apiFetch(`/admin/championship/tournaments/${tournament.id}/teams/${match.awayTeam.id}/players`).catch(() => [])
+          : Promise.resolve([]),
+      ]);
+      setGoals(g || []);
+      setHomePlayers(hp || []);
+      setAwayPlayers(ap || []);
+      setLoading(false);
+    }
+    load();
+  }, [match.id, tournament?.id, match.homeTeam?.id, match.awayTeam?.id]);
+
+  function getPlayerName(playerId, teamId) {
+    const isHome = teamId === match.homeTeam?.id;
+    const players = isHome ? homePlayers : awayPlayers;
+    return players.find(p => p.id === playerId)?.name || '—';
+  }
+
+  function printSumula() {
+    const homeGoals  = goals.filter(g => g.teamId === match.homeTeam?.id);
+    const awayGoals  = goals.filter(g => g.teamId === match.awayTeam?.id);
+    const homeScore  = homeGoals.length;
+    const awayScore  = awayGoals.length;
+    const homeName   = match.homeTeam?.name || 'A definir';
+    const awayName   = match.awayTeam?.name || 'A definir';
+    const phase      = PHASE_LABELS[match.phase] || match.phase || '';
+    const tournName  = tournament?.name || '';
+    const fmtDate    = match.scheduledAt
+      ? new Date(match.scheduledAt).toLocaleString('pt-BR', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit',
+        })
+      : '___/___/______  ___:___';
+
+    function goalRows(goalList) {
+      if (goalList.length === 0)
+        return '<tr><td colspan="2" style="color:#999;font-style:italic;text-align:center;padding:8px">Nenhum gol registrado</td></tr>';
+      return goalList.map((g, i) => {
+        const name = getPlayerName(g.playerId, g.teamId);
+        return `<tr><td style="padding:4px 8px;border-bottom:1px solid #eee;text-align:center;width:40px">${i + 1}º</td><td style="padding:4px 8px;border-bottom:1px solid #eee">${name}</td></tr>`;
+      }).join('');
+    }
+
+    function playerRows(players) {
+      if (players.length === 0)
+        return '<tr><td colspan="3" style="color:#999;font-style:italic;text-align:center;padding:8px">Nenhum jogador cadastrado</td></tr>';
+      return players.map(p => {
+        const pos = POSITION_SHORT[p.position] || '—';
+        return `<tr><td style="padding:3px 6px;border-bottom:1px solid #eee;text-align:center;width:36px">${p.number ?? '—'}</td><td style="padding:3px 6px;border-bottom:1px solid #eee">${p.name}</td><td style="padding:3px 6px;border-bottom:1px solid #eee;text-align:center;width:46px">${pos}</td></tr>`;
+      }).join('');
+    }
+
+    const penSection = match.homePenalties !== null
+      ? `<p style="text-align:center;margin:6px 0;font-size:13px;color:#b8860b;font-weight:700">Disputa de Pênaltis: ${homeName} ${match.homePenalties} × ${match.awayPenalties} ${awayName}</p>`
+      : '';
+
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Súmula — ${homeName} × ${awayName}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:13px;color:#222;padding:24px;max-width:800px;margin:0 auto}
+  h1{font-size:17px;text-align:center;text-transform:uppercase;letter-spacing:2px;margin-bottom:2px}
+  h2{font-size:12px;text-align:center;color:#666;margin-bottom:14px}
+  .divider{border:none;border-top:2px solid #222;margin:12px 0}
+  .divider-thin{border:none;border-top:1px solid #ccc;margin:10px 0}
+  .meta-row{display:flex;gap:16px;font-size:12px;margin-bottom:10px;flex-wrap:wrap}
+  .meta-item{display:flex;flex-direction:column;min-width:100px}
+  .meta-label{font-size:10px;text-transform:uppercase;color:#888;letter-spacing:0.5px}
+  .meta-value{font-weight:bold}
+  .score-box{display:flex;justify-content:center;align-items:center;gap:20px;margin:14px 0}
+  .team-name{font-size:15px;font-weight:bold;text-align:center;flex:1}
+  .score{font-size:44px;font-weight:900;min-width:56px;text-align:center;line-height:1}
+  .score-sep{font-size:28px;color:#777}
+  .section-title{font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;background:#f0f0f0;padding:5px 10px;border-left:4px solid #333;margin:14px 0 6px}
+  .two-col{display:flex;gap:20px}
+  .two-col>div{flex:1;min-width:0}
+  table{width:100%;border-collapse:collapse}
+  th{background:#f7f7f7;padding:4px 8px;text-align:left;font-size:11px;border-bottom:2px solid #ddd}
+  .sig-row{display:flex;gap:32px;margin-top:12px}
+  .sig-item{flex:1;padding-top:6px;text-align:center;font-size:11px;color:#555;border-top:1px solid #444}
+  @media print{body{padding:10px}button{display:none}}
+</style>
+</head>
+<body>
+<h1>Associação Atlética Banco do Brasil</h1>
+<h2>Súmula de Partida — ${tournName}</h2>
+<hr class="divider">
+<div class="meta-row">
+  <div class="meta-item"><span class="meta-label">Fase</span><span class="meta-value">${phase}</span></div>
+  <div class="meta-item"><span class="meta-label">Data / Hora</span><span class="meta-value">${fmtDate}</span></div>
+  <div class="meta-item"><span class="meta-label">Nº da Partida</span><span class="meta-value">#${match.id}</span></div>
+  <div class="meta-item"><span class="meta-label">Local</span><span class="meta-value">AABB</span></div>
+</div>
+<hr class="divider">
+<div class="score-box">
+  <span class="team-name">${homeName}</span>
+  <span class="score">${homeScore}</span>
+  <span class="score-sep">×</span>
+  <span class="score">${awayScore}</span>
+  <span class="team-name">${awayName}</span>
+</div>
+${penSection}
+<hr class="divider-thin">
+<div class="two-col">
+  <div>
+    <div class="section-title">Gols — ${homeName}</div>
+    <table><thead><tr><th>#</th><th>Jogador</th></tr></thead><tbody>${goalRows(homeGoals)}</tbody></table>
+  </div>
+  <div>
+    <div class="section-title">Gols — ${awayName}</div>
+    <table><thead><tr><th>#</th><th>Jogador</th></tr></thead><tbody>${goalRows(awayGoals)}</tbody></table>
+  </div>
+</div>
+<hr class="divider-thin">
+<div class="two-col">
+  <div>
+    <div class="section-title">Elenco — ${homeName}</div>
+    <table><thead><tr><th>Nº</th><th>Nome</th><th>Pos.</th></tr></thead><tbody>${playerRows(homePlayers)}</tbody></table>
+  </div>
+  <div>
+    <div class="section-title">Elenco — ${awayName}</div>
+    <table><thead><tr><th>Nº</th><th>Nome</th><th>Pos.</th></tr></thead><tbody>${playerRows(awayPlayers)}</tbody></table>
+  </div>
+</div>
+<hr class="divider" style="margin-top:28px">
+<div class="section-title">Assinaturas</div>
+<div class="sig-row">
+  <div class="sig-item">Árbitro</div>
+  <div class="sig-item">Capitão — ${homeName}</div>
+  <div class="sig-item">Capitão — ${awayName}</div>
+  <div class="sig-item">Responsável AABB</div>
+</div>
+<p style="text-align:center;font-size:10px;color:#bbb;margin-top:28px">
+  Documento gerado em ${new Date().toLocaleString('pt-BR')} — Sistema de Reservas AABB
+</p>
+</body>
+</html>`;
+
+    const w = window.open('', '_blank', 'width=840,height=940');
+    if (!w) { window.alert('Permita pop-ups neste site para gerar a súmula.'); return; }
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    setTimeout(() => w.print(), 500);
+  }
+
+  const homeGoals = goals.filter(g => g.teamId === match.homeTeam?.id);
+  const awayGoals = goals.filter(g => g.teamId === match.awayTeam?.id);
+  const homeName  = match.homeTeam?.name || 'A definir';
+  const awayName  = match.awayTeam?.name || 'A definir';
+
+  return (
+    <Modal title="📄 Súmula da Partida" onClose={onClose}>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 32 }}><span className="ac-spinner" /></div>
+      ) : (
+        <div>
+          <p style={{ fontSize: '0.82rem', color: 'var(--ac-gray-600)', marginBottom: 12 }}>
+            Prévia da súmula. Clique em <strong>Imprimir</strong> para abrir o documento formatado pronto para impressão ou salvar como PDF.
+          </p>
+
+          <div style={{ border: '1px solid var(--ac-gray-200)', borderRadius: 8, padding: 16, marginBottom: 16, background: 'var(--ac-gray-50)' }}>
+            <p style={{ textAlign: 'center', fontWeight: 800, fontSize: '0.9rem', marginBottom: 4, color: 'var(--ac-gray-700)' }}>
+              {PHASE_LABELS[match.phase] || match.phase} — {tournament?.name}
+            </p>
+            <p style={{ textAlign: 'center', fontSize: '1.8rem', fontWeight: 900, margin: '8px 0' }}>
+              {homeName} <span style={{ color: 'var(--ac-gray-400)', fontSize: '1.3rem' }}>{homeGoals.length} × {awayGoals.length}</span> {awayName}
+            </p>
+            {match.homePenalties !== null && (
+              <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--ac-warning)', fontWeight: 700 }}>
+                Pênaltis: {match.homePenalties} × {match.awayPenalties}
+              </p>
+            )}
+            <hr style={{ margin: '10px 0', border: 'none', borderTop: '1px solid var(--ac-gray-200)' }} />
+            <div style={{ display: 'flex', gap: 16 }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--ac-gray-700)', marginBottom: 4 }}>⚽ Gols {homeName}</p>
+                {homeGoals.length === 0
+                  ? <p style={{ fontSize: '0.75rem', color: 'var(--ac-gray-400)', fontStyle: 'italic' }}>Nenhum</p>
+                  : homeGoals.map((g, i) => (
+                      <p key={g.id} style={{ fontSize: '0.75rem', marginBottom: 2 }}>{i + 1}. {getPlayerName(g.playerId, g.teamId)}</p>
+                    ))
+                }
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--ac-gray-700)', marginBottom: 4 }}>⚽ Gols {awayName}</p>
+                {awayGoals.length === 0
+                  ? <p style={{ fontSize: '0.75rem', color: 'var(--ac-gray-400)', fontStyle: 'italic' }}>Nenhum</p>
+                  : awayGoals.map((g, i) => (
+                      <p key={g.id} style={{ fontSize: '0.75rem', marginBottom: 2 }}>{i + 1}. {getPlayerName(g.playerId, g.teamId)}</p>
+                    ))
+                }
+              </div>
+            </div>
+          </div>
+
+          <div className="ac-form-actions">
+            <button className="ac-btn ac-btn-ghost" onClick={onClose}>Fechar</button>
+            <button className="ac-btn ac-btn-primary" onClick={printSumula}>
+              🖨️ Imprimir / Salvar PDF
+            </button>
+          </div>
+        </div>
+      )}
+    </Modal>
+  );
+}
+
 // ─── ABA: TIMES ──────────────────────────────────────────────────────────────
 
 // ─── CACHE DE TIMES (carregado uma vez via TheSportsDB) ──────────────────────
@@ -873,6 +1099,7 @@ function MatchesTab({ tournament, onRefresh }) {
   const [matches, setMatches] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [scheduleMatch, setScheduleMatch] = useState(null);
+  const [sumulaMatch, setSumulaMatch]     = useState(null);
   const [alert, setAlert] = useState(null);
 
   const loadMatches = useCallback(async () => {
@@ -915,6 +1142,14 @@ function MatchesTab({ tournament, onRefresh }) {
           match={scheduleMatch}
           onClose={() => setScheduleMatch(null)}
           onSaved={() => { setScheduleMatch(null); loadMatches(); }}
+        />
+      )}
+
+      {sumulaMatch && (
+        <SumulaModal
+          match={sumulaMatch}
+          tournament={tournament}
+          onClose={() => setSumulaMatch(null)}
         />
       )}
 
@@ -990,6 +1225,16 @@ function MatchesTab({ tournament, onRefresh }) {
                         onClick={() => setSelectedMatch(m)}
                       >
                         {m.status === 'FINISHED' ? '✏️ Corrigir' : '📝 Resultado'}
+                      </button>
+                    )}
+
+                    {/* Botão de súmula — só se times definidos */}
+                    {m.homeTeam && m.awayTeam && (
+                      <button
+                        className="ac-btn ac-btn-sm ac-btn-ghost"
+                        onClick={() => setSumulaMatch(m)}
+                      >
+                        📄 Súmula
                       </button>
                     )}
                   </div>
