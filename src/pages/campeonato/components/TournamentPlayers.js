@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TeamLogo from './TeamLogo';
 
 const POSITION_SHORT = {
@@ -8,7 +8,13 @@ const POSITION_SHORT = {
   FORWARD:    'ATA',
 };
 
+function normalize(str) {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
 export default function TournamentPlayers({ players, onTeamClick }) {
+  const [query, setQuery] = useState('');
+
   if (!players || players.length === 0) {
     return (
       <div className="camp-empty">
@@ -22,12 +28,40 @@ export default function TournamentPlayers({ players, onTeamClick }) {
   const disciplinary = [...players].filter(p => p.yellowCards > 0 || p.redCards > 0)
     .sort((a, b) => b.redCards - a.redCards || b.yellowCards - a.yellowCards);
 
+  // rank real de cada jogador na lista completa
+  const rankMap = new Map(scorers.map((p, i) => [p.id, i + 1]));
+
+  const trimmed = query.trim();
+  const visibleScorers = trimmed
+    ? scorers.filter(p => normalize(p.name).includes(normalize(trimmed)))
+    : scorers.slice(0, 15);
+
   return (
     <div className="camp-players">
 
       {/* ── Artilharia ── */}
       <div className="camp-group-section">
         <h3 className="camp-group-title">⚽ Artilharia</h3>
+
+        {/* Barra de busca */}
+        <div style={{ marginBottom: 12 }}>
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Buscar jogador pelo nome…"
+            style={{
+              width: '100%',
+              padding: '7px 12px',
+              fontSize: '0.875rem',
+              border: '1px solid var(--border-color, #dee2e6)',
+              borderRadius: 6,
+              outline: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
+        </div>
+
         <div className="camp-table-wrap">
           <table className="camp-table">
             <thead>
@@ -42,46 +76,60 @@ export default function TournamentPlayers({ players, onTeamClick }) {
               </tr>
             </thead>
             <tbody>
-              {scorers.map((p, i) => (
-                <tr key={p.id} className="camp-tr">
-                  <td className="camp-td pos">{i + 1}</td>
-                  <td className="camp-td" style={{ fontWeight: 600 }}>{p.name}</td>
-                  <td className="camp-td">
-                    <span
-                      className="ts-team-cell"
-                      onClick={onTeamClick && p.team ? () => onTeamClick({ name: p.team.name, logoUrl: p.team.logoUrl }) : undefined}
-                      style={onTeamClick && p.team ? { cursor: 'pointer' } : undefined}
-                    >
-                      {p.team && (
-                        <TeamLogo name={p.team.name} logoUrl={p.team.logoUrl} size={24} shape="shield" />
-                      )}
-                      <span className={onTeamClick && p.team ? 'camp-team-clickable' : ''} style={{ fontSize: '0.875rem' }}>{p.team?.name ?? '—'}</span>
-                    </span>
-                  </td>
-                  <td className="camp-td center">
-                    {p.position ? (
-                      <span style={{
-                        fontSize: '0.7rem', fontWeight: 700, padding: '2px 6px',
-                        borderRadius: 4, background: '#e9ecef', color: '#495057',
-                      }}>
-                        {POSITION_SHORT[p.position] || p.position}
-                      </span>
-                    ) : '—'}
-                  </td>
-                  <td className="camp-td center pts" style={{ fontWeight: 800 }}>{p.goals}</td>
-                  <td className="camp-td center"
-                    style={{ color: p.yellowCards > 0 ? '#d68910' : undefined }}>
-                    {p.yellowCards || '—'}
-                  </td>
-                  <td className="camp-td center"
-                    style={{ color: p.redCards > 0 ? '#c0392b' : undefined }}>
-                    {p.redCards || '—'}
+              {visibleScorers.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '16px 0', color: '#888', fontSize: '0.875rem' }}>
+                    Nenhum jogador encontrado.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                visibleScorers.map(p => (
+                  <tr key={p.id} className="camp-tr">
+                    <td className="camp-td pos">{rankMap.get(p.id)}</td>
+                    <td className="camp-td" style={{ fontWeight: 600 }}>{p.name}</td>
+                    <td className="camp-td">
+                      <span
+                        className="ts-team-cell"
+                        onClick={onTeamClick && p.team ? () => onTeamClick({ name: p.team.name, logoUrl: p.team.logoUrl }) : undefined}
+                        style={onTeamClick && p.team ? { cursor: 'pointer' } : undefined}
+                      >
+                        {p.team && (
+                          <TeamLogo name={p.team.name} logoUrl={p.team.logoUrl} size={24} shape="shield" />
+                        )}
+                        <span className={onTeamClick && p.team ? 'camp-team-clickable' : ''} style={{ fontSize: '0.875rem' }}>{p.team?.name ?? '—'}</span>
+                      </span>
+                    </td>
+                    <td className="camp-td center">
+                      {p.position ? (
+                        <span style={{
+                          fontSize: '0.7rem', fontWeight: 700, padding: '2px 6px',
+                          borderRadius: 4, background: '#e9ecef', color: '#495057',
+                        }}>
+                          {POSITION_SHORT[p.position] || p.position}
+                        </span>
+                      ) : '—'}
+                    </td>
+                    <td className="camp-td center pts" style={{ fontWeight: 800 }}>{p.goals}</td>
+                    <td className="camp-td center"
+                      style={{ color: p.yellowCards > 0 ? '#d68910' : undefined }}>
+                      {p.yellowCards || '—'}
+                    </td>
+                    <td className="camp-td center"
+                      style={{ color: p.redCards > 0 ? '#c0392b' : undefined }}>
+                      {p.redCards || '—'}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
+
+        {!trimmed && scorers.length > 15 && (
+          <p style={{ fontSize: '0.78rem', color: '#888', marginTop: 8 }}>
+            Exibindo os 15 primeiros. Use a busca acima para encontrar outros jogadores.
+          </p>
+        )}
       </div>
 
       {/* ── Ranking Disciplinar ── */}

@@ -457,14 +457,12 @@ function SumulaModal({ match, tournament, onClose }) {
       const foulBoxes = Array(5).fill(BOX).join('');
       const numBox    = `<span style="display:inline-block;width:20px;height:14px;border:1.5px solid #444;border-radius:2px;vertical-align:middle"></span>`;
       if (players.length === 0)
-        return `<tr><td colspan="7" style="color:#999;font-style:italic;text-align:center;padding:8px">Nenhum jogador cadastrado</td></tr>`;
+        return `<tr><td colspan="6" style="color:#999;font-style:italic;text-align:center;padding:8px">Nenhum jogador cadastrado</td></tr>`;
       return players.map(p => {
-        const pos     = POSITION_SHORT[p.position] || '—';
         const numCell = p.number != null ? p.number : numBox;
         return `<tr>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;width:24px;font-size:11px">${numCell}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;font-size:12px">${p.name}</td>
-          <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;width:28px;font-size:11px">${pos}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;white-space:nowrap">${foulBoxes}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${YELLOW_BOX}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${RED_BOX}</td>
@@ -486,10 +484,9 @@ function SumulaModal({ match, tournament, onClose }) {
               <tr style="background:#f7f7f7">
                 <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Nº</th>
                 <th style="padding:3px 4px;text-align:left;border-bottom:2px solid #ddd;font-size:9px">Jogador</th>
-                <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Pos.</th>
                 <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Faltas</th>
-                <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Amarelo</th>
-                <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Vermelho</th>
+                <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">A</th>
+                <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">V</th>
                 <th style="padding:3px 4px;text-align:center;border-bottom:2px solid #ddd;font-size:9px">Assinatura</th>
               </tr>
             </thead>
@@ -521,7 +518,7 @@ function SumulaModal({ match, tournament, onClose }) {
   .two-col{display:flex;gap:18px}
   .two-col>div{flex:1;min-width:0}
   .sig-row{display:flex;gap:24px;margin-top:14px}
-  .sig-item{flex:1;padding-top:6px;text-align:center;font-size:11px;color:#555;border-top:1px solid #444}
+  .sig-item{flex:1;margin-top:50px;padding-top:5px;text-align:center;font-size:11px;color:#555;border-top:1px solid #444}
   @media print{body{padding:8px}button{display:none}}
 </style>
 </head>
