@@ -228,30 +228,40 @@ function getInitials(name = '') {
 }
 
 // ── Cache global (null = não buscou, false = não encontrou, string = URL) ─────
-const _cache = {};
+const _cache    = {};
+const _inflight = {}; // deduplicação: evita múltiplas requisições para o mesmo time
 
 async function fetchLogo(name) {
   if (_cache[name] !== undefined) return _cache[name];
-  try {
-    const r = await fetch(
-      `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(name)}`
-    );
-    const d = await r.json();
-    const teams = d.teams || [];
-    const norm  = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    const q     = norm(name);
-    const word  = q.split(' ')[0];
-    const exact   = teams.find(t => (t.strSport === 'Soccer' || t.strSport === 'Football') && norm(t.strTeam) === q);
-    const partial = teams.find(t => (t.strSport === 'Soccer' || t.strSport === 'Football') && norm(t.strTeam).includes(word));
-    const match = exact || partial;
-    const badge = match?.strTeamBadge || match?.strBadge || null;
-    const url   = badge ? badge + '/tiny' : false;
-    _cache[name] = url;
-    return url;
-  } catch {
-    _cache[name] = false;
-    return false;
-  }
+  // Reutiliza a promise em andamento para o mesmo nome (evita duplicatas)
+  if (_inflight[name]) return _inflight[name];
+
+  _inflight[name] = (async () => {
+    try {
+      const r = await fetch(
+        `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(name)}`
+      );
+      const d = await r.json();
+      const teams = d.teams || [];
+      const norm  = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const q     = norm(name);
+      const word  = q.split(' ')[0];
+      const exact   = teams.find(t => (t.strSport === 'Soccer' || t.strSport === 'Football') && norm(t.strTeam) === q);
+      const partial = teams.find(t => (t.strSport === 'Soccer' || t.strSport === 'Football') && norm(t.strTeam).includes(word));
+      const match = exact || partial;
+      const badge = match?.strTeamBadge || match?.strBadge || null;
+      const url   = badge ? badge + '/tiny' : false;
+      _cache[name] = url;
+      return url;
+    } catch {
+      _cache[name] = false;
+      return false;
+    } finally {
+      delete _inflight[name];
+    }
+  })();
+
+  return _inflight[name];
 }
 
 // ── Componente principal ──────────────────────────────────────────────────────
