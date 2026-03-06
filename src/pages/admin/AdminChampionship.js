@@ -206,6 +206,7 @@ function ResultModal({ match, tid, onClose, onSaved }) {
   const [goals, setGoals]         = useState([]);  // [{ id, teamId, playerId, player? }]
   const [homePen, setHomePen]     = useState(match.homePenalties ?? '');
   const [awayPen, setAwayPen]     = useState(match.awayPenalties ?? '');
+  const [cards, setCards]         = useState([]);  // [{ id, teamId, playerId, type, player? }]
   const [goalLoading, setGoalLoading] = useState(false);
   const [cardLoading, setCardLoading] = useState(false);
   const [showCards, setShowCards] = useState(false);
@@ -222,10 +223,12 @@ function ResultModal({ match, tid, onClose, onSaved }) {
   const awayScore = awayGoals.length;
   const showPenalties = homeScore === awayScore && match.phase !== 'GROUP';
 
-  // Carrega gols salvos + jogadores ao abrir o modal
+  // Carrega gols, cartões e jogadores ao abrir o modal
   useEffect(() => {
     apiFetch(`/admin/championship/matches/${match.id}/goals`)
       .then(d => setGoals(d || [])).catch(() => {});
+    apiFetch(`/admin/championship/matches/${match.id}/cards`)
+      .then(d => setCards(d || [])).catch(() => {});
     if (tid && match.homeTeam?.id)
       apiFetch(`/admin/championship/tournaments/${tid}/teams/${match.homeTeam.id}/players`)
         .then(d => setHomePlayers(d || [])).catch(() => {});
@@ -260,16 +263,23 @@ function ResultModal({ match, tid, onClose, onSaved }) {
     finally { setGoalLoading(false); }
   }
 
-  async function adjustCard(playerId, stat, delta) {
+  async function addCard(teamId, playerId, type) {
     setCardLoading(true);
     try {
-      const updated = await apiFetch(
-        `/admin/championship/players/${playerId}/stat/${stat}/increment`,
-        { method: 'PATCH', body: JSON.stringify({ delta }) },
-      );
-      const updater = prev => prev.map(p => p.id === playerId ? { ...p, [stat]: updated[stat] } : p);
-      setHomePlayers(updater);
-      setAwayPlayers(updater);
+      const created = await apiFetch(`/admin/championship/matches/${match.id}/cards`, {
+        method: 'POST',
+        body: JSON.stringify({ teamId, playerId: Number(playerId), type }),
+      });
+      setCards(prev => [...prev, created]);
+    } catch (err) { setError(err.message); }
+    finally { setCardLoading(false); }
+  }
+
+  async function removeCard(cardId) {
+    setCardLoading(true);
+    try {
+      await apiFetch(`/admin/championship/matches/${match.id}/cards/${cardId}`, { method: 'DELETE' });
+      setCards(prev => prev.filter(c => c.id !== cardId));
     } catch (err) { setError(err.message); }
     finally { setCardLoading(false); }
   }
@@ -445,43 +455,50 @@ function ResultModal({ match, tid, onClose, onSaved }) {
           {showCards && (
             <div style={{ display: 'flex', gap: 12, marginTop: 10 }}>
               {[
-                { players: homePlayers, label: match.homeTeam?.name || 'Casa' },
-                { players: awayPlayers, label: match.awayTeam?.name || 'Visitante' },
-              ].map(({ players, label }) => (
-                <div key={label} style={{ flex: 1 }}>
-                  <p className="ac-score-team-label" style={{ marginBottom: 6 }}>{label}</p>
-                  {players.length === 0
-                    ? <p style={{ fontSize: '0.75rem', color: 'var(--ac-gray-400)' }}>Sem jogadores cadastrados</p>
-                    : players.map(p => (
-                      <div key={p.id} className="ac-card-player-row">
-                        <span className="ac-card-player-name">{p.number ? `${p.number}. ` : ''}{p.name}</span>
-                        <span className="ac-card-badge yellow">{p.yellowCards ?? 0}</span>
-                        <button
-                          type="button" className="ac-card-btn yellow"
-                          onClick={() => adjustCard(p.id, 'yellowCards', 1)}
-                          disabled={cardLoading}
-                        >+</button>
-                        <button
-                          type="button" className="ac-card-btn yellow"
-                          onClick={() => adjustCard(p.id, 'yellowCards', -1)}
-                          disabled={cardLoading || !(p.yellowCards > 0)}
-                        >−</button>
-                        <span className="ac-card-badge red">{p.redCards ?? 0}</span>
-                        <button
-                          type="button" className="ac-card-btn red"
-                          onClick={() => adjustCard(p.id, 'redCards', 1)}
-                          disabled={cardLoading}
-                        >+</button>
-                        <button
-                          type="button" className="ac-card-btn red"
-                          onClick={() => adjustCard(p.id, 'redCards', -1)}
-                          disabled={cardLoading || !(p.redCards > 0)}
-                        >−</button>
-                      </div>
-                    ))
-                  }
-                </div>
-              ))}
+                { teamId: match.homeTeam?.id, players: homePlayers, label: match.homeTeam?.name || 'Casa' },
+                { teamId: match.awayTeam?.id, players: awayPlayers, label: match.awayTeam?.name || 'Visitante' },
+              ].map(({ teamId, players, label }) => {
+                const teamCards = cards.filter(c => c.teamId === teamId);
+                return (
+                  <div key={label} style={{ flex: 1 }}>
+                    <p className="ac-score-team-label" style={{ marginBottom: 6 }}>{label}</p>
+                    {players.length === 0
+                      ? <p style={{ fontSize: '0.75rem', color: 'var(--ac-gray-400)' }}>Sem jogadores cadastrados</p>
+                      : players.map(p => {
+                          const pYellow = teamCards.filter(c => c.playerId === p.id && c.type === 'YELLOW');
+                          const pRed    = teamCards.filter(c => c.playerId === p.id && c.type === 'RED');
+                          return (
+                            <div key={p.id} className="ac-card-player-row">
+                              <span className="ac-card-player-name">{p.number ? `${p.number}. ` : ''}{p.name}</span>
+                              <span className="ac-card-badge yellow">{pYellow.length}</span>
+                              <button
+                                type="button" className="ac-card-btn yellow"
+                                onClick={() => addCard(teamId, p.id, 'YELLOW')}
+                                disabled={cardLoading}
+                              >+</button>
+                              <button
+                                type="button" className="ac-card-btn yellow"
+                                onClick={() => removeCard(pYellow[pYellow.length - 1]?.id)}
+                                disabled={cardLoading || pYellow.length === 0}
+                              >−</button>
+                              <span className="ac-card-badge red">{pRed.length}</span>
+                              <button
+                                type="button" className="ac-card-btn red"
+                                onClick={() => addCard(teamId, p.id, 'RED')}
+                                disabled={cardLoading}
+                              >+</button>
+                              <button
+                                type="button" className="ac-card-btn red"
+                                onClick={() => removeCard(pRed[pRed.length - 1]?.id)}
+                                disabled={cardLoading || pRed.length === 0}
+                              >−</button>
+                            </div>
+                          );
+                        })
+                    }
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
