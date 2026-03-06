@@ -601,8 +601,9 @@
   gap: 0;
   border-radius: 18px;
   overflow: hidden;
-  background: rgba(245, 184, 0, 0.04);
-  box-shadow: 0 8px 40px rgba(245,184,0,0.15), 0 0 0 1.5px rgba(245,184,0,0.2);
+  background: #fafafa;
+  border: 1px solid rgba(245,184,0,0.25);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07), 0 0 0 1px rgba(245,184,0,0.12);
 }
 
 /* ── Campeão ───────────────────────────────────────────────────────────── */
@@ -675,8 +676,8 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: rgba(245,184,0,0.3) transparent;
-  padding: 24px 16px 20px;
-  background: transparent;
+  padding: 28px 20px 24px;
+  background: linear-gradient(180deg, rgba(245,184,0,0.03) 0%, transparent 60%);
 }
 
 .wb-scroll-wrap::-webkit-scrollbar { height: 4px; }
@@ -729,17 +730,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   font-size: 0.65rem;
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(160,100,0,0.8);
-  border-bottom: 1px solid rgba(245,184,0,0.14);
-  background: rgba(245,184,0,0.06);
+  color: rgba(140,85,0,0.9);
+  border-bottom: 1px solid rgba(245,184,0,0.18);
+  background: rgba(245,184,0,0.07);
 }
 
-.wb-col--left  { border-right: 1px solid rgba(245,184,0,0.08); }
-.wb-col--right { border-left:  1px solid rgba(245,184,0,0.08); }
+.wb-col-header::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(245,184,0,0.55);
+  flex-shrink: 0;
+}
+
+.wb-col--left  { border-right: 1px solid rgba(245,184,0,0.1); }
+.wb-col--right { border-left:  1px solid rgba(245,184,0,0.1); }
 
 .wb-col-matches {
   display: flex;
@@ -756,50 +767,68 @@
   position: relative;
 }
 
-/* Linha de conexão horizontal sutil */
+/* Conectores horizontais entre rounds */
 .wb-col--left  .wb-slot::after,
 .wb-col--right .wb-slot::after {
   content: '';
   position: absolute;
   top: 50%;
-  width: 8px;
+  width: 14px;
   height: 1px;
-  background: rgba(245,184,0,0.2);
+  background: linear-gradient(90deg, rgba(245,184,0,0.15), rgba(245,184,0,0.45));
 }
-
-.wb-col--left  .wb-slot::after { right: -8px; }
-.wb-col--right .wb-slot::after { left: -8px; }
+.wb-col--left  .wb-slot::after { right: -14px; }
+.wb-col--right .wb-slot::after { left: -14px; background: linear-gradient(270deg, rgba(245,184,0,0.15), rgba(245,184,0,0.45)); }
 
 /* ── Match Card ────────────────────────────────────────────────────────── */
 .wb-card {
   width: 100%;
-  background: rgba(255,255,255,0.55);
-  border: 1px solid rgba(245,184,0,0.2);
+  background: #ffffff;
+  border: 1px solid rgba(245,184,0,0.22);
+  border-left: 3px solid rgba(245,184,0,0.5);
   border-radius: 10px;
   overflow: hidden;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
 }
 
 .wb-card:hover {
-  border-color: rgba(245,184,0,0.3);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  border-color: rgba(245,184,0,0.55);
+  border-left-color: #F5B800;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+  transform: translateY(-1px);
 }
 
 .wb-card--done {
-  border-color: rgba(255,255,255,0.07);
+  border-left-color: rgba(245,184,0,0.7);
+}
+
+/* Card preview (placeholder / sem times definidos) */
+.wb-card--preview {
+  background: rgba(245,184,0,0.02);
+  border: 1px dashed rgba(245,184,0,0.28);
+  border-left: none;
+  box-shadow: none;
+}
+.wb-card--preview:hover {
+  border-color: rgba(245,184,0,0.5);
+  box-shadow: none;
+  transform: none;
 }
 
 /* Card da Final — maior, mais dourado */
 .wb-card--final {
-  background: rgba(255,255,255,0.6);
+  background: #fffdf0;
   border: 2px solid rgba(200,140,0,0.5);
+  border-left: 4px solid #F5B800;
   border-radius: 12px;
-  box-shadow: 0 0 40px rgba(245,184,0,0.12), 0 8px 32px rgba(0,0,0,0.4);
+  box-shadow: 0 0 40px rgba(245,184,0,0.12), 0 8px 32px rgba(0,0,0,0.08);
 }
 
 .wb-card--final:hover {
-  border-color: rgba(245,184,0,0.6);
-  box-shadow: 0 0 60px rgba(245,184,0,0.2), 0 8px 32px rgba(0,0,0,0.4);
+  border-color: rgba(245,184,0,0.7);
+  border-left-color: #F5B800;
+  box-shadow: 0 0 60px rgba(245,184,0,0.2), 0 8px 32px rgba(0,0,0,0.12);
 }
 
 /* ── Row (time) ────────────────────────────────────────────────────────── */
@@ -815,13 +844,31 @@
 .wb-card--final .wb-row { padding: 12px 14px; }
 
 .wb-row--won {
-  background: linear-gradient(90deg, rgba(245,184,0,0.18) 0%, rgba(245,184,0,0.06) 100%);
+  background: linear-gradient(90deg, rgba(245,184,0,0.18) 0%, rgba(245,184,0,0.04) 100%);
 }
 
 .wb-row--tbd .wb-name {
-  color: rgba(0,0,0,0.25);
+  color: rgba(0,0,0,0.3);
   font-style: italic;
   font-size: 0.8rem;
+}
+
+/* ── Badge de seed (slot vazio com posição) ────────────────────────────── */
+.wb-seed-badge {
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(245,184,0,0.12);
+  border: 1px solid rgba(245,184,0,0.35);
+  color: rgba(140,90,0,0.65);
+  font-size: 0.58rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  flex-shrink: 0;
+  letter-spacing: -0.02em;
 }
 
 .wb-name {
@@ -903,9 +950,9 @@
   z-index: 2;
   flex-shrink: 0;
   width: 190px;
-  border-left:  2px solid rgba(245,184,0,0.15);
-  border-right: 2px solid rgba(245,184,0,0.15);
-  background: radial-gradient(ellipse at center, rgba(245,184,0,0.18) 0%, transparent 70%);
+  border-left:  2px solid rgba(245,184,0,0.22);
+  border-right: 2px solid rgba(245,184,0,0.22);
+  background: radial-gradient(ellipse at center, rgba(245,184,0,0.08) 0%, transparent 75%);
 }
 
 .wb-final-badge {

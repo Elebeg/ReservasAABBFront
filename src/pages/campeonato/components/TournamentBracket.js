@@ -10,27 +10,54 @@ const PHASE_SHORT = {
 };
 
 // ── Bracket vazio (preview antes do mata-mata) ────────────────────────────────
-const PHASE_MIN_TEAMS   = { ROUND_OF_16: 16, QUARTER_FINAL: 8, SEMI_FINAL: 4, FINAL: 2 };
-const PHASE_MATCH_COUNT = { ROUND_OF_16: 8,  QUARTER_FINAL: 4, SEMI_FINAL: 2, FINAL: 1 };
+const PHASE_MIN_TEAMS = { ROUND_OF_16: 16, QUARTER_FINAL: 8, SEMI_FINAL: 4, FINAL: 2 };
+
+// Seeding padrão: 1 vs n, 2 vs n-1... estruturado recursivamente
+function generateSeeds(n) {
+  if (n <= 2) return [1, 2];
+  const prev = generateSeeds(n / 2);
+  const result = [];
+  for (const s of prev) result.push(s, n + 1 - s);
+  return result;
+}
 
 function buildEmptyBracket(teamCount) {
   if (!teamCount || teamCount < 2) return null;
-  const phases = PHASE_ORDER.filter(p => teamCount >= PHASE_MIN_TEAMS[p]);
+  // Arredonda para próxima potência de 2
+  const n = Math.pow(2, Math.ceil(Math.log2(Math.max(teamCount, 2))));
+  const phases = PHASE_ORDER.filter(p => n >= PHASE_MIN_TEAMS[p]);
   if (!phases.length) return null;
+
+  const seeds = generateSeeds(n); // ex: n=4 → [1,4,2,3]; n=8 → [1,8,4,5,2,7,3,6]
+
   return {
-    rounds: phases.map(phase => ({
-      phase,
-      matches: Array.from({ length: PHASE_MATCH_COUNT[phase] }, (_, j) => ({
-        id:          `empty-${phase}-${j}`,
-        homeTeam:    null,
-        awayTeam:    null,
-        status:      'PENDING',
-        scheduledAt: null,
-        winner:      null,
-        homeScore:   null,
-        awayScore:   null,
-      })),
-    })),
+    rounds: phases.map((phase, phaseIndex) => {
+      const matchCount = n / Math.pow(2, phaseIndex + 1);
+      const isFirstRound = phaseIndex === 0;
+      return {
+        phase,
+        matches: Array.from({ length: matchCount }, (_, j) => {
+          let homeTeam = null;
+          let awayTeam = null;
+          if (isFirstRound) {
+            const s1 = seeds[j * 2];
+            const s2 = seeds[j * 2 + 1];
+            if (s1 && s1 <= teamCount) homeTeam = { name: `${s1}º Lugar`, isPlaceholder: true, seed: s1 };
+            if (s2 && s2 <= teamCount) awayTeam = { name: `${s2}º Lugar`, isPlaceholder: true, seed: s2 };
+          }
+          return {
+            id:          `empty-${phase}-${j}`,
+            homeTeam,
+            awayTeam,
+            status:      'PENDING',
+            scheduledAt: null,
+            winner:      null,
+            homeScore:   null,
+            awayScore:   null,
+          };
+        }),
+      };
+    }),
   };
 }
 
@@ -46,12 +73,29 @@ function knockoutTeamCount(tournament, standings) {
 const SLOT_MIN  = 96;
 const HEADER_H  = 38;
 
+function TeamSlot({ team, won, finished, score }) {
+  const isPlaceholder = team?.isPlaceholder;
+  const isTbd = !team;
+  const rowClass = `wb-row${won ? ' wb-row--won' : ''}${(isTbd || isPlaceholder) ? ' wb-row--tbd' : ''}`;
+  return (
+    <div className={rowClass}>
+      {isPlaceholder
+        ? <span className="wb-seed-badge">{team.seed}º</span>
+        : <TeamLogo name={team?.name || '?'} logoUrl={team?.logoUrl || null} size={20} shape="shield" style={{ marginRight: 6 }} />
+      }
+      <span className="wb-name">{team?.name || 'A definir'}</span>
+      {finished && <span className={`wb-score${won ? ' wb-score--won' : ''}`}>{score}</span>}
+    </div>
+  );
+}
+
 function MatchCard({ match, isFinal = false }) {
   if (!match) return null;
-  const winnerId = match.winner?.id;
-  const homeWon  = !!(winnerId && match.homeTeam?.id === winnerId);
-  const awayWon  = !!(winnerId && match.awayTeam?.id === winnerId);
-  const finished = match.status === 'FINISHED';
+  const winnerId    = match.winner?.id;
+  const homeWon     = !!(winnerId && match.homeTeam?.id === winnerId);
+  const awayWon     = !!(winnerId && match.awayTeam?.id === winnerId);
+  const finished    = match.status === 'FINISHED';
+  const isPreview   = !match.homeTeam?.id && !match.awayTeam?.id; // ambos slots ainda vazios
 
   const fmtDate = match.scheduledAt
     ? new Date(match.scheduledAt).toLocaleString('pt-BR', {
@@ -61,19 +105,11 @@ function MatchCard({ match, isFinal = false }) {
     : null;
 
   return (
-    <div className={`wb-card${isFinal ? ' wb-card--final' : ''}${finished ? ' wb-card--done' : ''}`}>
+    <div className={`wb-card${isFinal ? ' wb-card--final' : ''}${finished ? ' wb-card--done' : ''}${isPreview ? ' wb-card--preview' : ''}`}>
       {fmtDate && <div className="wb-date">📅 {fmtDate}</div>}
-      <div className={`wb-row${homeWon ? ' wb-row--won' : ''}${!match.homeTeam ? ' wb-row--tbd' : ''}`}>
-        <TeamLogo name={match.homeTeam?.name || '?'} logoUrl={match.homeTeam?.logoUrl || null} size={20} shape="shield" style={{ marginRight: 6 }} />
-        <span className="wb-name">{match.homeTeam?.name || 'A definir'}</span>
-        {finished && <span className={`wb-score${homeWon ? ' wb-score--won' : ''}`}>{match.homeScore}</span>}
-      </div>
+      <TeamSlot team={match.homeTeam} won={homeWon} finished={finished} score={match.homeScore} />
       <div className="wb-sep" />
-      <div className={`wb-row${awayWon ? ' wb-row--won' : ''}${!match.awayTeam ? ' wb-row--tbd' : ''}`}>
-        <TeamLogo name={match.awayTeam?.name || '?'} logoUrl={match.awayTeam?.logoUrl || null} size={20} shape="shield" style={{ marginRight: 6 }} />
-        <span className="wb-name">{match.awayTeam?.name || 'A definir'}</span>
-        {finished && <span className={`wb-score${awayWon ? ' wb-score--won' : ''}`}>{match.awayScore}</span>}
-      </div>
+      <TeamSlot team={match.awayTeam} won={awayWon} finished={finished} score={match.awayScore} />
       {match.homePenalties != null && (
         <div className="wb-pen">Pên: {match.homePenalties} × {match.awayPenalties}</div>
       )}
