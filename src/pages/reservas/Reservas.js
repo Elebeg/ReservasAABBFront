@@ -5,6 +5,55 @@ import { format, parseISO, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import './Reservas.css';
 
+function CourtIllustration({ isSelected }) {
+  const surface = isSelected ? '#1e40af' : '#16a34a';
+  const line    = 'rgba(255,255,255,0.9)';
+  return (
+    <svg viewBox="0 0 200 120" width="100%" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+      {/* fundo */}
+      <rect width="200" height="120" fill="#e2e8f0" rx="6" />
+      {/* superfície da quadra */}
+      <rect x="6" y="6" width="188" height="108" rx="4" fill={surface} />
+      {/* delimitação externa */}
+      <rect x="16" y="12" width="168" height="96" fill="none" stroke={line} strokeWidth="2.5" />
+      {/* linha central */}
+      <line x1="100" y1="12" x2="100" y2="108" stroke={line} strokeWidth="2" />
+      {/* círculo central */}
+      <circle cx="100" cy="60" r="16" fill="none" stroke={line} strokeWidth="2" />
+      <circle cx="100" cy="60" r="3" fill={line} />
+      {/* linhas de serviço esquerda */}
+      <line x1="16" y1="60" x2="100" y2="60" stroke={line} strokeWidth="1.5" />
+      <line x1="58" y1="12" x2="58" y2="108" stroke={line} strokeWidth="1.5" />
+      {/* linhas de serviço direita */}
+      <line x1="100" y1="60" x2="184" y2="60" stroke={line} strokeWidth="1.5" />
+      <line x1="142" y1="12" x2="142" y2="108" stroke={line} strokeWidth="1.5" />
+      {/* traves/postes */}
+      <line x1="16" y1="40" x2="16" y2="80" stroke={line} strokeWidth="5" strokeLinecap="round" />
+      <line x1="184" y1="40" x2="184" y2="80" stroke={line} strokeWidth="5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CourtCard({ court, isSelected, onClick, disabled }) {
+  return (
+    <button
+      type="button"
+      className={`court-card${isSelected ? ' court-card--selected' : ''}${disabled ? ' court-card--disabled' : ''}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <div className="court-card-field">
+        <CourtIllustration isSelected={isSelected} />
+        {isSelected && <div className="court-card-check">✓</div>}
+      </div>
+      <div className="court-card-info">
+        <span className="court-card-name">{court.name}</span>
+        {isSelected && <span className="court-card-selected-label">Selecionada</span>}
+      </div>
+    </button>
+  );
+}
+
 function SlotDetailPanel({ slot, onClose, onEdit, onDelete, onQuickReserve, currentUserId }) {
   if (!slot) return null;
 
@@ -556,18 +605,17 @@ function ReservationsPage() {
           
           <div className="form-group">
             <label>Quadra:</label>
-            <select 
-              value={selectedCourt || ''}
-              onChange={(e) => setSelectedCourt(Number(e.target.value))}
-              disabled={isEditing}
-            >
-              <option value="">Selecione uma quadra</option>
+            <div className="court-selector">
               {courts.map((court) => (
-                <option key={court.id} value={court.id}>
-                  {court.name}
-                </option>
+                <CourtCard
+                  key={court.id}
+                  court={court}
+                  isSelected={selectedCourt === court.id}
+                  onClick={() => setSelectedCourt(court.id)}
+                  disabled={isEditing}
+                />
               ))}
-            </select>
+            </div>
           </div>
           
           {selectedCourt && (
