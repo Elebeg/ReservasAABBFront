@@ -5,6 +5,21 @@ import './AdminChampionship.css';
 
 const API = 'https://reservasaabb-production.up.railway.app';
 
+const DEFAULT_BADGES = [
+  '/images/badges/badge-red.svg',
+  '/images/badges/badge-blue.svg',
+  '/images/badges/badge-green.svg',
+  '/images/badges/badge-orange.svg',
+  '/images/badges/badge-purple.svg',
+  '/images/badges/badge-teal.svg',
+  '/images/badges/badge-pink.svg',
+  '/images/badges/badge-navy.svg',
+];
+
+function getDefaultBadge(teamId) {
+  return DEFAULT_BADGES[teamId % DEFAULT_BADGES.length];
+}
+
 function adminHeaders() {
   return {
     'Content-Type': 'application/json',
@@ -821,10 +836,93 @@ function TeamSearch({ onSelect }) {
   );
 }
 
+// ─── EDITAR LOGO DO TIME ──────────────────────────────────────────────────────
+
+function EditTeamLogoModal({ team, tournamentId, onClose, onSaved }) {
+  const [urlInput, setUrlInput] = useState(team.logoUrl || '');
+  const [selected, setSelected] = useState(null);
+  const [saving, setSaving]     = useState(false);
+  const [error, setError]       = useState('');
+
+  const previewSrc = selected ?? (urlInput.trim() || null) ?? getDefaultBadge(team.id);
+
+  async function save() {
+    setSaving(true); setError('');
+    try {
+      const logoUrl = selected !== null ? selected : (urlInput.trim() || null);
+      const updated = await apiFetch(
+        `/admin/championship/tournaments/${tournamentId}/teams/${team.id}/logo`,
+        { method: 'PATCH', body: JSON.stringify({ logoUrl }) },
+      );
+      onSaved(updated);
+    } catch (err) {
+      setError(err.message);
+    } finally { setSaving(false); }
+  }
+
+  return (
+    <Modal title={`Logo — ${team.name}`} onClose={onClose}>
+      <div>
+        <Alert type="error" message={error} onClose={() => setError('')} />
+
+        <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          <img
+            src={previewSrc}
+            alt="Preview"
+            style={{ width: 64, height: 64, objectFit: 'contain', borderRadius: 6, border: '1px solid var(--ac-gray-200)' }}
+            onError={e => { e.target.src = defaultBadge; }}
+          />
+        </div>
+
+        <div className="ac-form-group">
+          <label>URL da logo (opcional)</label>
+          <input
+            value={urlInput}
+            onChange={e => { setUrlInput(e.target.value); setSelected(null); }}
+            placeholder="https://..."
+          />
+        </div>
+
+        <p style={{ fontSize: '0.8rem', color: 'var(--ac-gray-600)', margin: '12px 0 8px' }}>
+          Ou escolha um escudo padrão:
+        </p>
+        <div className="ac-badge-picker">
+          {DEFAULT_BADGES.map(b => (
+            <button
+              key={b}
+              type="button"
+              className={`ac-badge-option ${selected === b ? 'selected' : ''}`}
+              onClick={() => { setSelected(b); setUrlInput(''); }}
+            >
+              <img src={b} alt="escudo" />
+            </button>
+          ))}
+          <button
+            type="button"
+            className={`ac-badge-option ${selected === null && !urlInput.trim() ? 'selected' : ''}`}
+            onClick={() => { setSelected(null); setUrlInput(''); }}
+            title="Sem logo (usa padrão automático)"
+          >
+            <img src={defaultBadge} alt="padrão" />
+          </button>
+        </div>
+
+        <div className="ac-form-actions">
+          <button type="button" className="ac-btn ac-btn-ghost" onClick={onClose}>Cancelar</button>
+          <button type="button" className="ac-btn ac-btn-primary" onClick={save} disabled={saving}>
+            {saving ? <span className="ac-spinner" /> : 'Salvar Logo'}
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 function TeamsTab({ tournament, onRefresh }) {
-  const [teams, setTeams]   = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [alert, setAlert]   = useState(null);
+  const [teams, setTeams]       = useState([]);
+  const [loading, setLoading]   = useState(false);
+  const [alert, setAlert]       = useState(null);
+  const [editingTeam, setEditingTeam] = useState(null);
   const isDraft = tournament.status === 'DRAFT';
 
   const loadTeams = useCallback(async () => {
@@ -881,17 +979,33 @@ function TeamsTab({ tournament, onRefresh }) {
         <div className="ac-teams-grid">
           {teams.map((t) => (
             <div className="ac-team-chip" key={t.id}>
-              {t.logoUrl
-                ? <img src={t.logoUrl} alt={t.name} className="ac-team-chip-logo" />
-                : <span className="ac-team-chip-placeholder">⚽</span>
-              }
+              <img
+                src={t.logoUrl || getDefaultBadge(t.id)}
+                alt={t.name}
+                className="ac-team-chip-logo"
+                onError={e => { e.target.src = defaultBadge; }}
+              />
               <span>{t.name}</span>
+              <button
+                className="ac-team-chip-edit"
+                onClick={() => setEditingTeam(t)}
+                title="Editar logo"
+              >✎</button>
               {isDraft && (
                 <button onClick={() => removeTeam(t.id)} title="Remover">×</button>
               )}
             </div>
           ))}
         </div>
+      )}
+
+      {editingTeam && (
+        <EditTeamLogoModal
+          team={editingTeam}
+          tournamentId={tournament.id}
+          onClose={() => setEditingTeam(null)}
+          onSaved={() => { setEditingTeam(null); loadTeams(); }}
+        />
       )}
     </div>
   );
