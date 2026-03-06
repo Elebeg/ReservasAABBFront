@@ -851,12 +851,25 @@ function EditTeamLogoModal({ team, tournamentId, onClose, onSaved }) {
   function handleFile(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { setError('Arquivo muito grande (máx 2 MB).'); return; }
+    if (file.size > 5 * 1024 * 1024) { setError('Arquivo muito grande (máx 5 MB).'); return; }
     const reader = new FileReader();
     reader.onload = ev => {
-      setFilePreview(ev.target.result);
-      setUrlInput('');
-      setSelected(null);
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 200;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.82);
+        setFilePreview(compressed);
+        setUrlInput('');
+        setSelected(null);
+      };
+      img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   }
