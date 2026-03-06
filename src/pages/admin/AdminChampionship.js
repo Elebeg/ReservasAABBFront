@@ -207,6 +207,8 @@ function ResultModal({ match, tid, onClose, onSaved }) {
   const [homePen, setHomePen]     = useState(match.homePenalties ?? '');
   const [awayPen, setAwayPen]     = useState(match.awayPenalties ?? '');
   const [goalLoading, setGoalLoading] = useState(false);
+  const [cardLoading, setCardLoading] = useState(false);
+  const [showCards, setShowCards] = useState(false);
   const [saving, setSaving]       = useState(false);
   const [error, setError]         = useState('');
   const [homePlayers, setHomePlayers] = useState([]);
@@ -256,6 +258,20 @@ function ResultModal({ match, tid, onClose, onSaved }) {
       setGoals(prev => prev.filter(g => g.id !== goalId));
     } catch (err) { setError(err.message); }
     finally { setGoalLoading(false); }
+  }
+
+  async function adjustCard(playerId, stat, delta) {
+    setCardLoading(true);
+    try {
+      const updated = await apiFetch(
+        `/admin/championship/players/${playerId}/stat/${stat}/increment`,
+        { method: 'PATCH', body: JSON.stringify({ delta }) },
+      );
+      const updater = prev => prev.map(p => p.id === playerId ? { ...p, [stat]: updated[stat] } : p);
+      setHomePlayers(updater);
+      setAwayPlayers(updater);
+    } catch (err) { setError(err.message); }
+    finally { setCardLoading(false); }
   }
 
   async function setScorer(goalId, playerId) {
@@ -414,6 +430,61 @@ function ResultModal({ match, tid, onClose, onSaved }) {
             </div>
           </div>
         )}
+
+        {/* ── Cartões ─────────────────────────────────────────────────────── */}
+        <div className="ac-cards-section">
+          <button
+            type="button"
+            className="ac-cards-toggle"
+            onClick={() => setShowCards(v => !v)}
+          >
+            <span>Cartões</span>
+            <span style={{ fontSize: '0.7rem', marginLeft: 6, opacity: 0.6 }}>{showCards ? '▲' : '▼'}</span>
+          </button>
+
+          {showCards && (
+            <div style={{ display: 'flex', gap: 12, marginTop: 10 }}>
+              {[
+                { players: homePlayers, label: match.homeTeam?.name || 'Casa' },
+                { players: awayPlayers, label: match.awayTeam?.name || 'Visitante' },
+              ].map(({ players, label }) => (
+                <div key={label} style={{ flex: 1 }}>
+                  <p className="ac-score-team-label" style={{ marginBottom: 6 }}>{label}</p>
+                  {players.length === 0
+                    ? <p style={{ fontSize: '0.75rem', color: 'var(--ac-gray-400)' }}>Sem jogadores cadastrados</p>
+                    : players.map(p => (
+                      <div key={p.id} className="ac-card-player-row">
+                        <span className="ac-card-player-name">{p.number ? `${p.number}. ` : ''}{p.name}</span>
+                        <span className="ac-card-badge yellow">{p.yellowCards ?? 0}</span>
+                        <button
+                          type="button" className="ac-card-btn yellow"
+                          onClick={() => adjustCard(p.id, 'yellowCards', 1)}
+                          disabled={cardLoading}
+                        >+</button>
+                        <button
+                          type="button" className="ac-card-btn yellow"
+                          onClick={() => adjustCard(p.id, 'yellowCards', -1)}
+                          disabled={cardLoading || !(p.yellowCards > 0)}
+                        >−</button>
+                        <span className="ac-card-badge red">{p.redCards ?? 0}</span>
+                        <button
+                          type="button" className="ac-card-btn red"
+                          onClick={() => adjustCard(p.id, 'redCards', 1)}
+                          disabled={cardLoading}
+                        >+</button>
+                        <button
+                          type="button" className="ac-card-btn red"
+                          onClick={() => adjustCard(p.id, 'redCards', -1)}
+                          disabled={cardLoading || !(p.redCards > 0)}
+                        >−</button>
+                      </div>
+                    ))
+                  }
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         <div className="ac-form-actions">
           {isEdit && (

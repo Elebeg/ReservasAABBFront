@@ -682,6 +682,71 @@
   margin-bottom: 4px;
 }
 
+/* ─── SEÇÃO CARTÕES NO MODAL DE RESULTADO ───────────────────────────────────── */
+.ac-cards-section {
+  border-top: 1px solid var(--ac-gray-200);
+  margin-bottom: 12px;
+  padding-top: 10px;
+}
+
+.ac-cards-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ac-gray-700);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+}
+.ac-cards-toggle:hover { color: var(--ac-primary); }
+
+.ac-card-player-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 5px;
+  font-size: 0.78rem;
+}
+
+.ac-card-player-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ac-gray-800);
+}
+
+.ac-card-badge {
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-weight: 700;
+  font-size: 0.72rem;
+  min-width: 22px;
+  text-align: center;
+}
+.ac-card-badge.yellow { background: #ffd600; color: #333; }
+.ac-card-badge.red    { background: #d32f2f; color: #fff; }
+
+.ac-card-btn {
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  line-height: 1.4;
+  transition: opacity 0.15s;
+}
+.ac-card-btn:disabled { opacity: 0.35; cursor: default; }
+.ac-card-btn.yellow { background: #fff8e1; color: #795548; border: 1px solid #ffd600; }
+.ac-card-btn.yellow:not(:disabled):hover { background: #ffd600; }
+.ac-card-btn.red    { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+.ac-card-btn.red:not(:disabled):hover    { background: #ef9a9a; }
+
 /* ─── GRUPO ASSIGN ───────────────────────────────────────────────────────────── */
 .ac-assign-grid {
   display: grid;
