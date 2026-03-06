@@ -47,9 +47,8 @@ export default function Campeonato() {
   const [tab, setTab] = useState('matches');
   const [selectedTeam, setSelectedTeam] = useState(null);
 
-  const showStandings  = tournament && ['GROUPS', 'LEAGUE'].includes(tournament.format);
-  const hasBracketData = bracket && bracket.rounds && bracket.rounds.length > 0;
-  const hasPlayers     = players && players.length > 0;
+  const showStandings = tournament && ['GROUPS', 'LEAGUE'].includes(tournament.format);
+  const hasPlayers    = players && players.length > 0;
 
   const tabs = [
     { key: 'matches',   label: '🗓️ Partidas',      show: true },
@@ -153,7 +152,7 @@ export default function Campeonato() {
             />
           )}
           {tab === 'bracket' && (
-            <TournamentBracket bracket={hasBracketData ? bracket : null} />
+            <TournamentBracket bracket={bracket} tournament={tournament} standings={standings} />
           )}
           {tab === 'players' && (
             <TournamentPlayers players={players} onTeamClick={setSelectedTeam} />

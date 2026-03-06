@@ -9,6 +9,40 @@ const PHASE_SHORT = {
   FINAL:         'Final',
 };
 
+// ── Bracket vazio (preview antes do mata-mata) ────────────────────────────────
+const PHASE_MIN_TEAMS   = { ROUND_OF_16: 16, QUARTER_FINAL: 8, SEMI_FINAL: 4, FINAL: 2 };
+const PHASE_MATCH_COUNT = { ROUND_OF_16: 8,  QUARTER_FINAL: 4, SEMI_FINAL: 2, FINAL: 1 };
+
+function buildEmptyBracket(teamCount) {
+  if (!teamCount || teamCount < 2) return null;
+  const phases = PHASE_ORDER.filter(p => teamCount >= PHASE_MIN_TEAMS[p]);
+  if (!phases.length) return null;
+  return {
+    rounds: phases.map(phase => ({
+      phase,
+      matches: Array.from({ length: PHASE_MATCH_COUNT[phase] }, (_, j) => ({
+        id:          `empty-${phase}-${j}`,
+        homeTeam:    null,
+        awayTeam:    null,
+        status:      'PENDING',
+        scheduledAt: null,
+        winner:      null,
+        homeScore:   null,
+        awayScore:   null,
+      })),
+    })),
+  };
+}
+
+function knockoutTeamCount(tournament, standings) {
+  if (!tournament) return 0;
+  const { format, teamsAdvancing, groupCount } = tournament;
+  if (format === 'GROUPS')   return (teamsAdvancing || 1) * (groupCount || 1);
+  if (format === 'LEAGUE')   return teamsAdvancing || 0;
+  if (format === 'KNOCKOUT') return standings?.length || 0;
+  return 0;
+}
+
 const SLOT_MIN  = 96;
 const HEADER_H  = 38;
 
@@ -62,8 +96,14 @@ function RoundColumn({ round, colH, side }) {
   );
 }
 
-export default function TournamentBracket({ bracket }) {
-  if (!bracket?.rounds?.length) {
+export default function TournamentBracket({ bracket, tournament, standings }) {
+  const hasRealBracket = bracket?.rounds?.length > 0;
+
+  const resolved = hasRealBracket
+    ? bracket
+    : buildEmptyBracket(knockoutTeamCount(tournament, standings));
+
+  if (!resolved) {
     return (
       <div className="camp-empty">
         <span className="camp-empty-icon">🏆</span>
@@ -72,7 +112,7 @@ export default function TournamentBracket({ bracket }) {
     );
   }
 
-  const sorted = [...bracket.rounds].sort(
+  const sorted = [...resolved.rounds].sort(
     (a, b) => PHASE_ORDER.indexOf(a.phase) - PHASE_ORDER.indexOf(b.phase)
   );
 
