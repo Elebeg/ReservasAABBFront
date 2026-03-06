@@ -913,6 +913,31 @@
 }
 .ac-team-chip-edit:hover { color: var(--ac-primary); }
 
+/* ── Upload de arquivo / separador ──────────────────────────────────────────── */
+.ac-file-upload-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ac-logo-source-divider {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--ac-gray-400);
+  margin: 10px 0;
+  position: relative;
+}
+.ac-logo-source-divider::before,
+.ac-logo-source-divider::after {
+  content: '';
+  display: inline-block;
+  width: 42%;
+  height: 1px;
+  background: var(--ac-gray-200);
+  vertical-align: middle;
+  margin: 0 6px;
+}
+
 /* ── Badge picker no modal de logo ──────────────────────────────────────────── */
 .ac-badge-picker {
   display: flex;

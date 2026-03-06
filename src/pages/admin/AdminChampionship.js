@@ -839,17 +839,32 @@ function TeamSearch({ onSelect }) {
 // ─── EDITAR LOGO DO TIME ──────────────────────────────────────────────────────
 
 function EditTeamLogoModal({ team, tournamentId, onClose, onSaved }) {
-  const [urlInput, setUrlInput] = useState(team.logoUrl || '');
+  const [urlInput, setUrlInput] = useState(team.logoUrl?.startsWith('data:') ? '' : (team.logoUrl || ''));
   const [selected, setSelected] = useState(null);
+  const [filePreview, setFilePreview] = useState(team.logoUrl?.startsWith('data:') ? team.logoUrl : null);
   const [saving, setSaving]     = useState(false);
   const [error, setError]       = useState('');
+  const fileRef = React.useRef();
 
-  const previewSrc = selected ?? (urlInput.trim() || null) ?? getDefaultBadge(team.id);
+  const previewSrc = filePreview ?? selected ?? (urlInput.trim() || null) ?? getDefaultBadge(team.id);
+
+  function handleFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { setError('Arquivo muito grande (máx 2 MB).'); return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      setFilePreview(ev.target.result);
+      setUrlInput('');
+      setSelected(null);
+    };
+    reader.readAsDataURL(file);
+  }
 
   async function save() {
     setSaving(true); setError('');
     try {
-      const logoUrl = selected !== null ? selected : (urlInput.trim() || null);
+      const logoUrl = filePreview ?? (selected !== null ? selected : (urlInput.trim() || null));
       const updated = await apiFetch(
         `/admin/championship/tournaments/${tournamentId}/teams/${team.id}/logo`,
         { method: 'PATCH', body: JSON.stringify({ logoUrl }) },
@@ -874,11 +889,45 @@ function EditTeamLogoModal({ team, tournamentId, onClose, onSaved }) {
           />
         </div>
 
+        {/* Upload de arquivo local */}
         <div className="ac-form-group">
-          <label>URL da logo (opcional)</label>
+          <label>Importar arquivo (PNG, JPG, SVG — máx 2 MB)</label>
+          <div className="ac-file-upload-row">
+            <button
+              type="button"
+              className="ac-btn ac-btn-ghost"
+              style={{ fontSize: '0.8rem' }}
+              onClick={() => fileRef.current.click()}
+            >
+              Escolher arquivo...
+            </button>
+            {filePreview && (
+              <button
+                type="button"
+                className="ac-btn ac-btn-ghost"
+                style={{ fontSize: '0.8rem', color: 'var(--ac-danger)' }}
+                onClick={() => { setFilePreview(null); fileRef.current.value = ''; }}
+              >
+                Remover
+              </button>
+            )}
+          </div>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/png,image/jpeg,image/svg+xml,image/webp"
+            style={{ display: 'none' }}
+            onChange={handleFile}
+          />
+        </div>
+
+        <div className="ac-logo-source-divider">ou</div>
+
+        <div className="ac-form-group">
+          <label>URL da logo</label>
           <input
             value={urlInput}
-            onChange={e => { setUrlInput(e.target.value); setSelected(null); }}
+            onChange={e => { setUrlInput(e.target.value); setSelected(null); setFilePreview(null); if (fileRef.current) fileRef.current.value = ''; }}
             placeholder="https://..."
           />
         </div>
@@ -892,15 +941,15 @@ function EditTeamLogoModal({ team, tournamentId, onClose, onSaved }) {
               key={b}
               type="button"
               className={`ac-badge-option ${selected === b ? 'selected' : ''}`}
-              onClick={() => { setSelected(b); setUrlInput(''); }}
+              onClick={() => { setSelected(b); setUrlInput(''); setFilePreview(null); if (fileRef.current) fileRef.current.value = ''; }}
             >
               <img src={b} alt="escudo" />
             </button>
           ))}
           <button
             type="button"
-            className={`ac-badge-option ${selected === null && !urlInput.trim() ? 'selected' : ''}`}
-            onClick={() => { setSelected(null); setUrlInput(''); }}
+            className={`ac-badge-option ${selected === null && !urlInput.trim() && !filePreview ? 'selected' : ''}`}
+            onClick={() => { setSelected(null); setUrlInput(''); setFilePreview(null); if (fileRef.current) fileRef.current.value = ''; }}
             title="Sem logo (usa padrão automático)"
           >
             <img src={defaultBadge} alt="padrão" />
