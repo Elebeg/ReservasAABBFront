@@ -1,27 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { format, parseISO, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import './Reservas.css';
 
+const Spline = lazy(() => import('@splinetool/react-spline'));
+
 function CourtModel3D({ isSelected }) {
   return (
     <div className={`cm${isSelected ? ' cm--sel' : ''}`}>
-      <div className="cm-g">
-        {/* Superfície de areia */}
-        <div className="cm-floor" />
-        {/* Linha central perpendicular (divide esquerda/direita) */}
-        <div className="cm-vl" />
-        {/* Marcação da rede na superfície */}
-        <div className="cm-hl" />
-        {/* Rede (ergue-se da superfície) */}
-        <div className="cm-net">
-          <div className="cm-post cm-post--l" />
-          <div className="cm-post cm-post--r" />
-        </div>
-      </div>
-      {/* Indicador de seleção */}
+      <Suspense fallback={<div className="cm-loading" />}>
+        <Spline
+          scene="https://prod.spline.design/MfEp2hjYVrW77rR6/scene.splinecode"
+          style={{ width: '100%', height: '100%' }}
+        />
+      </Suspense>
       {isSelected && <div className="cm-glow" />}
     </div>
   );
