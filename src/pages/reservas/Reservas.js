@@ -5,122 +5,27 @@ import { format, parseISO, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import './Reservas.css';
 
-function CourtIllustration({ isSelected }) {
-  // Perspectiva: quadra de beach tennis 3D
-  // Baseline próxima: y=140 | Baseline distante: y=45
-  // Esquerda próxima: x=20 | Esquerda distante: x=62
-  // Direita próxima: x=240 | Direita distante: x=198
-  // lerp(a,b,t) → t=0 = próximo, t=1 = distante
-  // Net (t=0.5): esq=(41,92.5) dir=(219,92.5)
-  // Linha serviço A (t=0.28): esq=(31,107) dir=(229,107)
-  // Linha serviço B (t=0.72): esq=(51,73) dir=(209,73)
-  const W = 'rgba(255,255,255,0.88)';
+function CourtModel3D({ isSelected }) {
   return (
-    <svg viewBox="0 0 260 162" width="100%" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-      <defs>
-        <linearGradient id={`sg${isSelected?1:0}`} x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%"   stopColor="#e8d09a" />
-          <stop offset="100%" stopColor="#c8a968" />
-        </linearGradient>
-        <linearGradient id={`wf${isSelected?1:0}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#1a3356" />
-          <stop offset="100%" stopColor="#0d1f36" />
-        </linearGradient>
-        <linearGradient id={`wr${isSelected?1:0}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stopColor="#1e3a5f" />
-          <stop offset="100%" stopColor="#2c527e" />
-        </linearGradient>
-        <filter id="post-shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="1" dy="2" stdDeviation="1" floodOpacity="0.3" />
-        </filter>
-      </defs>
-
-      {/* Sombra no chão */}
-      <ellipse cx="130" cy="157" rx="115" ry="6" fill="rgba(0,0,0,0.18)" />
-
-      {/* Parede lateral esquerda (sombra) */}
-      <polygon points="20,140 62,45 62,57 20,152" fill="#0d1e35" />
-      {/* Parede lateral direita (luz) */}
-      <polygon points="240,140 198,45 198,57 240,152" fill={`url(#wr${isSelected?1:0})`} />
-      {/* Parede frontal */}
-      <polygon points="20,140 240,140 240,152 20,152" fill={`url(#wf${isSelected?1:0})`} />
-
-      {/* Linha de borda (soleira inferior das paredes) */}
-      <line x1="20" y1="152" x2="240" y2="152" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
-
-      {/* Superfície de areia */}
-      <polygon points="20,140 240,140 198,45 62,45" fill={`url(#sg${isSelected?1:0})`} />
-
-      {/* Textura de areia */}
-      <circle cx="45"  cy="124" r="1.3" fill="rgba(0,0,0,0.09)" />
-      <circle cx="80"  cy="116" r="1"   fill="rgba(0,0,0,0.08)" />
-      <circle cx="115" cy="128" r="1.2" fill="rgba(0,0,0,0.08)" />
-      <circle cx="155" cy="120" r="1"   fill="rgba(0,0,0,0.08)" />
-      <circle cx="195" cy="112" r="1.3" fill="rgba(0,0,0,0.09)" />
-      <circle cx="72"  cy="100" r="1"   fill="rgba(0,0,0,0.07)" />
-      <circle cx="140" cy="104" r="1.1" fill="rgba(0,0,0,0.07)" />
-      <circle cx="182" cy="96"  r="1"   fill="rgba(0,0,0,0.07)" />
-      <circle cx="100" cy="78"  r="1.2" fill="rgba(0,0,0,0.06)" />
-      <circle cx="158" cy="68"  r="1"   fill="rgba(0,0,0,0.06)" />
-      <circle cx="122" cy="58"  r="1.1" fill="rgba(0,0,0,0.05)" />
-      <circle cx="85"  cy="134" r="1"   fill="rgba(0,0,0,0.07)" />
-      <circle cx="210" cy="130" r="1.2" fill="rgba(0,0,0,0.08)" />
-
-      {/* Linha de contorno da quadra */}
-      <polygon points="20,140 240,140 198,45 62,45"
-        fill="none" stroke={W} strokeWidth="2.2" />
-
-      {/* Linhas de serviço */}
-      <line x1="31" y1="107" x2="229" y2="107" stroke={W} strokeWidth="1.4" strokeOpacity="0.8" />
-      <line x1="51" y1="73"  x2="209" y2="73"  stroke={W} strokeWidth="1.4" strokeOpacity="0.8" />
-
-      {/* Linha central (tracejada) */}
-      <line x1="130" y1="140" x2="130" y2="93"
-        stroke={W} strokeWidth="1" strokeOpacity="0.4" strokeDasharray="5,4" />
-      <line x1="130" y1="93" x2="130" y2="45"
-        stroke={W} strokeWidth="1" strokeOpacity="0.4" strokeDasharray="5,4" />
-
-      {/* ── Rede ─────────────────────────────────────────── */}
-      {/* Postes */}
-      <rect x="36" y="60" width="7" height="33" rx="2" fill="#1a1008" filter="url(#post-shadow)" />
-      <rect x="217" y="60" width="7" height="33" rx="2" fill="#1a1008" filter="url(#post-shadow)" />
-      {/* Cabeça do poste (amarelo) */}
-      <ellipse cx="39.5" cy="60"  rx="5" ry="3" fill="#F5B800" />
-      <ellipse cx="220.5" cy="60" rx="5" ry="3" fill="#F5B800" />
-
-      {/* Faixa da rede */}
-      <rect x="43" y="76" width="174" height="17" fill="rgba(8,6,3,0.82)" rx="1" />
-      {/* Cabo superior da rede (amarelo – detalhe de marca) */}
-      <line x1="36" y1="76" x2="224" y2="76" stroke="#F5B800" strokeWidth="2.2" />
-      {/* Destaque branco fino sobre o cabo */}
-      <line x1="36" y1="76" x2="224" y2="76"
-        stroke="rgba(255,255,255,0.45)" strokeWidth="0.8" />
-      {/* Trama da rede */}
-      <line x1="43" y1="76" x2="217" y2="93"  stroke="rgba(255,255,255,0.18)" strokeWidth="1" strokeDasharray="7,5" />
-      <line x1="70" y1="76" x2="70"  y2="91"  stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
-      <line x1="100" y1="76" x2="100" y2="90" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
-      <line x1="130" y1="76" x2="130" y2="89" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
-      <line x1="160" y1="76" x2="160" y2="88" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
-      <line x1="190" y1="76" x2="190" y2="87" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
-
-      {/* Reflexo de luz no topo da quadra (borda distante) */}
-      <line x1="62" y1="45" x2="198" y2="45" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" />
-
-      {/* Indicador de seleção – borda se desenhando */}
-      {isSelected && (
-        <rect x="1" y="1" width="258" height="160" rx="5"
-          fill="rgba(245,184,0,0.10)" stroke="#F5B800" strokeWidth="2.5"
-          strokeDasharray="840" strokeDashoffset="840">
-          <animate attributeName="strokeDashoffset"
-            from="840" to="0" dur="0.45s"
-            calcMode="spline" keySplines="0.4 0 0.2 1"
-            fill="freeze" />
-          <animate attributeName="fill"
-            from="rgba(245,184,0,0)" to="rgba(245,184,0,0.10)"
-            dur="0.4s" fill="freeze" />
-        </rect>
-      )}
-    </svg>
+    <div className={`cm${isSelected ? ' cm--sel' : ''}`}>
+      {/* Grupo 3D — câmera orbita aqui */}
+      <div className="cm-g">
+        {/* Superfície de areia */}
+        <div className="cm-floor" />
+        {/* Linhas de serviço (deitadas no plano da quadra) */}
+        <div className="cm-hl" style={{ top: '28%' }} />
+        <div className="cm-hl" style={{ top: '72%' }} />
+        {/* Marca da rede na superfície */}
+        <div className="cm-hl cm-hl--net" style={{ top: '50%' }} />
+        {/* Rede (ergue-se perpendicular à superfície) */}
+        <div className="cm-net">
+          <div className="cm-post cm-post--l" />
+          <div className="cm-post cm-post--r" />
+        </div>
+      </div>
+      {/* Glow de seleção */}
+      {isSelected && <div className="cm-glow" />}
+    </div>
   );
 }
 
@@ -133,7 +38,7 @@ function CourtCard({ court, isSelected, onClick, disabled }) {
       disabled={disabled}
     >
       <div className="court-card-field">
-        <CourtIllustration isSelected={isSelected} />
+        <CourtModel3D isSelected={isSelected} />
         {isSelected && <div className="court-card-check">✓</div>}
       </div>
       <div className="court-card-info">
