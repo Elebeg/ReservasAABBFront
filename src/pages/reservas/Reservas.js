@@ -1,70 +1,22 @@
-import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import { format, parseISO, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import './Reservas.css';
 
-const Spline = lazy(() => import('@splinetool/react-spline'));
-
-const SCENE_URL = 'https://prod.spline.design/MfEp2hjYVrW77rR6/scene.splinecode';
-
-// Zoom inicial (mostra o modelo inteiro) e zoom ao selecionar (aproxima)
-const ZOOM_DEFAULT  = 0.7;
-const ZOOM_SELECTED = 1.05;
-
-// Deslocamento de posição ao selecionar (ângulo ligeiramente diferente)
-const POS_SEL = { dx: 60, dy: -50 };
-
 function CourtModel3D({ isSelected }) {
-  const appRef  = useRef(null);
-  const camRef  = useRef(null);
-  const origRef = useRef(null);
-
-  function onLoad(splineApp) {
-    appRef.current = splineApp;
-
-    const all = splineApp.getAllObjects();
-    const cam = all.find(obj => /camera/i.test(obj.name ?? ''));
-
-    if (cam) {
-      // Aplica zoom inicial para enquadrar o modelo inteiro
-      cam.zoom = ZOOM_DEFAULT;
-
-      camRef.current = cam;
-      origRef.current = {
-        x: cam.position.x,
-        y: cam.position.y,
-        z: cam.position.z,
-      };
-    }
-  }
-
-  useEffect(() => {
-    const cam  = camRef.current;
-    const orig = origRef.current;
-    if (!cam || !orig) return;
-
-    if (isSelected) {
-      cam.zoom        = ZOOM_SELECTED;
-      cam.position.x  = orig.x + POS_SEL.dx;
-      cam.position.y  = orig.y + POS_SEL.dy;
-    } else {
-      cam.zoom        = ZOOM_DEFAULT;
-      cam.position.x  = orig.x;
-      cam.position.y  = orig.y;
-    }
-  }, [isSelected]);
-
   return (
     <div className={`cm${isSelected ? ' cm--sel' : ''}`}>
-      <Suspense fallback={<div className="cm-loading" />}>
-        <Spline
-          scene={SCENE_URL}
-          onLoad={onLoad}
-          style={{ width: '100%', height: '100%' }}
-        />
-      </Suspense>
+      <div className="cm-g">
+        <div className="cm-floor" />
+        <div className="cm-vl" />
+        <div className="cm-hl" />
+        <div className="cm-net">
+          <div className="cm-post cm-post--l" />
+          <div className="cm-post cm-post--r" />
+        </div>
+      </div>
       {isSelected && <div className="cm-glow" />}
     </div>
   );
