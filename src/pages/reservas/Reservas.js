@@ -5,20 +5,49 @@ import { format, parseISO, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import './Reservas.css';
 
-function CourtModel3D({ isSelected }) {
+function CourtIllustration({ isSelected }) {
+  const line = 'rgba(255,255,255,0.92)';
   return (
-    <div className={`cm${isSelected ? ' cm--sel' : ''}`}>
-      <div className="cm-g">
-        <div className="cm-floor" />
-        <div className="cm-vl" />
-        <div className="cm-hl" />
-        <div className="cm-net">
-          <div className="cm-post cm-post--l" />
-          <div className="cm-post cm-post--r" />
-        </div>
-      </div>
-      {isSelected && <div className="cm-glow" />}
-    </div>
+    <svg viewBox="0 0 200 120" width="100%" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+      {/* outer frame */}
+      <rect width="200" height="120" fill="#b8955a" rx="6" />
+      {/* sand surface */}
+      <rect x="5" y="5" width="190" height="110" rx="4" fill="#e8c98a" />
+      {/* sand texture dots */}
+      <circle cx="28" cy="22" r="1.2" fill="rgba(0,0,0,0.07)" />
+      <circle cx="55" cy="35" r="1"   fill="rgba(0,0,0,0.06)" />
+      <circle cx="80" cy="18" r="1.3" fill="rgba(0,0,0,0.07)" />
+      <circle cx="140" cy="28" r="1"  fill="rgba(0,0,0,0.06)" />
+      <circle cx="165" cy="15" r="1.2" fill="rgba(0,0,0,0.07)" />
+      <circle cx="35" cy="95" r="1.1" fill="rgba(0,0,0,0.07)" />
+      <circle cx="68" cy="102" r="1"  fill="rgba(0,0,0,0.06)" />
+      <circle cx="130" cy="98" r="1.3" fill="rgba(0,0,0,0.07)" />
+      <circle cx="170" cy="90" r="1"  fill="rgba(0,0,0,0.06)" />
+      <circle cx="45" cy="50" r="1"   fill="rgba(0,0,0,0.05)" />
+      <circle cx="155" cy="72" r="1.1" fill="rgba(0,0,0,0.05)" />
+      {/* court boundary */}
+      <rect x="18" y="12" width="164" height="96" fill="none" stroke={line} strokeWidth="2.5" />
+      {/* service lines (parallel to net) */}
+      <line x1="18" y1="36" x2="182" y2="36" stroke={line} strokeWidth="1.5" strokeOpacity="0.85" />
+      <line x1="18" y1="84" x2="182" y2="84" stroke={line} strokeWidth="1.5" strokeOpacity="0.85" />
+      {/* center line dashed */}
+      <line x1="100" y1="12" x2="100" y2="57" stroke={line} strokeWidth="1" strokeOpacity="0.5" strokeDasharray="4,3" />
+      <line x1="100" y1="63" x2="100" y2="108" stroke={line} strokeWidth="1" strokeOpacity="0.5" strokeDasharray="4,3" />
+      {/* net posts */}
+      <rect x="13" y="50" width="6" height="20" rx="2" fill="#4a3728" />
+      <rect x="181" y="50" width="6" height="20" rx="2" fill="#4a3728" />
+      {/* net band */}
+      <rect x="18" y="57" width="164" height="6" fill="rgba(30,20,10,0.7)" rx="1" />
+      {/* net top cable */}
+      <line x1="13" y1="57" x2="187" y2="57" stroke="#888" strokeWidth="1.5" />
+      {/* net mesh */}
+      <line x1="18" y1="57" x2="182" y2="63" stroke="rgba(255,255,255,0.25)" strokeWidth="1" strokeDasharray="5,4" />
+      {/* selected glow */}
+      {isSelected && (
+        <rect x="5" y="5" width="190" height="110" rx="4"
+          fill="rgba(245,184,0,0.18)" stroke="#F5B800" strokeWidth="2" />
+      )}
+    </svg>
   );
 }
 
@@ -31,7 +60,7 @@ function CourtCard({ court, isSelected, onClick, disabled }) {
       disabled={disabled}
     >
       <div className="court-card-field">
-        <CourtModel3D isSelected={isSelected} />
+        <CourtIllustration isSelected={isSelected} />
         {isSelected && <div className="court-card-check">✓</div>}
       </div>
       <div className="court-card-info">
