@@ -7,12 +7,49 @@ import './Reservas.css';
 
 const Spline = lazy(() => import('@splinetool/react-spline'));
 
+const SCENE_URL = 'https://prod.spline.design/MfEp2hjYVrW77rR6/scene.splinecode';
+
+// Camera offsets when court is selected vs default
+const CAM_DEFAULT = { z: 0,    y: 0 };
+const CAM_SELECTED = { z: -300, y: 150 };
+
 function CourtModel3D({ isSelected }) {
+  const appRef   = useRef(null);
+  const camRef   = useRef(null);
+  const origRef  = useRef(null);
+
+  function onLoad(splineApp) {
+    appRef.current = splineApp;
+
+    // Find the camera object
+    const all = splineApp.getAllObjects();
+    const cam = all.find(obj => /camera/i.test(obj.name ?? ''));
+    if (cam) {
+      camRef.current = cam;
+      origRef.current = {
+        x: cam.position.x,
+        y: cam.position.y,
+        z: cam.position.z,
+      };
+    }
+  }
+
+  useEffect(() => {
+    const cam  = camRef.current;
+    const orig = origRef.current;
+    if (!cam || !orig) return;
+
+    const target = isSelected ? CAM_SELECTED : CAM_DEFAULT;
+    cam.position.y = orig.y + target.y;
+    cam.position.z = orig.z + target.z;
+  }, [isSelected]);
+
   return (
     <div className={`cm${isSelected ? ' cm--sel' : ''}`}>
       <Suspense fallback={<div className="cm-loading" />}>
         <Spline
-          scene="https://prod.spline.design/MfEp2hjYVrW77rR6/scene.splinecode"
+          scene={SCENE_URL}
+          onLoad={onLoad}
           style={{ width: '100%', height: '100%' }}
         />
       </Suspense>

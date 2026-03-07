@@ -375,13 +375,14 @@
   background: #0a1628;
 }
 
-/* canvas/iframe gerado pelo Spline */
+/* canvas/iframe gerado pelo Spline — sem interação do usuário */
 .cm canvas,
 .cm iframe {
   width: 100% !important;
   height: 100% !important;
   border: none;
   display: block;
+  pointer-events: none;
 }
 
 /* Skeleton enquanto carrega */
