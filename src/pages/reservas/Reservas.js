@@ -10,7 +10,7 @@ const Spline = lazy(() => import('@splinetool/react-spline'));
 const SCENE_URL = 'https://prod.spline.design/MfEp2hjYVrW77rR6/scene.splinecode';
 
 // Camera offsets when court is selected vs default
-const CAM_DEFAULT = { z: 0,    y: 0 };
+const CAM_DEFAULT = { z: -300,    y: 150 };
 const CAM_SELECTED = { z: -300, y: 150 };
 
 function CourtModel3D({ isSelected }) {
