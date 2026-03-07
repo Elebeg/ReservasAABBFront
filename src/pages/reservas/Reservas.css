@@ -325,9 +325,18 @@
   cursor: pointer;
   padding: 0;
   transition: var(--transition);
-  overflow: hidden;
+  overflow: visible;
   text-align: center;
   width: 100%;
+}
+
+/* Arredondamento preservado nos filhos diretos */
+.court-card-field {
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.court-card-info {
+  border-radius: 0 0 calc(var(--radius) - 2px) calc(var(--radius) - 2px);
 }
 
 .court-card:hover:not(.court-card--disabled) {
@@ -341,36 +350,43 @@
   position: relative;
   z-index: 1;
   animation:
-    courtOrbit 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-    courtGlow  2.4s ease-in-out 0.7s infinite;
+    courtPop  0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+    courtGlow 2.4s ease-in-out 0.45s infinite;
 }
 
-@keyframes courtOrbit {
-  0%   {
-    transform: perspective(500px) rotateY(0deg)   rotateX(0deg)   scale(0.94) translateY(0px);
-    box-shadow: none;
-  }
-  18%  {
-    transform: perspective(500px) rotateY(-28deg) rotateX(18deg)  scale(0.90) translateY(-2px);
-    box-shadow: 0 6px 18px rgba(245,184,0,0.15);
-  }
-  45%  {
-    transform: perspective(500px) rotateY(20deg)  rotateX(-10deg) scale(1.05) translateY(-6px);
-    box-shadow: 0 16px 36px rgba(245,184,0,0.42);
-  }
-  68%  {
-    transform: perspective(500px) rotateY(-7deg)  rotateX(4deg)   scale(1.01) translateY(-4px);
-    box-shadow: 0 10px 24px rgba(245,184,0,0.28);
-  }
-  100% {
-    transform: perspective(500px) rotateY(0deg)   rotateX(0deg)   scale(1)    translateY(-3px);
-    box-shadow: 0 0 0 3px rgba(245,184,0,0.30), 0 6px 20px rgba(245,184,0,0.22);
-  }
+@keyframes courtPop {
+  0%   { transform: scale(0.94) translateY(0);    box-shadow: none; }
+  55%  { transform: scale(1.06) translateY(-6px); box-shadow: 0 12px 32px rgba(245,184,0,0.4); }
+  100% { transform: scale(1)    translateY(-3px); box-shadow: 0 0 0 3px rgba(245,184,0,0.30), 0 6px 20px rgba(245,184,0,0.22); }
 }
 
 @keyframes courtGlow {
   0%, 100% { box-shadow: 0 0 0 3px rgba(245,184,0,0.28), 0 6px 20px rgba(245,184,0,0.20); }
   50%       { box-shadow: 0 0 0 5px rgba(245,184,0,0.45), 0 8px 28px rgba(245,184,0,0.38); }
+}
+
+/* ── SVG 3D camera orbit ─────────────────────────────────────────────────── */
+.court-card-field {
+  perspective: 700px;
+  perspective-origin: 50% 45%;
+}
+
+.court-card--selected .court-card-field svg {
+  animation: svgCamOrbit 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: center 60%;
+}
+
+@keyframes svgCamOrbit {
+  /* câmera começa de frente */
+  0%   { transform: rotateX(0deg)   rotateY(0deg)   scale(1);    }
+  /* orbita para mostrar face esquerda (câmera move pra direita) */
+  22%  { transform: rotateX(-18deg) rotateY(-42deg)  scale(0.84); }
+  /* cruza para mostrar face direita */
+  52%  { transform: rotateX(10deg)  rotateY(30deg)   scale(0.88); }
+  /* amortece */
+  75%  { transform: rotateX(-6deg)  rotateY(-10deg)  scale(0.94); }
+  /* pousa em ângulo levemente diferente do inicial */
+  100% { transform: rotateX(-5deg)  rotateY(18deg)   scale(0.95); }
 }
 
 .court-card--disabled {
