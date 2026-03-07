@@ -8,22 +8,20 @@ import './Reservas.css';
 function CourtModel3D({ isSelected }) {
   return (
     <div className={`cm${isSelected ? ' cm--sel' : ''}`}>
-      {/* Grupo 3D — câmera orbita aqui */}
       <div className="cm-g">
         {/* Superfície de areia */}
         <div className="cm-floor" />
-        {/* Linhas de serviço (deitadas no plano da quadra) */}
-        <div className="cm-hl" style={{ top: '28%' }} />
-        <div className="cm-hl" style={{ top: '72%' }} />
-        {/* Marca da rede na superfície */}
-        <div className="cm-hl cm-hl--net" style={{ top: '50%' }} />
-        {/* Rede (ergue-se perpendicular à superfície) */}
+        {/* Linha central perpendicular (divide esquerda/direita) */}
+        <div className="cm-vl" />
+        {/* Marcação da rede na superfície */}
+        <div className="cm-hl" />
+        {/* Rede (ergue-se da superfície) */}
         <div className="cm-net">
           <div className="cm-post cm-post--l" />
           <div className="cm-post cm-post--r" />
         </div>
       </div>
-      {/* Glow de seleção */}
+      {/* Indicador de seleção */}
       {isSelected && <div className="cm-glow" />}
     </div>
   );
