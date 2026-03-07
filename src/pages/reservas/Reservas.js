@@ -9,25 +9,27 @@ const Spline = lazy(() => import('@splinetool/react-spline'));
 
 const SCENE_URL = 'https://prod.spline.design/MfEp2hjYVrW77rR6/scene.splinecode';
 
-// Camera offsets when court is selected vs default
-const CAM_DEFAULT = { z: -300,    y: 150 };
-const CAM_SELECTED = { z: -300, y: 150 };
+// Zoom inicial (mostra o modelo inteiro) e zoom ao selecionar (aproxima)
+const ZOOM_DEFAULT  = 0.7;
+const ZOOM_SELECTED = 1.05;
+
+// Deslocamento de posição ao selecionar (ângulo ligeiramente diferente)
+const POS_SEL = { dx: 60, dy: -50 };
 
 function CourtModel3D({ isSelected }) {
-  const appRef   = useRef(null);
-  const camRef   = useRef(null);
-  const origRef  = useRef(null);
+  const appRef  = useRef(null);
+  const camRef  = useRef(null);
+  const origRef = useRef(null);
 
-    function onLoad(splineApp) {
+  function onLoad(splineApp) {
     appRef.current = splineApp;
 
     const all = splineApp.getAllObjects();
     const cam = all.find(obj => /camera/i.test(obj.name ?? ''));
 
     if (cam) {
-      // DEBUG — me mande esses valores
-      console.log('Camera pos x/y/z:', cam.position.x, cam.position.y, cam.position.z);
-      console.log('Camera rot x/y/z:', cam.rotation.x, cam.rotation.y, cam.rotation.z);
+      // Aplica zoom inicial para enquadrar o modelo inteiro
+      cam.zoom = ZOOM_DEFAULT;
 
       camRef.current = cam;
       origRef.current = {
@@ -43,9 +45,15 @@ function CourtModel3D({ isSelected }) {
     const orig = origRef.current;
     if (!cam || !orig) return;
 
-    const target = isSelected ? CAM_SELECTED : CAM_DEFAULT;
-    cam.position.y = orig.y + target.y;
-    cam.position.z = orig.z + target.z;
+    if (isSelected) {
+      cam.zoom        = ZOOM_SELECTED;
+      cam.position.x  = orig.x + POS_SEL.dx;
+      cam.position.y  = orig.y + POS_SEL.dy;
+    } else {
+      cam.zoom        = ZOOM_DEFAULT;
+      cam.position.x  = orig.x;
+      cam.position.y  = orig.y;
+    }
   }, [isSelected]);
 
   return (
