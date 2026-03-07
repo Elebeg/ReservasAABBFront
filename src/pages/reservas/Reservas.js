@@ -21,21 +21,20 @@ function CourtModel3D({ isSelected }) {
     function onLoad(splineApp) {
     appRef.current = splineApp;
 
-    // Tenta acessar a câmera Three.js internamente
-    const cam =
-      splineApp._camera ??
-      splineApp.camera ??
-      splineApp._renderer?.camera ??
-      splineApp._scene?.camera ??
-      null;
-
-    // DEBUG — remover depois
-    console.log('App props:', Object.keys(splineApp));
-    console.log('Câmera:', cam);
+    const all = splineApp.getAllObjects();
+    const cam = all.find(obj => /camera/i.test(obj.name ?? ''));
 
     if (cam) {
+      // DEBUG — me mande esses valores
+      console.log('Camera pos x/y/z:', cam.position.x, cam.position.y, cam.position.z);
+      console.log('Camera rot x/y/z:', cam.rotation.x, cam.rotation.y, cam.rotation.z);
+
       camRef.current = cam;
-      origRef.current = { x: cam.position.x, y: cam.position.y, z: cam.position.z, fov: cam.fov };
+      origRef.current = {
+        x: cam.position.x,
+        y: cam.position.y,
+        z: cam.position.z,
+      };
     }
   }
 
