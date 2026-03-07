@@ -349,12 +349,12 @@
 
 .court-card-field {
   position: relative;
-  padding: 8px 8px 4px;
-  background: #f5e9d0;
+  padding: 10px 10px 6px;
+  background: #f0f4f8;
 }
 
 .court-card--selected .court-card-field {
-  background: #fef9e7;
+  background: #f0f4f8;
 }
 
 .court-card-check {

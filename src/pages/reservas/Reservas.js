@@ -6,46 +6,110 @@ import { ptBR } from 'date-fns/locale';
 import './Reservas.css';
 
 function CourtIllustration({ isSelected }) {
-  const line = 'rgba(255,255,255,0.92)';
+  // Perspectiva: quadra de beach tennis 3D
+  // Baseline próxima: y=140 | Baseline distante: y=45
+  // Esquerda próxima: x=20 | Esquerda distante: x=62
+  // Direita próxima: x=240 | Direita distante: x=198
+  // lerp(a,b,t) → t=0 = próximo, t=1 = distante
+  // Net (t=0.5): esq=(41,92.5) dir=(219,92.5)
+  // Linha serviço A (t=0.28): esq=(31,107) dir=(229,107)
+  // Linha serviço B (t=0.72): esq=(51,73) dir=(209,73)
+  const W = 'rgba(255,255,255,0.88)';
   return (
-    <svg viewBox="0 0 200 120" width="100%" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-      {/* outer frame */}
-      <rect width="200" height="120" fill="#b8955a" rx="6" />
-      {/* sand surface */}
-      <rect x="5" y="5" width="190" height="110" rx="4" fill="#e8c98a" />
-      {/* sand texture dots */}
-      <circle cx="28" cy="22" r="1.2" fill="rgba(0,0,0,0.07)" />
-      <circle cx="55" cy="35" r="1" fill="rgba(0,0,0,0.06)" />
-      <circle cx="80" cy="18" r="1.3" fill="rgba(0,0,0,0.07)" />
-      <circle cx="140" cy="28" r="1" fill="rgba(0,0,0,0.06)" />
-      <circle cx="165" cy="15" r="1.2" fill="rgba(0,0,0,0.07)" />
-      <circle cx="35" cy="95" r="1.1" fill="rgba(0,0,0,0.07)" />
-      <circle cx="68" cy="102" r="1" fill="rgba(0,0,0,0.06)" />
-      <circle cx="130" cy="98" r="1.3" fill="rgba(0,0,0,0.07)" />
-      <circle cx="170" cy="90" r="1" fill="rgba(0,0,0,0.06)" />
-      <circle cx="45" cy="50" r="1" fill="rgba(0,0,0,0.05)" />
-      <circle cx="155" cy="72" r="1.1" fill="rgba(0,0,0,0.05)" />
-      {/* court boundary */}
-      <rect x="18" y="12" width="164" height="96" fill="none" stroke={line} strokeWidth="2.5" />
-      {/* service lines (parallel to net) */}
-      <line x1="18" y1="36" x2="182" y2="36" stroke={line} strokeWidth="1.5" strokeOpacity="0.85" />
-      <line x1="18" y1="84" x2="182" y2="84" stroke={line} strokeWidth="1.5" strokeOpacity="0.85" />
-      {/* center line (singles sideline in some rules) */}
-      <line x1="100" y1="12" x2="100" y2="57" stroke={line} strokeWidth="1" strokeOpacity="0.5" strokeDasharray="4,3" />
-      <line x1="100" y1="63" x2="100" y2="108" stroke={line} strokeWidth="1" strokeOpacity="0.5" strokeDasharray="4,3" />
-      {/* net posts */}
-      <rect x="13" y="50" width="6" height="20" rx="2" fill="#4a3728" />
-      <rect x="181" y="50" width="6" height="20" rx="2" fill="#4a3728" />
-      {/* net band */}
-      <rect x="18" y="57" width="164" height="6" fill="rgba(30,20,10,0.7)" rx="1" />
-      {/* net top cable */}
-      <line x1="13" y1="57" x2="187" y2="57" stroke="#888" strokeWidth="1.5" />
-      {/* net mesh pattern */}
-      <line x1="18" y1="57" x2="182" y2="63" stroke="rgba(255,255,255,0.25)" strokeWidth="1" strokeDasharray="5,4" />
-      {/* selected glow overlay */}
+    <svg viewBox="0 0 260 162" width="100%" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+      <defs>
+        <linearGradient id={`sg${isSelected?1:0}`} x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%"   stopColor="#e8d09a" />
+          <stop offset="100%" stopColor="#c8a968" />
+        </linearGradient>
+        <linearGradient id={`wf${isSelected?1:0}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#1a3356" />
+          <stop offset="100%" stopColor="#0d1f36" />
+        </linearGradient>
+        <linearGradient id={`wr${isSelected?1:0}`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stopColor="#1e3a5f" />
+          <stop offset="100%" stopColor="#2c527e" />
+        </linearGradient>
+        <filter id="post-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="1" dy="2" stdDeviation="1" floodOpacity="0.3" />
+        </filter>
+      </defs>
+
+      {/* Sombra no chão */}
+      <ellipse cx="130" cy="157" rx="115" ry="6" fill="rgba(0,0,0,0.18)" />
+
+      {/* Parede lateral esquerda (sombra) */}
+      <polygon points="20,140 62,45 62,57 20,152" fill="#0d1e35" />
+      {/* Parede lateral direita (luz) */}
+      <polygon points="240,140 198,45 198,57 240,152" fill={`url(#wr${isSelected?1:0})`} />
+      {/* Parede frontal */}
+      <polygon points="20,140 240,140 240,152 20,152" fill={`url(#wf${isSelected?1:0})`} />
+
+      {/* Linha de borda (soleira inferior das paredes) */}
+      <line x1="20" y1="152" x2="240" y2="152" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+
+      {/* Superfície de areia */}
+      <polygon points="20,140 240,140 198,45 62,45" fill={`url(#sg${isSelected?1:0})`} />
+
+      {/* Textura de areia */}
+      <circle cx="45"  cy="124" r="1.3" fill="rgba(0,0,0,0.09)" />
+      <circle cx="80"  cy="116" r="1"   fill="rgba(0,0,0,0.08)" />
+      <circle cx="115" cy="128" r="1.2" fill="rgba(0,0,0,0.08)" />
+      <circle cx="155" cy="120" r="1"   fill="rgba(0,0,0,0.08)" />
+      <circle cx="195" cy="112" r="1.3" fill="rgba(0,0,0,0.09)" />
+      <circle cx="72"  cy="100" r="1"   fill="rgba(0,0,0,0.07)" />
+      <circle cx="140" cy="104" r="1.1" fill="rgba(0,0,0,0.07)" />
+      <circle cx="182" cy="96"  r="1"   fill="rgba(0,0,0,0.07)" />
+      <circle cx="100" cy="78"  r="1.2" fill="rgba(0,0,0,0.06)" />
+      <circle cx="158" cy="68"  r="1"   fill="rgba(0,0,0,0.06)" />
+      <circle cx="122" cy="58"  r="1.1" fill="rgba(0,0,0,0.05)" />
+      <circle cx="85"  cy="134" r="1"   fill="rgba(0,0,0,0.07)" />
+      <circle cx="210" cy="130" r="1.2" fill="rgba(0,0,0,0.08)" />
+
+      {/* Linha de contorno da quadra */}
+      <polygon points="20,140 240,140 198,45 62,45"
+        fill="none" stroke={W} strokeWidth="2.2" />
+
+      {/* Linhas de serviço */}
+      <line x1="31" y1="107" x2="229" y2="107" stroke={W} strokeWidth="1.4" strokeOpacity="0.8" />
+      <line x1="51" y1="73"  x2="209" y2="73"  stroke={W} strokeWidth="1.4" strokeOpacity="0.8" />
+
+      {/* Linha central (tracejada) */}
+      <line x1="130" y1="140" x2="130" y2="93"
+        stroke={W} strokeWidth="1" strokeOpacity="0.4" strokeDasharray="5,4" />
+      <line x1="130" y1="93" x2="130" y2="45"
+        stroke={W} strokeWidth="1" strokeOpacity="0.4" strokeDasharray="5,4" />
+
+      {/* ── Rede ─────────────────────────────────────────── */}
+      {/* Postes */}
+      <rect x="36" y="60" width="7" height="33" rx="2" fill="#1a1008" filter="url(#post-shadow)" />
+      <rect x="217" y="60" width="7" height="33" rx="2" fill="#1a1008" filter="url(#post-shadow)" />
+      {/* Cabeça do poste (amarelo) */}
+      <ellipse cx="39.5" cy="60"  rx="5" ry="3" fill="#F5B800" />
+      <ellipse cx="220.5" cy="60" rx="5" ry="3" fill="#F5B800" />
+
+      {/* Faixa da rede */}
+      <rect x="43" y="76" width="174" height="17" fill="rgba(8,6,3,0.82)" rx="1" />
+      {/* Cabo superior da rede (amarelo – detalhe de marca) */}
+      <line x1="36" y1="76" x2="224" y2="76" stroke="#F5B800" strokeWidth="2.2" />
+      {/* Destaque branco fino sobre o cabo */}
+      <line x1="36" y1="76" x2="224" y2="76"
+        stroke="rgba(255,255,255,0.45)" strokeWidth="0.8" />
+      {/* Trama da rede */}
+      <line x1="43" y1="76" x2="217" y2="93"  stroke="rgba(255,255,255,0.18)" strokeWidth="1" strokeDasharray="7,5" />
+      <line x1="70" y1="76" x2="70"  y2="91"  stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+      <line x1="100" y1="76" x2="100" y2="90" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+      <line x1="130" y1="76" x2="130" y2="89" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+      <line x1="160" y1="76" x2="160" y2="88" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+      <line x1="190" y1="76" x2="190" y2="87" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+
+      {/* Reflexo de luz no topo da quadra (borda distante) */}
+      <line x1="62" y1="45" x2="198" y2="45" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" />
+
+      {/* Indicador de seleção */}
       {isSelected && (
-        <rect x="5" y="5" width="190" height="110" rx="4"
-          fill="rgba(245,184,0,0.18)" stroke="#F5B800" strokeWidth="2" />
+        <rect x="1" y="1" width="258" height="160" rx="5"
+          fill="rgba(245,184,0,0.10)" stroke="#F5B800" strokeWidth="2.5" />
       )}
     </svg>
   );
