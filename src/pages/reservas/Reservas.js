@@ -106,10 +106,19 @@ function CourtIllustration({ isSelected }) {
       {/* Reflexo de luz no topo da quadra (borda distante) */}
       <line x1="62" y1="45" x2="198" y2="45" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" />
 
-      {/* Indicador de seleção */}
+      {/* Indicador de seleção – borda se desenhando */}
       {isSelected && (
         <rect x="1" y="1" width="258" height="160" rx="5"
-          fill="rgba(245,184,0,0.10)" stroke="#F5B800" strokeWidth="2.5" />
+          fill="rgba(245,184,0,0.10)" stroke="#F5B800" strokeWidth="2.5"
+          strokeDasharray="840" strokeDashoffset="840">
+          <animate attributeName="strokeDashoffset"
+            from="840" to="0" dur="0.45s"
+            calcMode="spline" keySplines="0.4 0 0.2 1"
+            fill="freeze" />
+          <animate attributeName="fill"
+            from="rgba(245,184,0,0)" to="rgba(245,184,0,0.10)"
+            dur="0.4s" fill="freeze" />
+        </rect>
       )}
     </svg>
   );
