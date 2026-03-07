@@ -238,13 +238,13 @@ function ResultModal({ match, tid, onClose, onSaved }) {
   }, [match.id, tid, match.homeTeam?.id, match.awayTeam?.id]);
 
   // Cada ação persiste imediatamente no banco
-  async function addGoal(teamId, playerId) {
-    if (!playerId) return;
+  async function addGoal(teamId, playerId, ownGoal = false) {
+    if (!ownGoal && !playerId) return;
     setGoalLoading(true);
     try {
       const created = await apiFetch(`/admin/championship/matches/${match.id}/goals`, {
         method: 'POST',
-        body: JSON.stringify({ teamId, playerId: Number(playerId) }),
+        body: JSON.stringify({ teamId, playerId: playerId ? Number(playerId) : null, ownGoal }),
       });
       setGoals(prev => [...prev, created]);
       // Reseta o select de "novo gol" do time correspondente
@@ -374,17 +374,20 @@ function ResultModal({ match, tid, onClose, onSaved }) {
                 {sideGoals.map((g, i) => (
                   <div key={g.id} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--ac-gray-500)', minWidth: 22 }}>⚽{i + 1}</span>
-                    <select
-                      value={g.playerId ?? ''}
-                      onChange={e => setScorer(g.id, e.target.value)}
-                      disabled={goalLoading}
-                      style={{ flex: 1, fontSize: '0.78rem', padding: '3px 5px', borderRadius: 4, border: '1px solid var(--ac-gray-300)' }}
-                    >
-                      <option value="">— Jogador —</option>
-                      {players.map(p => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
-                      ))}
-                    </select>
+                    {g.ownGoal
+                      ? <span style={{ flex: 1, fontSize: '0.78rem', padding: '3px 5px', color: 'var(--ac-gray-500)', fontStyle: 'italic' }}>Gol Contra</span>
+                      : <select
+                          value={g.playerId ?? ''}
+                          onChange={e => setScorer(g.id, e.target.value)}
+                          disabled={goalLoading}
+                          style={{ flex: 1, fontSize: '0.78rem', padding: '3px 5px', borderRadius: 4, border: '1px solid var(--ac-gray-300)' }}
+                        >
+                          <option value="">— Jogador —</option>
+                          {players.map(p => (
+                            <option key={p.id} value={p.id}>{p.name}</option>
+                          ))}
+                        </select>
+                    }
                     <button type="button" className="ac-btn-icon danger"
                       onClick={() => removeGoal(g.id)}
                       disabled={goalLoading}
@@ -414,6 +417,18 @@ function ResultModal({ match, tid, onClose, onSaved }) {
                   style={{ fontSize: '0.78rem', whiteSpace: 'nowrap' }}
                 >
                   + Gol
+                </button>
+              </div>
+              {/* Botão gol contra: adiciona gol ao time sem atribuir a ninguém */}
+              <div style={{ marginTop: 4 }}>
+                <button
+                  type="button"
+                  className="ac-btn ac-btn-sm"
+                  onClick={() => addGoal(teamId, null, true)}
+                  disabled={goalLoading}
+                  style={{ fontSize: '0.75rem', whiteSpace: 'nowrap', width: '100%', background: 'var(--ac-gray-100)', color: 'var(--ac-gray-600)', border: '1px dashed var(--ac-gray-400)' }}
+                >
+                  + Gol Contra
                 </button>
               </div>
             </div>
@@ -1746,7 +1761,7 @@ function PlayersTab({ tournament }) {
   const [view, setView]                 = useState('manage');
   const [teams, setTeams]               = useState([]);
   const [selectedTeamId, setTeamId]     = useState(null);
-  const [teamPlayers, setTeamPlayers]   = useState([]);
+  const [teamPlayers, setTeamPlayers]   = use State([]);
   const [allPlayers, setAllPlayers]     = useState([]);
   const [addForm, setAddForm]           = useState({ name: '', number: '', position: '' });
   const [bulkText, setBulkText]         = useState('');
