@@ -18,19 +18,18 @@ function CourtModel3D({ isSelected }) {
   const camRef   = useRef(null);
   const origRef  = useRef(null);
 
-  function onLoad(splineApp) {
+    function onLoad(splineApp) {
     appRef.current = splineApp;
-
-    // Find the camera object
     const all = splineApp.getAllObjects();
+
+    // DEBUG — remover depois
+    console.log('Todos os objetos:', all.map(o => ({ name: o.name, type: o.type, pos: o.position })));
+
     const cam = all.find(obj => /camera/i.test(obj.name ?? ''));
     if (cam) {
+      console.log('Câmera encontrada:', cam.name, cam.position, cam.rotation);
       camRef.current = cam;
-      origRef.current = {
-        x: cam.position.x,
-        y: cam.position.y,
-        z: cam.position.z,
-      };
+      origRef.current = { x: cam.position.x, y: cam.position.y, z: cam.position.z };
     }
   }
 
