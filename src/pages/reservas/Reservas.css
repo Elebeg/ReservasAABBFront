@@ -338,19 +338,38 @@
 
 .court-card--selected {
   border-color: var(--yellow);
+  position: relative;
+  z-index: 1;
   animation:
-    courtPop  0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-    courtGlow 2.4s ease-in-out 0.4s infinite;
+    courtOrbit 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+    courtGlow  2.4s ease-in-out 0.7s infinite;
 }
 
-@keyframes courtPop {
-  0%   { transform: scale(0.94) translateY(0);    box-shadow: none; }
-  55%  { transform: scale(1.05) translateY(-5px); box-shadow: 0 10px 30px rgba(245,184,0,0.35); }
-  100% { transform: scale(1)    translateY(-3px); box-shadow: 0 0 0 3px rgba(245,184,0,0.3), 0 6px 20px rgba(245,184,0,0.22); }
+@keyframes courtOrbit {
+  0%   {
+    transform: perspective(500px) rotateY(0deg)   rotateX(0deg)   scale(0.94) translateY(0px);
+    box-shadow: none;
+  }
+  18%  {
+    transform: perspective(500px) rotateY(-28deg) rotateX(18deg)  scale(0.90) translateY(-2px);
+    box-shadow: 0 6px 18px rgba(245,184,0,0.15);
+  }
+  45%  {
+    transform: perspective(500px) rotateY(20deg)  rotateX(-10deg) scale(1.05) translateY(-6px);
+    box-shadow: 0 16px 36px rgba(245,184,0,0.42);
+  }
+  68%  {
+    transform: perspective(500px) rotateY(-7deg)  rotateX(4deg)   scale(1.01) translateY(-4px);
+    box-shadow: 0 10px 24px rgba(245,184,0,0.28);
+  }
+  100% {
+    transform: perspective(500px) rotateY(0deg)   rotateX(0deg)   scale(1)    translateY(-3px);
+    box-shadow: 0 0 0 3px rgba(245,184,0,0.30), 0 6px 20px rgba(245,184,0,0.22);
+  }
 }
 
 @keyframes courtGlow {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(245,184,0,0.28), 0 6px 20px rgba(245,184,0,0.2); }
+  0%, 100% { box-shadow: 0 0 0 3px rgba(245,184,0,0.28), 0 6px 20px rgba(245,184,0,0.20); }
   50%       { box-shadow: 0 0 0 5px rgba(245,184,0,0.45), 0 8px 28px rgba(245,184,0,0.38); }
 }
 
