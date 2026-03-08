@@ -612,7 +612,7 @@ function SumulaModal({ match, tournament, onClose }) {
       const year = getTournamentYear(tournament);
       return players.map(p => {
         const numCell = p.number != null ? p.number : numBox;
-        const vetBadge = isVeteran(p, year) ? ' <span style="font-size:9px;font-weight:700;color:#fff;background:#7c3aed;border-radius:3px;padding:1px 4px;vertical-align:middle">V</span>' : '';
+        const vetBadge = isVeteran(p, year) ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">V</span>' : '';
         return `<tr>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;width:24px;font-size:11px">${numCell}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;font-size:12px">${p.name}${vetBadge}</td>
@@ -1416,10 +1416,20 @@ function ScheduleModal({ match, onClose, onSaved }) {
 // ─── MODAL UPLOAD SÚMULA ──────────────────────────────────────────────────────
 
 function SumulaUploadModal({ match, onClose, onSaved }) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState('');
-  const [preview, setPreview] = useState(null);  // base64 ou URL já existente
-  const hasCurrent = !!match.sumulaUrl;
+  const [loading, setLoading]       = useState(false);
+  const [fetching, setFetching]     = useState(!!match.hasSumula);
+  const [currentUrl, setCurrentUrl] = useState(null);  // URL já salva no banco
+  const [preview, setPreview]       = useState(null);   // novo arquivo selecionado (base64)
+  const [error, setError]           = useState('');
+
+  // Carrega a URL atual se já existir súmula
+  useEffect(() => {
+    if (!match.hasSumula) return;
+    apiFetch(`/admin/championship/matches/${match.id}/detail`)
+      .then(d => setCurrentUrl(d.sumulaUrl ?? null))
+      .catch(() => {})
+      .finally(() => setFetching(false));
+  }, [match.id, match.hasSumula]);
 
   function handleFile(e) {
     const file = e.target.files?.[0];
@@ -1455,45 +1465,69 @@ function SumulaUploadModal({ match, onClose, onSaved }) {
     finally { setLoading(false); }
   }
 
-  const isImage = preview?.startsWith('data:image') || (!preview && match.sumulaUrl?.startsWith('data:image'));
-  const isPdf   = preview?.startsWith('data:application/pdf') || (!preview && match.sumulaUrl?.startsWith('data:application/pdf'));
+  const isImage  = preview?.startsWith('data:image') || (!preview && currentUrl?.startsWith('data:image'));
+  const isPdf    = preview?.startsWith('data:application/pdf') || (!preview && currentUrl?.startsWith('data:application/pdf'));
+  const replacing = !!currentUrl && !!preview;
 
   return (
     <Modal title="📎 Súmula Digitalizada" onClose={onClose}>
       <Alert type="error" message={error} onClose={() => setError('')} />
 
-      {hasCurrent && !preview && (
-        <div style={{ marginBottom: 14, padding: '10px 14px', background: 'var(--ac-gray-100)', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: '0.82rem', color: 'var(--ac-gray-700)', flex: 1 }}>
-            {match.sumulaUrl?.startsWith('data:image') ? '🖼️ Imagem já enviada' : '📄 PDF já enviado'}
-          </span>
-          <a
-            href={match.sumulaUrl} target="_blank" rel="noreferrer"
-            className="ac-btn ac-btn-sm ac-btn-ghost"
-            style={{ fontSize: '0.75rem' }}
-          >Visualizar</a>
-          <button className="ac-btn ac-btn-sm" onClick={remove} disabled={loading}
-            style={{ fontSize: '0.75rem', color: 'var(--ac-danger)' }}>🗑 Remover</button>
+      {/* Súmula existente */}
+      {fetching ? (
+        <div style={{ textAlign: 'center', padding: '12px 0', color: 'var(--ac-gray-500)', fontSize: '0.85rem' }}>
+          <span className="ac-spinner" /> Carregando...
+        </div>
+      ) : currentUrl && !preview && (
+        <div style={{ marginBottom: 14, padding: '10px 14px', background: 'var(--ac-gray-100)', borderRadius: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+            <span style={{ fontSize: '0.82rem', color: 'var(--ac-gray-700)', flex: 1, fontWeight: 600 }}>
+              {isImage ? '🖼️ Imagem enviada' : '📄 PDF enviado'}
+            </span>
+            <a href={currentUrl} target="_blank" rel="noreferrer"
+              className="ac-btn ac-btn-sm ac-btn-ghost" style={{ fontSize: '0.75rem' }}>
+              Visualizar
+            </a>
+            <button className="ac-btn ac-btn-sm" onClick={remove} disabled={loading}
+              style={{ fontSize: '0.75rem', color: 'var(--ac-danger)', border: '1px solid var(--ac-danger)' }}>
+              🗑 Excluir
+            </button>
+          </div>
+          {isImage && (
+            <img src={currentUrl} alt="Súmula atual"
+              style={{ maxWidth: '100%', maxHeight: 180, borderRadius: 4, border: '1px solid var(--ac-gray-200)', display: 'block' }} />
+          )}
         </div>
       )}
 
+      {/* Seleção de novo arquivo */}
       <div className="ac-form-group">
-        <label>Selecionar arquivo (PDF ou imagem)</label>
+        <label>{replacing ? '🔄 Substituir por novo arquivo (PDF ou imagem)' : 'Selecionar arquivo (PDF ou imagem)'}</label>
         <input type="file" accept="application/pdf,image/*" onChange={handleFile}
           style={{ fontSize: '0.85rem' }} />
       </div>
 
+      {/* Preview do novo arquivo */}
       {preview && (
-        <div style={{ marginTop: 10, marginBottom: 10 }}>
-          {isImage && <img src={preview} alt="Preview" style={{ maxWidth: '100%', maxHeight: 300, borderRadius: 6, border: '1px solid var(--ac-gray-200)' }} />}
-          {isPdf   && <p style={{ fontSize: '0.82rem', color: 'var(--ac-gray-600)' }}>📄 PDF selecionado — clique em Salvar para enviar.</p>}
+        <div style={{ marginTop: 8, marginBottom: 8 }}>
+          {replacing && (
+            <p style={{ fontSize: '0.78rem', color: 'var(--ac-warning)', fontWeight: 600, marginBottom: 6 }}>
+              ⚠️ A súmula anterior será substituída ao salvar.
+            </p>
+          )}
+          {preview.startsWith('data:image') && (
+            <img src={preview} alt="Preview" style={{ maxWidth: '100%', maxHeight: 260, borderRadius: 6, border: '1px solid var(--ac-gray-200)' }} />
+          )}
+          {preview.startsWith('data:application/pdf') && (
+            <p style={{ fontSize: '0.82rem', color: 'var(--ac-gray-600)' }}>📄 PDF selecionado — clique em Salvar para enviar.</p>
+          )}
         </div>
       )}
 
       <div className="ac-form-actions">
         <button className="ac-btn ac-btn-ghost" onClick={onClose}>Cancelar</button>
         <button className="ac-btn ac-btn-primary" onClick={save} disabled={!preview || loading}>
-          {loading ? <span className="ac-spinner" /> : '💾 Salvar Súmula'}
+          {loading ? <span className="ac-spinner" /> : (replacing ? '🔄 Substituir Súmula' : '💾 Salvar Súmula')}
         </button>
       </div>
     </Modal>

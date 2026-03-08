@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import TeamLogo from './TeamLogo';
 
+function isVet(player, year) {
+  if (!player.birthDate) return false;
+  return new Date(player.birthDate).getFullYear() <= year - 40;
+}
+
+const VetBadge = () => (
+  <span style={{ marginLeft: 5, fontSize: '0.62rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 5px', verticalAlign: 'middle' }}>VET</span>
+);
+
 const POSITION_SHORT = {
   GOALKEEPER: 'GOL',
   DEFENDER:   'DEF',
@@ -12,7 +21,7 @@ function normalize(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
-export default function TournamentPlayers({ players, onTeamClick }) {
+export default function TournamentPlayers({ players, tournamentYear = new Date().getFullYear(), onTeamClick }) {
   const [query, setQuery] = useState('');
 
   if (!players || players.length === 0) {
@@ -86,7 +95,9 @@ export default function TournamentPlayers({ players, onTeamClick }) {
                 visibleScorers.map(p => (
                   <tr key={p.id} className="camp-tr">
                     <td className="camp-td pos">{rankMap.get(p.id)}</td>
-                    <td className="camp-td" style={{ fontWeight: 600 }}>{p.name}</td>
+                    <td className="camp-td" style={{ fontWeight: 600 }}>
+                      {p.name}{isVet(p, tournamentYear) && <VetBadge />}
+                    </td>
                     <td className="camp-td">
                       <span
                         className="ts-team-cell"
@@ -149,7 +160,9 @@ export default function TournamentPlayers({ players, onTeamClick }) {
               <tbody>
                 {disciplinary.map(p => (
                   <tr key={p.id} className="camp-tr">
-                    <td className="camp-td" style={{ fontWeight: 600 }}>{p.name}</td>
+                    <td className="camp-td" style={{ fontWeight: 600 }}>
+                      {p.name}{isVet(p, tournamentYear) && <VetBadge />}
+                    </td>
                     <td className="camp-td">
                       <span className="ts-team-cell">
                         {p.team && (

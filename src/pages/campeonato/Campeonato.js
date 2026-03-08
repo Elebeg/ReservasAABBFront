@@ -47,6 +47,10 @@ export default function Campeonato() {
   const [tab, setTab] = useState('matches');
   const [selectedTeam, setSelectedTeam] = useState(null);
 
+  const tournamentYear = tournament
+    ? new Date(tournament.startDate || tournament.createdAt).getFullYear()
+    : new Date().getFullYear();
+
   const showStandings = tournament && ['GROUPS', 'LEAGUE'].includes(tournament.format);
   const hasPlayers    = players && players.length > 0;
 
@@ -95,6 +99,7 @@ export default function Campeonato() {
           players={players}
           standings={standings}
           matches={matches}
+          tournamentYear={tournamentYear}
           onClose={() => setSelectedTeam(null)}
         />
       )}
@@ -142,7 +147,7 @@ export default function Campeonato() {
 
         <div className="camp-tab-content">
           {tab === 'matches' && (
-            <TournamentMatches matches={matches} onTeamClick={setSelectedTeam} />
+            <TournamentMatches matches={matches} tournamentYear={tournamentYear} onTeamClick={setSelectedTeam} />
           )}
           {tab === 'standings' && (
             <TournamentStandings
@@ -155,7 +160,7 @@ export default function Campeonato() {
             <TournamentBracket bracket={bracket} tournament={tournament} standings={standings} />
           )}
           {tab === 'players' && (
-            <TournamentPlayers players={players} onTeamClick={setSelectedTeam} />
+            <TournamentPlayers players={players} tournamentYear={tournamentYear} onTeamClick={setSelectedTeam} />
           )}
         </div>
       </div>

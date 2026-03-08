@@ -1,6 +1,15 @@
 import React from 'react';
 import TeamLogo from './TeamLogo';
 
+function isVet(player, year) {
+  if (!player.birthDate) return false;
+  return new Date(player.birthDate).getFullYear() <= year - 40;
+}
+
+const VetBadge = () => (
+  <span style={{ marginLeft: 5, fontSize: '0.6rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle' }}>VET</span>
+);
+
 const POSITION_SHORT = {
   GOALKEEPER: 'GOL',
   DEFENDER:   'DEF',
@@ -37,7 +46,7 @@ function StatBox({ label, value, primary }) {
   );
 }
 
-export default function TeamProfile({ team, players, standings, matches, onClose }) {
+export default function TeamProfile({ team, players, standings, matches, tournamentYear = new Date().getFullYear(), onClose }) {
   const teamPlayers = (players || [])
     .filter(p => p.team?.name === team.name)
     .sort((a, b) => b.goals - a.goals || a.name.localeCompare(b.name));
@@ -136,6 +145,7 @@ export default function TeamProfile({ team, players, standings, matches, onClose
                             <span style={{ color: '#adb5bd', fontSize: '0.72rem', marginRight: 5 }}>#{p.number}</span>
                           )}
                           <span style={{ fontWeight: 600 }}>{p.name}</span>
+                          {isVet(p, tournamentYear) && <VetBadge />}
                         </td>
                         <td style={td('center')}>
                           {p.position ? (
