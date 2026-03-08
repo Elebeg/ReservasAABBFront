@@ -612,10 +612,15 @@ function SumulaModal({ match, tournament, onClose }) {
       const year = getTournamentYear(tournament);
       return players.map(p => {
         const numCell = p.number != null ? p.number : numBox;
-        const vetBadge = isVeteran(p, year) ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">V</span>' : '';
+        const vetBadge  = isVeteran(p, year) ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">V</span>' : '';
+        const suspBadge = p.suspended      ? ' <span style="font-size:9px;font-weight:700;color:#fff;background:#dc2626;border-radius:2px;padding:0 3px;vertical-align:middle">SUSP</span>' : '';
+        const pendBadge = !p.suspended && p.yellowCardAccum === 1 ? ' <span style="font-size:9px;font-weight:700;color:#92400e;border:1px solid #f59e0b;border-radius:2px;padding:0 3px;vertical-align:middle">⚠️</span>' : '';
+        const nameCell  = p.suspended
+          ? `<del style="color:#aaa">${p.name}</del>${vetBadge}${suspBadge}`
+          : `${p.name}${vetBadge}${pendBadge}`;
         return `<tr>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;width:24px;font-size:11px">${numCell}</td>
-          <td style="padding:3px 4px;border-bottom:1px solid #eee;font-size:12px">${p.name}${vetBadge}</td>
+          <td style="padding:3px 4px;border-bottom:1px solid #eee;font-size:12px">${nameCell}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;white-space:nowrap">${foulBoxes}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${YELLOW_BOX}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${RED_BOX}</td>
@@ -2023,6 +2028,13 @@ function PlayersTab({ tournament }) {
     } catch (err) { setAlert({ type: 'error', msg: err.message }); }
   }
 
+  async function clearSuspension(playerId) {
+    try {
+      await apiFetch(`/admin/championship/players/${playerId}/suspension/clear`, { method: 'PATCH' });
+      loadTeamPlayers(); loadAllPlayers();
+    } catch (err) { setAlert({ type: 'error', msg: err.message }); }
+  }
+
   async function doBulkImport() {
     if (!selectedTeamId || !bulkText.trim()) return;
     const lines = bulkText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -2186,7 +2198,7 @@ function PlayersTab({ tournament }) {
                       </thead>
                       <tbody>
                         {teamPlayers.map(p => (
-                          <tr key={p.id}>
+                          <tr key={p.id} style={p.suspended ? { background: '#fef2f2' } : p.yellowCardAccum === 1 ? { background: '#fffbeb' } : {}}>
                             <td className="center">
                               <input
                                 type="number" min={1} max={99}
@@ -2200,6 +2212,12 @@ function PlayersTab({ tournament }) {
                               {p.name}
                               {isVeteran(p, getTournamentYear(tournament)) && (
                                 <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 5px' }}>VET</span>
+                              )}
+                              {p.suspended && (
+                                <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#dc2626', borderRadius: 3, padding: '1px 5px' }}>SUSPENSO</span>
+                              )}
+                              {!p.suspended && p.yellowCardAccum === 1 && (
+                                <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#92400e', background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 3, padding: '1px 5px' }}>⚠️ PENDURADO</span>
                               )}
                             </td>
                             <td className="center">
@@ -2238,7 +2256,14 @@ function PlayersTab({ tournament }) {
                                 onMinus={() => incrStat(p.id, 'redCards', -1)}
                                 onPlus={() => incrStat(p.id, 'redCards', 1)} />
                             </td>
-                            <td className="center">
+                            <td className="center" style={{ whiteSpace: 'nowrap' }}>
+                              {p.suspended && (
+                                <button className="ac-btn ac-btn-sm" title="Marcar suspensão como cumprida"
+                                  onClick={() => clearSuspension(p.id)}
+                                  style={{ fontSize: '0.68rem', marginRight: 4, color: '#dc2626', border: '1px solid #dc2626', padding: '2px 6px' }}>
+                                  ✓ Cumpriu
+                                </button>
+                              )}
                               <button className="ac-btn-icon danger" title="Remover jogador"
                                 onClick={() => removePlayer(p.id)}>🗑</button>
                             </td>

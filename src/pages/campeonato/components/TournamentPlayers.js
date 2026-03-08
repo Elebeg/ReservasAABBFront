@@ -10,6 +10,14 @@ const VetBadge = () => (
   <span style={{ marginLeft: 5, fontSize: '0.62rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 5px', verticalAlign: 'middle' }}>VET</span>
 );
 
+const SuspBadge = () => (
+  <span style={{ marginLeft: 5, fontSize: '0.62rem', fontWeight: 700, color: '#fff', background: '#dc2626', borderRadius: 3, padding: '1px 5px', verticalAlign: 'middle' }}>SUSPENSO</span>
+);
+
+const PendBadge = () => (
+  <span style={{ marginLeft: 5, fontSize: '0.62rem', fontWeight: 700, color: '#92400e', background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 3, padding: '1px 5px', verticalAlign: 'middle' }}>⚠️ pendurado</span>
+);
+
 const POSITION_SHORT = {
   GOALKEEPER: 'GOL',
   DEFENDER:   'DEF',
@@ -96,7 +104,10 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
                   <tr key={p.id} className="camp-tr">
                     <td className="camp-td pos">{rankMap.get(p.id)}</td>
                     <td className="camp-td" style={{ fontWeight: 600 }}>
-                      {p.name}{isVet(p, tournamentYear) && <VetBadge />}
+                      {p.name}
+                      {isVet(p, tournamentYear) && <VetBadge />}
+                      {p.suspended && <SuspBadge />}
+                      {!p.suspended && p.yellowCardAccum === 1 && <PendBadge />}
                     </td>
                     <td className="camp-td">
                       <span
@@ -161,7 +172,10 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
                 {disciplinary.map(p => (
                   <tr key={p.id} className="camp-tr">
                     <td className="camp-td" style={{ fontWeight: 600 }}>
-                      {p.name}{isVet(p, tournamentYear) && <VetBadge />}
+                      {p.name}
+                      {isVet(p, tournamentYear) && <VetBadge />}
+                      {p.suspended && <SuspBadge />}
+                      {!p.suspended && p.yellowCardAccum === 1 && <PendBadge />}
                     </td>
                     <td className="camp-td">
                       <span className="ts-team-cell">

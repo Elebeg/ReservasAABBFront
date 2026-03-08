@@ -10,6 +10,14 @@ const VetBadge = () => (
   <span style={{ marginLeft: 5, fontSize: '0.6rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle' }}>VET</span>
 );
 
+const SuspBadge = () => (
+  <span style={{ marginLeft: 5, fontSize: '0.6rem', fontWeight: 700, color: '#fff', background: '#dc2626', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle' }}>SUSPENSO</span>
+);
+
+const PendBadge = () => (
+  <span style={{ marginLeft: 5, fontSize: '0.6rem', fontWeight: 700, color: '#92400e', background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle' }}>⚠️ pendurado</span>
+);
+
 const POSITION_SHORT = {
   GOALKEEPER: 'GOL',
   DEFENDER:   'DEF',
@@ -144,8 +152,10 @@ export default function TeamProfile({ team, players, standings, matches, tournam
                           {p.number != null && (
                             <span style={{ color: '#adb5bd', fontSize: '0.72rem', marginRight: 5 }}>#{p.number}</span>
                           )}
-                          <span style={{ fontWeight: 600 }}>{p.name}</span>
+                          <span style={{ fontWeight: 600, textDecoration: p.suspended ? 'line-through' : 'none', color: p.suspended ? '#aaa' : undefined }}>{p.name}</span>
                           {isVet(p, tournamentYear) && <VetBadge />}
+                          {p.suspended && <SuspBadge />}
+                          {!p.suspended && p.yellowCardAccum === 1 && <PendBadge />}
                         </td>
                         <td style={td('center')}>
                           {p.position ? (
