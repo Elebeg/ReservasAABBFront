@@ -288,7 +288,7 @@
 
 .camp-tr:last-child .camp-td { border-bottom: none; }
 .camp-td.center    { text-align: center; }
-.camp-td.team-name { font-weight: 650; }
+.camp-td.team-name { font-weight: 650; padding-left: 4px; }
 
 .camp-td.pts {
   font-weight: 900;

@@ -613,10 +613,10 @@ function SumulaModal({ match, tournament, onClose }) {
       return players.map(p => {
         const numCell = p.number != null ? p.number : numBox;
         const vetBadge  = isVeteran(p, year) ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">V</span>' : '';
-        const suspBadge = p.suspended      ? ' <span style="font-size:9px;font-weight:700;color:#fff;background:#dc2626;border-radius:2px;padding:0 3px;vertical-align:middle">SUSP</span>' : '';
-        const pendBadge = !p.suspended && p.yellowCardAccum === 1 ? ' <span style="font-size:9px;font-weight:700;color:#92400e;border:1px solid #f59e0b;border-radius:2px;padding:0 3px;vertical-align:middle">⚠️</span>' : '';
+        const suspBadge = p.suspended      ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1.5px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">SUSP</span>' : '';
+        const pendBadge = !p.suspended && p.yellowCardAccum === 1 ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">PEN</span>' : '';
         const nameCell  = p.suspended
-          ? `<del style="color:#aaa">${p.name}</del>${vetBadge}${suspBadge}`
+          ? `<del>${p.name}</del>${vetBadge}${suspBadge}`
           : `${p.name}${vetBadge}${pendBadge}`;
         return `<tr>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;width:24px;font-size:11px">${numCell}</td>
