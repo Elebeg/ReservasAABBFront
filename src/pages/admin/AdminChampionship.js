@@ -70,6 +70,18 @@ const POSITION_SHORT = {
   FORWARD:    'ATA',
 };
 
+/** Retorna true se o jogador completa ou já completou 40 anos no ano do campeonato */
+function isVeteran(player, tournamentYear) {
+  if (!player.birthDate) return false;
+  return new Date(player.birthDate).getFullYear() <= tournamentYear - 40;
+}
+
+/** Extrai o ano do campeonato (usa startDate se disponível, senão createdAt) */
+function getTournamentYear(tournament) {
+  const ref = tournament.startDate || tournament.createdAt;
+  return ref ? new Date(ref).getFullYear() : new Date().getFullYear();
+}
+
 function StatusBadge({ status }) {
   const cls = {
     DRAFT:          'ac-status-draft',
@@ -200,7 +212,7 @@ function CreateTournamentModal({ onClose, onCreated }) {
 
 // ─── RESULTADO PARTIDA ────────────────────────────────────────────────────────
 
-function ResultModal({ match, tid, onClose, onSaved }) {
+function ResultModal({ match, tid, tournamentYear = new Date().getFullYear(), onClose, onSaved }) {
   const isEdit = match.status === 'FINISHED';
 
   const [goals, setGoals]         = useState([]);  // [{ id, teamId, playerId, player? }]
@@ -384,7 +396,7 @@ function ResultModal({ match, tid, onClose, onSaved }) {
                         >
                           <option value="">— Jogador —</option>
                           {players.map(p => (
-                            <option key={p.id} value={p.id}>{p.name}</option>
+                            <option key={p.id} value={p.id}>{isVeteran(p, tournamentYear) ? `[V] ${p.name}` : p.name}</option>
                           ))}
                         </select>
                     }
@@ -406,7 +418,7 @@ function ResultModal({ match, tid, onClose, onSaved }) {
                 >
                   <option value="">— Quem marcou? —</option>
                   {players.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
+                    <option key={p.id} value={p.id}>{isVeteran(p, tournamentYear) ? `[V] ${p.name}` : p.name}</option>
                   ))}
                 </select>
                 <button
@@ -484,7 +496,12 @@ function ResultModal({ match, tid, onClose, onSaved }) {
                           const pRed    = teamCards.filter(c => c.playerId === p.id && c.type === 'RED');
                           return (
                             <div key={p.id} className="ac-card-player-row">
-                              <span className="ac-card-player-name">{p.number ? `${p.number}. ` : ''}{p.name}</span>
+                              <span className="ac-card-player-name">
+                                {p.number ? `${p.number}. ` : ''}{p.name}
+                                {isVeteran(p, tournamentYear) && (
+                                  <span style={{ marginLeft: 4, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle' }}>V</span>
+                                )}
+                              </span>
                               <span className="ac-card-badge yellow">{pYellow.length}</span>
                               <button
                                 type="button" className="ac-card-btn yellow"
@@ -592,11 +609,13 @@ function SumulaModal({ match, tournament, onClose }) {
       const numBox    = `<span style="display:inline-block;width:20px;height:14px;border:1.5px solid #444;border-radius:2px;vertical-align:middle"></span>`;
       if (players.length === 0)
         return `<tr><td colspan="6" style="color:#999;font-style:italic;text-align:center;padding:8px">Nenhum jogador cadastrado</td></tr>`;
+      const year = getTournamentYear(tournament);
       return players.map(p => {
         const numCell = p.number != null ? p.number : numBox;
+        const vetBadge = isVeteran(p, year) ? ' <span style="font-size:9px;font-weight:700;color:#fff;background:#7c3aed;border-radius:3px;padding:1px 4px;vertical-align:middle">V</span>' : '';
         return `<tr>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;width:24px;font-size:11px">${numCell}</td>
-          <td style="padding:3px 4px;border-bottom:1px solid #eee;font-size:12px">${p.name}</td>
+          <td style="padding:3px 4px;border-bottom:1px solid #eee;font-size:12px">${p.name}${vetBadge}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;white-space:nowrap">${foulBoxes}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${YELLOW_BOX}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center">${RED_BOX}</td>
@@ -1433,6 +1452,7 @@ function MatchesTab({ tournament, onRefresh }) {
         <ResultModal
           match={selectedMatch}
           tid={tournament.id}
+          tournamentYear={getTournamentYear(tournament)}
           onClose={() => setSelectedMatch(null)}
           onSaved={() => { setSelectedMatch(null); loadMatches(); onRefresh(); }}
         />
@@ -1852,6 +1872,16 @@ function PlayersTab({ tournament }) {
     } catch (err) { setAlert({ type: 'error', msg: err.message }); }
   }
 
+  async function updateBirthDate(playerId, value) {
+    try {
+      await apiFetch(`/admin/championship/players/${playerId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ birthDate: value || null }),
+      });
+      loadTeamPlayers(); loadAllPlayers();
+    } catch (err) { setAlert({ type: 'error', msg: err.message }); }
+  }
+
   async function doBulkImport() {
     if (!selectedTeamId || !bulkText.trim()) return;
     const lines = bulkText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -2006,6 +2036,7 @@ function PlayersTab({ tournament }) {
                           <th className="center">#</th>
                           <th>Nome</th>
                           <th className="center">Pos.</th>
+                          <th className="center">Nascimento</th>
                           <th className="center" title="Gols">⚽ Gols</th>
                           <th className="center" title="Cartões Amarelos">🟡 Amarelos</th>
                           <th className="center" title="Cartões Vermelhos">🔴 Vermelhos</th>
@@ -2024,7 +2055,12 @@ function PlayersTab({ tournament }) {
                                 style={{ width: 48, fontSize: '0.75rem', padding: '2px 4px', borderRadius: 4, border: '1px solid var(--ac-gray-300)', background: 'var(--ac-gray-100)', textAlign: 'center' }}
                               />
                             </td>
-                            <td style={{ fontWeight: 600 }}>{p.name}</td>
+                            <td style={{ fontWeight: 600 }}>
+                              {p.name}
+                              {isVeteran(p, getTournamentYear(tournament)) && (
+                                <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 5px' }}>VET</span>
+                              )}
+                            </td>
                             <td className="center">
                               <select
                                 value={p.position || ''}
@@ -2037,6 +2073,14 @@ function PlayersTab({ tournament }) {
                                 <option value="MIDFIELDER">MEI</option>
                                 <option value="FORWARD">ATA</option>
                               </select>
+                            </td>
+                            <td className="center">
+                              <input
+                                type="date"
+                                defaultValue={p.birthDate ? p.birthDate.substring(0, 10) : ''}
+                                onBlur={e => updateBirthDate(p.id, e.target.value)}
+                                style={{ fontSize: '0.72rem', padding: '2px 4px', borderRadius: 4, border: '1px solid var(--ac-gray-300)', background: 'var(--ac-gray-100)' }}
+                              />
                             </td>
                             <td className="center">
                               <StatCtrl value={p.goals} minusDisabled={p.goals === 0}
@@ -2103,7 +2147,12 @@ function PlayersTab({ tournament }) {
                         .map((p, i) => (
                           <tr key={p.id}>
                             <td className="center bold">{i + 1}</td>
-                            <td style={{ fontWeight: 600 }}>{p.name}</td>
+                            <td style={{ fontWeight: 600 }}>
+                              {p.name}
+                              {isVeteran(p, getTournamentYear(tournament)) && (
+                                <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 5px' }}>VET</span>
+                              )}
+                            </td>
                             <td style={{ fontSize: '0.875rem', color: 'var(--ac-gray-700)' }}>
                               {p.team?.name ?? '—'}
                             </td>
@@ -2145,7 +2194,12 @@ function PlayersTab({ tournament }) {
                           .sort((a, b) => b.redCards - a.redCards || b.yellowCards - a.yellowCards)
                           .map(p => (
                             <tr key={p.id}>
-                              <td style={{ fontWeight: 600 }}>{p.name}</td>
+                              <td style={{ fontWeight: 600 }}>
+                                {p.name}
+                                {isVeteran(p, getTournamentYear(tournament)) && (
+                                  <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 5px' }}>VET</span>
+                                )}
+                              </td>
                               <td style={{ fontSize: '0.875rem', color: 'var(--ac-gray-700)' }}>{p.team?.name ?? '—'}</td>
                               <td className="center">
                                 {p.yellowCards > 0
