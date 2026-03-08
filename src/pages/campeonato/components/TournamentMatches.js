@@ -62,10 +62,6 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     load();
   }, [match.id]);
 
-  // Fecha ao clicar fora
-  function handleOverlayClick(e) {
-    if (e.target === e.currentTarget) onClose();
-  }
 
   const homeWon = match.homeScore > match.awayScore;
   const awayWon = match.awayScore > match.homeScore;
@@ -120,8 +116,8 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
   }
 
   return (
-    <div className="camp-report-overlay" onClick={handleOverlayClick}>
-      <div className="camp-report-modal" role="dialog" aria-modal="true">
+    <div className="camp-report-overlay" onClick={onClose}>
+      <div className="camp-report-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
 
         {/* ── Cabeçalho ── */}
         <div className="camp-report-header">
