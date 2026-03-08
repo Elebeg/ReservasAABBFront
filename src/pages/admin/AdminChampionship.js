@@ -1465,8 +1465,7 @@ function SumulaUploadModal({ match, onClose, onSaved }) {
     finally { setLoading(false); }
   }
 
-  const isImage  = preview?.startsWith('data:image') || (!preview && currentUrl?.startsWith('data:image'));
-  const isPdf    = preview?.startsWith('data:application/pdf') || (!preview && currentUrl?.startsWith('data:application/pdf'));
+  const isImage  = !preview && currentUrl?.startsWith('data:image');
   const replacing = !!currentUrl && !!preview;
 
   return (
