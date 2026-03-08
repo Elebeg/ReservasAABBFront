@@ -1761,7 +1761,7 @@ function PlayersTab({ tournament }) {
   const [view, setView]                 = useState('manage');
   const [teams, setTeams]               = useState([]);
   const [selectedTeamId, setTeamId]     = useState(null);
-  const [teamPlayers, setTeamPlayers]   = use State([]);
+  const [teamPlayers, setTeamPlayers]   = useState([]);
   const [allPlayers, setAllPlayers]     = useState([]);
   const [addForm, setAddForm]           = useState({ name: '', number: '', position: '' });
   const [bulkText, setBulkText]         = useState('');
