@@ -2,12 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 
 const API_URL = 'https://reservasaabb-production.up.railway.app';
 
-async function fetchJSON(path) {
-  const res = await fetch(`${API_URL}${path}`);
-  if (!res.ok) throw new Error(`Erro ${res.status}`);
-  return res.json();
-}
-
 export function useChampionship() {
   const [tournament, setTournament] = useState(null);
   const [standings, setStandings]   = useState([]);
@@ -21,20 +15,15 @@ export function useChampionship() {
     setLoading(true);
     setError(null);
     try {
-      const t = await fetchJSON('/championship/active');
-      setTournament(t);
+      const res = await fetch(`${API_URL}/championship/active/all`);
+      if (!res.ok) throw new Error(`Erro ${res.status}`);
+      const data = await res.json();
 
-      const [s, b, m, p] = await Promise.allSettled([
-        fetchJSON('/championship/active/standings'),
-        fetchJSON('/championship/active/bracket'),
-        fetchJSON('/championship/active/matches'),
-        fetchJSON('/championship/active/players'),
-      ]);
-
-      if (s.status === 'fulfilled') setStandings(s.value || []);
-      if (b.status === 'fulfilled') setBracket(b.value || null);
-      if (m.status === 'fulfilled') setMatches(m.value || []);
-      if (p.status === 'fulfilled') setPlayers(p.value || []);
+      setTournament(data.tournament  || null);
+      setStandings(data.standings    || []);
+      setBracket(data.bracket        || null);
+      setMatches(data.matches        || []);
+      setPlayers(data.players        || []);
     } catch (err) {
       setError(err.message);
     } finally {
