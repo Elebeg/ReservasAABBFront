@@ -1770,7 +1770,7 @@ function PlayersTab({ tournament }) {
   const [saving, setSaving]             = useState(false);
   const tid = tournament.id;
 
-  const loadAllPlayers = useCffallback(async () => {
+  const loadAllPlayers = useCallback(async () => {
     try {
       const d = await apiFetch(`/admin/championship/tournaments/${tid}/players`);
       setAllPlayers(d || []);
