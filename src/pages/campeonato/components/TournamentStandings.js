@@ -18,10 +18,24 @@ export default function TournamentStandings({ standings, teamsAdvancing, onTeamC
           <h3 className="camp-group-title">{group.group}</h3>
           <div className="camp-table-wrap">
             <table className="camp-table">
+              <colgroup>
+                <col style={{ width: 48 }} />   {/* # */}
+                <col />                          {/* Time */}
+                <col style={{ width: 38 }} />   {/* J */}
+                <col style={{ width: 38 }} />   {/* V */}
+                <col style={{ width: 38 }} />   {/* E */}
+                <col style={{ width: 38 }} />   {/* D */}
+                <col style={{ width: 44 }} />   {/* GP */}
+                <col style={{ width: 44 }} />   {/* GC */}
+                <col style={{ width: 44 }} />   {/* SG */}
+                <col style={{ width: 48 }} />   {/* Pts */}
+                <col style={{ width: 36 }} />   {/* 🟡 */}
+                <col style={{ width: 36 }} />   {/* 🔴 */}
+              </colgroup>
               <thead>
                 <tr>
-                  <th className="camp-th pos">#</th>
-                  <th className="camp-th team" style={{ minWidth: 200 }}>Time</th>
+                  <th className="camp-th st-pos">#</th>
+                  <th className="camp-th st-team">Time</th>
                   <th className="camp-th center" title="Jogos">J</th>
                   <th className="camp-th center" title="Vitórias">V</th>
                   <th className="camp-th center" title="Empates">E</th>
@@ -39,20 +53,27 @@ export default function TournamentStandings({ standings, teamsAdvancing, onTeamC
                   const advances = s.position <= (teamsAdvancing || 2);
                   return (
                     <tr key={s.team} className={`camp-tr ${advances ? 'advancing' : ''}`}>
-                      <td className="camp-td pos">
-                        {advances && <span className="camp-advance-dot" />}
-                        {s.position}
+
+                      {/* Posição */}
+                      <td className="camp-td st-pos">
+                        <div className="st-pos-inner">
+                          {advances && <span className="camp-advance-dot" />}
+                          <span>{s.position}</span>
+                        </div>
                       </td>
-                      <td className="camp-td team-name">
-                        <span
-                          className="ts-team-cell"
+
+                      {/* Time: logo + nome sem gap */}
+                      <td className="camp-td st-team">
+                        <div
+                          className={`st-team-inner${onTeamClick ? ' camp-team-clickable' : ''}`}
                           onClick={onTeamClick ? () => onTeamClick({ name: s.team, logoUrl: s.teamLogo }) : undefined}
                           style={onTeamClick ? { cursor: 'pointer' } : undefined}
                         >
-                          <TeamLogo name={s.team} logoUrl={s.teamLogo} size={32} shape="shield" />
-                          <span className={`ts-team-name${onTeamClick ? ' camp-team-clickable' : ''}`}>{s.team}</span>
-                        </span>
+                          <TeamLogo name={s.team} logoUrl={s.teamLogo} size={30} shape="shield" />
+                          <span className="st-team-name">{s.team}</span>
+                        </div>
                       </td>
+
                       <td className="camp-td center">{s.played}</td>
                       <td className="camp-td center">{s.wins}</td>
                       <td className="camp-td center">{s.draws}</td>

@@ -288,25 +288,45 @@
 
 .camp-tr:last-child .camp-td { border-bottom: none; }
 .camp-td.center    { text-align: center; }
-.camp-td.team-name { font-weight: 650; }
-
 .camp-td.pts {
   font-weight: 900;
   color: var(--camp-primary);
   text-align: center;
 }
 
-.camp-td.pos {
-  width: 40px;
+/* ── Standings: colunas pos e team ── */
+.camp-td.st-pos {
+  padding: 10px 0 10px 14px;
+  vertical-align: middle;
   font-weight: 800;
-  padding-right: 4px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  white-space: nowrap;
 }
 
-.camp-td.team-name {
-  padding-left: 0 !important;
+.st-pos-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.camp-td.st-team {
+  padding: 8px 14px 8px 6px;
+  vertical-align: middle;
+  font-weight: 650;
+}
+
+.camp-th.st-pos  { padding-left: 14px; }
+.camp-th.st-team { padding-left: 6px; min-width: 180px; }
+
+.st-team-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.st-team-name {
+  font-weight: 650;
+  color: var(--camp-gray-900);
+  white-space: nowrap;
 }
 
 .camp-advance-dot {
