@@ -1413,6 +1413,93 @@ function ScheduleModal({ match, onClose, onSaved }) {
   );
 }
 
+// ─── MODAL UPLOAD SÚMULA ──────────────────────────────────────────────────────
+
+function SumulaUploadModal({ match, onClose, onSaved }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
+  const [preview, setPreview] = useState(null);  // base64 ou URL já existente
+  const hasCurrent = !!match.sumulaUrl;
+
+  function handleFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setPreview(reader.result);
+    reader.readAsDataURL(file);
+  }
+
+  async function save() {
+    if (!preview) return;
+    setLoading(true); setError('');
+    try {
+      await apiFetch(`/admin/championship/matches/${match.id}/sumula`, {
+        method: 'PATCH',
+        body: JSON.stringify({ sumulaUrl: preview }),
+      });
+      onSaved();
+    } catch (err) { setError(err.message); }
+    finally { setLoading(false); }
+  }
+
+  async function remove() {
+    if (!window.confirm('Remover a súmula digitalizada desta partida?')) return;
+    setLoading(true); setError('');
+    try {
+      await apiFetch(`/admin/championship/matches/${match.id}/sumula`, {
+        method: 'PATCH',
+        body: JSON.stringify({ sumulaUrl: null }),
+      });
+      onSaved();
+    } catch (err) { setError(err.message); }
+    finally { setLoading(false); }
+  }
+
+  const isImage = preview?.startsWith('data:image') || (!preview && match.sumulaUrl?.startsWith('data:image'));
+  const isPdf   = preview?.startsWith('data:application/pdf') || (!preview && match.sumulaUrl?.startsWith('data:application/pdf'));
+
+  return (
+    <Modal title="📎 Súmula Digitalizada" onClose={onClose}>
+      <Alert type="error" message={error} onClose={() => setError('')} />
+
+      {hasCurrent && !preview && (
+        <div style={{ marginBottom: 14, padding: '10px 14px', background: 'var(--ac-gray-100)', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: '0.82rem', color: 'var(--ac-gray-700)', flex: 1 }}>
+            {match.sumulaUrl?.startsWith('data:image') ? '🖼️ Imagem já enviada' : '📄 PDF já enviado'}
+          </span>
+          <a
+            href={match.sumulaUrl} target="_blank" rel="noreferrer"
+            className="ac-btn ac-btn-sm ac-btn-ghost"
+            style={{ fontSize: '0.75rem' }}
+          >Visualizar</a>
+          <button className="ac-btn ac-btn-sm" onClick={remove} disabled={loading}
+            style={{ fontSize: '0.75rem', color: 'var(--ac-danger)' }}>🗑 Remover</button>
+        </div>
+      )}
+
+      <div className="ac-form-group">
+        <label>Selecionar arquivo (PDF ou imagem)</label>
+        <input type="file" accept="application/pdf,image/*" onChange={handleFile}
+          style={{ fontSize: '0.85rem' }} />
+      </div>
+
+      {preview && (
+        <div style={{ marginTop: 10, marginBottom: 10 }}>
+          {isImage && <img src={preview} alt="Preview" style={{ maxWidth: '100%', maxHeight: 300, borderRadius: 6, border: '1px solid var(--ac-gray-200)' }} />}
+          {isPdf   && <p style={{ fontSize: '0.82rem', color: 'var(--ac-gray-600)' }}>📄 PDF selecionado — clique em Salvar para enviar.</p>}
+        </div>
+      )}
+
+      <div className="ac-form-actions">
+        <button className="ac-btn ac-btn-ghost" onClick={onClose}>Cancelar</button>
+        <button className="ac-btn ac-btn-primary" onClick={save} disabled={!preview || loading}>
+          {loading ? <span className="ac-spinner" /> : '💾 Salvar Súmula'}
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
 // ─── ABA: PARTIDAS ────────────────────────────────────────────────────────────
 
 function MatchesTab({ tournament, onRefresh }) {
@@ -1420,6 +1507,7 @@ function MatchesTab({ tournament, onRefresh }) {
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [scheduleMatch, setScheduleMatch] = useState(null);
   const [sumulaMatch, setSumulaMatch]     = useState(null);
+  const [uploadSumulaMatch, setUploadSumulaMatch] = useState(null);
   const [alert, setAlert] = useState(null);
 
   const loadMatches = useCallback(async () => {
@@ -1471,6 +1559,14 @@ function MatchesTab({ tournament, onRefresh }) {
           match={sumulaMatch}
           tournament={tournament}
           onClose={() => setSumulaMatch(null)}
+        />
+      )}
+
+      {uploadSumulaMatch && (
+        <SumulaUploadModal
+          match={uploadSumulaMatch}
+          onClose={() => setUploadSumulaMatch(null)}
+          onSaved={() => { setUploadSumulaMatch(null); loadMatches(); }}
         />
       )}
 
@@ -1556,6 +1652,18 @@ function MatchesTab({ tournament, onRefresh }) {
                         onClick={() => setSumulaMatch(m)}
                       >
                         📄 Súmula
+                      </button>
+                    )}
+
+                    {/* Botão de upload de súmula digitalizada */}
+                    {m.homeTeam && m.awayTeam && (
+                      <button
+                        className="ac-btn ac-btn-sm ac-btn-ghost"
+                        onClick={() => setUploadSumulaMatch(m)}
+                        title="Enviar súmula digitalizada (foto/PDF)"
+                        style={m.hasSumula ? { borderColor: 'var(--ac-primary)', color: 'var(--ac-primary)' } : {}}
+                      >
+                        {m.hasSumula ? '📎 Súmula ✓' : '📎 Enviar Súmula'}
                       </button>
                     )}
                   </div>

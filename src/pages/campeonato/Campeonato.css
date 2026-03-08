@@ -1281,3 +1281,142 @@
   align-items: center;
   gap: 0;
 }
+
+/* ─── MATCH DETAIL (gols, cartões, súmula) ──────────────────────────────────── */
+
+.camp-detail-toggle {
+  background: none;
+  border: 1px solid var(--camp-border);
+  border-radius: 4px;
+  padding: 1px 8px;
+  font-size: 0.7rem;
+  color: var(--camp-text-muted);
+  cursor: pointer;
+  transition: background 0.15s;
+  line-height: 1.6;
+}
+.camp-detail-toggle:hover { background: var(--camp-surface-alt); }
+
+.camp-sumula-indicator {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.camp-match-detail {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--camp-border);
+}
+
+.camp-detail-loading {
+  font-size: 0.75rem;
+  color: var(--camp-text-muted);
+  padding: 6px 0;
+  text-align: center;
+}
+
+.camp-detail-cols {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+}
+
+.camp-detail-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.camp-detail-col.right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.camp-detail-divider {
+  width: 1px;
+  background: var(--camp-border);
+  align-self: stretch;
+  margin: 0 10px;
+}
+
+.camp-detail-events {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.camp-detail-event {
+  font-size: 0.75rem;
+  color: var(--camp-text-secondary);
+  line-height: 1.4;
+}
+
+.camp-detail-event.goal  { color: var(--camp-text-primary); }
+.camp-detail-event.yellow { color: #b45309; }
+.camp-detail-event.red    { color: #dc2626; }
+
+.camp-detail-empty {
+  font-size: 0.75rem;
+  color: var(--camp-text-muted);
+}
+
+.camp-detail-empty-msg {
+  font-size: 0.75rem;
+  color: var(--camp-text-muted);
+  text-align: center;
+  margin: 4px 0;
+}
+
+.camp-detail-sumula {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.camp-sumula-btn {
+  background: none;
+  border: 1px solid var(--camp-primary);
+  color: var(--camp-primary);
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.camp-sumula-btn:hover { background: rgba(var(--camp-primary-rgb, 37,99,235), 0.06); }
+
+/* Lightbox da súmula */
+.camp-sumula-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.camp-sumula-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  max-width: 900px;
+  width: 100%;
+  position: relative;
+  max-height: 92vh;
+  overflow: auto;
+}
+
+.camp-sumula-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #666;
+  z-index: 1;
+}
+.camp-sumula-close:hover { color: #111; }

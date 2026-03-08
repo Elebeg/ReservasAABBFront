@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import TeamLogo from './TeamLogo';
+
+const API_URL = 'https://reservasaabb-production.up.railway.app';
 
 const PHASE_LABELS = {
   GROUP:         'Fase de Grupos',
@@ -9,7 +11,6 @@ const PHASE_LABELS = {
   FINAL:         'Final',
 };
 
-// Formata "2025-06-15" → "Domingo, 15 de Junho"
 function formatDateHeader(dateStr) {
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('pt-BR', {
@@ -17,23 +18,128 @@ function formatDateHeader(dateStr) {
   });
 }
 
-// Formata ISO → "15:30"
 function formatTime(iso) {
   if (!iso) return null;
   const d = new Date(iso);
   return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
-// Extrai "YYYY-MM-DD" de um ISO timestamp (em horário local)
 function toDateKey(iso) {
   const d = new Date(iso);
   const pad = (n) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
+// ─── Detalhe da partida (gols + cartões + súmula) ────────────────────────────
+
+function MatchDetail({ matchId, homeTeamId, awayTeamId }) {
+  const [detail, setDetail]   = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded]   = useState(false);
+  const [sumulaOpen, setSumulaOpen] = useState(false);
+
+  const load = useCallback(async () => {
+    if (loaded) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/championship/matches/${matchId}/detail`);
+      if (res.ok) setDetail(await res.json());
+    } catch {}
+    finally { setLoading(false); setLoaded(true); }
+  }, [matchId, loaded]);
+
+  // Carrega ao montar
+  useState(() => { load(); }, []);
+
+  if (loading) return <div className="camp-match-detail-loading">Carregando...</div>;
+  if (!detail) return null;
+
+  const homeGoals = detail.goals.filter(g => g.teamId === homeTeamId);
+  const awayGoals = detail.goals.filter(g => g.teamId === awayTeamId);
+  const homeCards = detail.cards.filter(c => c.teamId === homeTeamId);
+  const awayCards = detail.cards.filter(c => c.teamId === awayTeamId);
+
+  const hasEvents = detail.goals.length > 0 || detail.cards.length > 0;
+
+  function goalLabel(g) {
+    if (g.ownGoal) return '⚽ Gol Contra';
+    const num = g.player?.number ? `${g.player.number}. ` : '';
+    return `⚽ ${num}${g.player?.name ?? '—'}`;
+  }
+
+  function renderEvents(goals, cards) {
+    if (goals.length === 0 && cards.length === 0) {
+      return <span className="camp-detail-empty">—</span>;
+    }
+    return (
+      <div className="camp-detail-events">
+        {goals.map(g => (
+          <span key={g.id} className="camp-detail-event goal">{goalLabel(g)}</span>
+        ))}
+        {cards.filter(c => c.type === 'YELLOW').map(c => (
+          <span key={c.id} className="camp-detail-event yellow">
+            🟡 {c.player?.number ? `${c.player.number}. ` : ''}{c.player?.name ?? '—'}
+          </span>
+        ))}
+        {cards.filter(c => c.type === 'RED').map(c => (
+          <span key={c.id} className="camp-detail-event red">
+            🔴 {c.player?.number ? `${c.player.number}. ` : ''}{c.player?.name ?? '—'}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="camp-match-detail">
+      {hasEvents ? (
+        <div className="camp-detail-cols">
+          <div className="camp-detail-col">{renderEvents(homeGoals, homeCards)}</div>
+          <div className="camp-detail-divider" />
+          <div className="camp-detail-col right">{renderEvents(awayGoals, awayCards)}</div>
+        </div>
+      ) : (
+        <p className="camp-detail-empty-msg">Nenhum evento registrado.</p>
+      )}
+
+      {detail.sumulaUrl && (
+        <div className="camp-detail-sumula">
+          <button
+            className="camp-sumula-btn"
+            onClick={() => setSumulaOpen(true)}
+          >
+            📎 Ver Súmula Digitalizada
+          </button>
+        </div>
+      )}
+
+      {/* Lightbox da súmula */}
+      {sumulaOpen && detail.sumulaUrl && (
+        <div className="camp-sumula-overlay" onClick={() => setSumulaOpen(false)}>
+          <div className="camp-sumula-box" onClick={e => e.stopPropagation()}>
+            <button className="camp-sumula-close" onClick={() => setSumulaOpen(false)}>✕</button>
+            {detail.sumulaUrl.startsWith('data:application/pdf') || detail.sumulaUrl.endsWith('.pdf') ? (
+              <iframe
+                src={detail.sumulaUrl}
+                title="Súmula"
+                style={{ width: '100%', height: '80vh', border: 'none', borderRadius: 6 }}
+              />
+            ) : (
+              <img src={detail.sumulaUrl} alt="Súmula" style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: 6 }} />
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Match Card ───────────────────────────────────────────────────────────────
+
 function MatchCard({ match, onTeamClick }) {
-  const finished = match.status === 'FINISHED';
-  const time     = match.scheduledAt ? formatTime(match.scheduledAt) : null;
+  const [expanded, setExpanded] = useState(false);
+  const finished  = match.status === 'FINISHED';
+  const time      = match.scheduledAt ? formatTime(match.scheduledAt) : null;
 
   function handleTeamClick(team) {
     if (onTeamClick && team) onTeamClick({ name: team.name, logoUrl: team.logoUrl });
@@ -88,13 +194,37 @@ function MatchCard({ match, onTeamClick }) {
 
       <div className="camp-match-footer">
         <span className="camp-match-phase-label">{PHASE_LABELS[match.phase] || match.phase}</span>
-        <span className={`camp-match-status ${finished ? 'done' : 'scheduled'}`}>
-          {finished ? '✓ Encerrada' : 'Agendada'}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {match.hasSumula && !expanded && (
+            <span className="camp-sumula-indicator" title="Súmula digitalizada disponível">📎</span>
+          )}
+          <span className={`camp-match-status ${finished ? 'done' : 'scheduled'}`}>
+            {finished ? '✓ Encerrada' : 'Agendada'}
+          </span>
+          {finished && (
+            <button
+              className="camp-detail-toggle"
+              onClick={() => setExpanded(v => !v)}
+              aria-label="Ver detalhes da partida"
+            >
+              {expanded ? '▲' : '▼'}
+            </button>
+          )}
+        </div>
       </div>
+
+      {expanded && (
+        <MatchDetail
+          matchId={match.id}
+          homeTeamId={match.homeTeam?.id}
+          awayTeamId={match.awayTeam?.id}
+        />
+      )}
     </div>
   );
 }
+
+// ─── Export ───────────────────────────────────────────────────────────────────
 
 export default function TournamentMatches({ matches, onTeamClick }) {
   const [activeDay, setActiveDay] = useState(null);
@@ -108,11 +238,9 @@ export default function TournamentMatches({ matches, onTeamClick }) {
     );
   }
 
-  // Separa partidas com data das sem data
   const withDate    = matches.filter(m => m.scheduledAt);
   const withoutDate = matches.filter(m => !m.scheduledAt);
 
-  // Agrupa partidas com data por dia (YYYY-MM-DD)
   const byDay = {};
   withDate.forEach(m => {
     const key = toDateKey(m.scheduledAt);
@@ -121,10 +249,8 @@ export default function TournamentMatches({ matches, onTeamClick }) {
   });
   const sortedDays = Object.keys(byDay).sort();
 
-  // Filtra pelo dia ativo (botões de filtro)
   const filteredDays = activeDay ? [activeDay] : sortedDays;
 
-  // Agrupa sem data por fase
   const phaseOrder = ['GROUP', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'FINAL'];
   const byPhase = {};
   withoutDate.forEach(m => {
@@ -140,7 +266,6 @@ export default function TournamentMatches({ matches, onTeamClick }) {
   return (
     <div className="camp-matches">
 
-      {/* ── Filtro por dia ── */}
       {hasDays && (
         <div className="camp-day-filters">
           <button
@@ -163,7 +288,6 @@ export default function TournamentMatches({ matches, onTeamClick }) {
         </div>
       )}
 
-      {/* ── Partidas com data agrupadas por dia ── */}
       {filteredDays.map(day => (
         <div className="camp-phase-section" key={day}>
           <h3 className="camp-phase-title camp-phase-title--date">
@@ -178,7 +302,6 @@ export default function TournamentMatches({ matches, onTeamClick }) {
         </div>
       ))}
 
-      {/* ── Partidas sem data (sem filtro ativo) ── */}
       {!activeDay && sortedPhases.map(phase => (
         <div className="camp-phase-section" key={phase}>
           <h3 className="camp-phase-title">
