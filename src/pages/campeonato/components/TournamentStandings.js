@@ -1,4 +1,3 @@
-import React from 'react';
 import TeamLogo from './TeamLogo';
 
 export default function TournamentStandings({ standings, teamsAdvancing, onTeamClick }) {
@@ -18,20 +17,6 @@ export default function TournamentStandings({ standings, teamsAdvancing, onTeamC
           <h3 className="camp-group-title">{group.group}</h3>
           <div className="camp-table-wrap">
             <table className="camp-table">
-              <colgroup>
-                <col style={{ width: 48 }} />   {/* # */}
-                <col />                          {/* Time */}
-                <col style={{ width: 38 }} />   {/* J */}
-                <col style={{ width: 38 }} />   {/* V */}
-                <col style={{ width: 38 }} />   {/* E */}
-                <col style={{ width: 38 }} />   {/* D */}
-                <col style={{ width: 44 }} />   {/* GP */}
-                <col style={{ width: 44 }} />   {/* GC */}
-                <col style={{ width: 44 }} />   {/* SG */}
-                <col style={{ width: 48 }} />   {/* Pts */}
-                <col style={{ width: 36 }} />   {/* 🟡 */}
-                <col style={{ width: 36 }} />   {/* 🔴 */}
-              </colgroup>
               <thead>
                 <tr>
                   <th className="camp-th st-pos">#</th>
