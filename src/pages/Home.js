@@ -36,14 +36,23 @@ function TournamentEventCard({ data }) {
   const { tournament, matches = [] } = data;
 
   const now = new Date();
-  const upcoming = matches
-    .filter(m => m.scheduledAt && m.status !== 'FINISHED' && new Date(m.scheduledAt) >= now)
-    .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))
-    .slice(0, 2);
 
+  // Partidas ainda não finalizadas — com ou sem data agendada
+  const upcoming = matches
+    .filter(m => m.status !== 'FINISHED')
+    .sort((a, b) => {
+      // Com data vêm primeiro, ordenadas por data; sem data ficam no final
+      if (a.scheduledAt && b.scheduledAt) return new Date(a.scheduledAt) - new Date(b.scheduledAt);
+      if (a.scheduledAt) return -1;
+      if (b.scheduledAt) return 1;
+      return 0;
+    })
+    .slice(0, 3);
+
+  // Última partida finalizada
   const lastFinished = [...matches]
     .filter(m => m.status === 'FINISHED')
-    .sort((a, b) => new Date(b.scheduledAt || 0) - new Date(a.scheduledAt || 0))[0];
+    .sort((a, b) => new Date(b.scheduledAt || b.updatedAt || 0) - new Date(a.scheduledAt || a.updatedAt || 0))[0];
 
   const statusColor = STATUS_COLOR[tournament.status] || '#1a56db';
   const statusLabel = STATUS_LABELS[tournament.status] || tournament.status;
@@ -85,9 +94,10 @@ function TournamentEventCard({ data }) {
             {upcoming.map(m => (
               <div key={m.id} className="tournament-match-line">
                 <strong>{m.homeTeam?.name || 'A definir'}</strong>
-                <span className="tournament-vs-badge">
-                  {fmtDate(m.scheduledAt)} · {fmtTime(m.scheduledAt)}
-                </span>
+                {m.scheduledAt
+                  ? <span className="tournament-vs-badge">{fmtDate(m.scheduledAt)} · {fmtTime(m.scheduledAt)}</span>
+                  : <span className="tournament-vs-badge">VS</span>
+                }
                 <strong>{m.awayTeam?.name || 'A definir'}</strong>
               </div>
             ))}
@@ -215,35 +225,7 @@ function Home() {
           <h2 className="section-title">Próximos Eventos</h2>
           <div className="events-slider">
             {tournamentData && <TournamentEventCard data={tournamentData} />}
-            <div className="event-card">
-              <div className="event-date">
-                <span className="day">15</span>
-                <span className="month">Jun</span>
-              </div>
-              <div className="event-info">
-                <h3>Torneio de Beach Tennis</h3>
-                <p>Torneio aberto para duplas masculinas, femininas e mistas.</p>
-                <Link to="/eventos/torneio-beach-tennis" className="btn-text">
-                  Saiba mais
-                </Link>
-              </div>
-            </div>
-            <div className="event-card">
-              <div className="event-date">
-                <span className="day">22</span>
-                <span className="month">Jun</span>
-              </div>
-              <div className="event-info">
-                <h3>Festa Junina AABB</h3>
-                <p>
-                  Tradicional festa junina com comidas típicas, música ao vivo e
-                  brincadeiras para toda família.
-                </p>
-                <Link to="/eventos/festa-junina" className="btn-text">
-                  Saiba mais
-                </Link>
-              </div>
-            </div>
+
           </div>
         </div>
       </section>
