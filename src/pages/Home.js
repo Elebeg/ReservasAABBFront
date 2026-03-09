@@ -37,9 +37,9 @@ function TournamentEventCard({ data }) {
 
   const now = new Date();
 
-  // Partidas ainda não finalizadas — com ou sem data agendada
+  // Partidas ainda não finalizadas — status 'SCHEDULED' (não 'FINISHED')
   const upcoming = matches
-    .filter(m => m.status !== 'FINISHED')
+    .filter(m => m.status === 'SCHEDULED')
     .sort((a, b) => {
       // Com data vêm primeiro, ordenadas por data; sem data ficam no final
       if (a.scheduledAt && b.scheduledAt) return new Date(a.scheduledAt) - new Date(b.scheduledAt);
@@ -49,10 +49,15 @@ function TournamentEventCard({ data }) {
     })
     .slice(0, 3);
 
-  // Última partida finalizada
+  // Última partida finalizada — ordena por scheduledAt, cai em id como fallback
   const lastFinished = [...matches]
     .filter(m => m.status === 'FINISHED')
-    .sort((a, b) => new Date(b.scheduledAt || b.updatedAt || 0) - new Date(a.scheduledAt || a.updatedAt || 0))[0];
+    .sort((a, b) => {
+      if (a.scheduledAt && b.scheduledAt) return new Date(b.scheduledAt) - new Date(a.scheduledAt);
+      if (a.scheduledAt) return -1;
+      if (b.scheduledAt) return 1;
+      return b.id - a.id; // fallback: id maior = mais recente
+    })[0];
 
   const statusColor = STATUS_COLOR[tournament.status] || '#1a56db';
   const statusLabel = STATUS_LABELS[tournament.status] || tournament.status;
