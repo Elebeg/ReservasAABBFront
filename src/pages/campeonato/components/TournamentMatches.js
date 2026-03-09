@@ -120,12 +120,60 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     return <div className={`camp-rm-list ${align}`}>{items}</div>;
   }
 
-  return (
-    <div className="camp-rm-overlay" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="camp-rm-modal" onClick={e => e.stopPropagation()}>
+  // ── Container fixo que cobre toda a tela ──
+  const wrapStyle = {
+    position: 'fixed', inset: 0, zIndex: 900,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: '12px',
+  };
+  // ── Backdrop: irmão do modal, não pai ──
+  const backdropStyle = {
+    position: 'absolute', inset: 0,
+    background: 'rgba(0,0,0,0.55)',
+    backdropFilter: 'blur(3px)',
+    WebkitBackdropFilter: 'blur(3px)',
+  };
+  // ── Dialog: relativo ao wrap, z=1 para ficar acima do backdrop ──
+  const dialogStyle = {
+    position: 'relative', zIndex: 1,
+    background: '#fff', borderRadius: 16,
+    width: '100%', maxWidth: 540,
+    maxHeight: '90vh',
+    display: 'flex', flexDirection: 'column',
+    overflow: 'hidden',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.28)',
+    animation: 'campRmIn 0.18s ease',
+  };
 
-        {/* ── Botão fechar — fora do header, z-index alto ── */}
-        <button className="camp-rm-close" onClick={onClose} aria-label="Fechar" type="button">✕</button>
+  return (
+    <div style={wrapStyle} role="dialog" aria-modal="true">
+      {/* Backdrop — clique fecha, completamente separado do modal */}
+      <div style={backdropStyle} onClick={onClose} />
+
+      {/* Modal */}
+      <div style={dialogStyle}>
+
+        {/* ── Barra do topo: só o botão fechar, no fluxo normal ── */}
+        <div style={{
+          background: 'linear-gradient(135deg, var(--camp-primary,#003882) 60%, #0e4f8a 130%)',
+          display: 'flex', justifyContent: 'flex-end',
+          padding: '8px 8px 0',
+        }}>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            style={{
+              width: 44, height: 44, borderRadius: '50%',
+              border: 'none', cursor: 'pointer',
+              background: 'rgba(255,255,255,0.18)',
+              color: '#fff', fontSize: '1.1rem', fontWeight: 700,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation',
+            }}
+          >✕</button>
+        </div>
 
         {/* ── Cabeçalho com placar ── */}
         <div className="camp-rm-header">
@@ -158,8 +206,8 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
           </div>
         </div>
 
-        {/* ── Eventos ── */}
-        <div className="camp-rm-body">
+        {/* ── Eventos (scrollável) ── */}
+        <div className="camp-rm-body" style={{ overflowY: 'auto' }}>
           {loading ? (
             <p className="camp-rm-loading">Carregando eventos...</p>
           ) : (
