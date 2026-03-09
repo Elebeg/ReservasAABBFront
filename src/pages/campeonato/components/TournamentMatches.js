@@ -47,8 +47,8 @@ function toDateKey(iso) {
 // ─── Modal de relatório de jogo ───────────────────────────────────────────────
 
 function MatchReportModal({ match, tournamentYear, onClose }) {
-  const [detail, setDetail]       = useState(null);
-  const [loading, setLoading]     = useState(true);
+  const [detail, setDetail]         = useState(null);
+  const [loading, setLoading]       = useState(true);
   const [sumulaOpen, setSumulaOpen] = useState(false);
 
   useEffect(() => {
@@ -62,148 +62,140 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     load();
   }, [match.id]);
 
+  // Fecha com Escape
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
-  const homeWon = match.homeScore > match.awayScore;
-  const awayWon = match.awayScore > match.homeScore;
+  const homeWon  = match.homeScore > match.awayScore;
+  const awayWon  = match.awayScore > match.homeScore;
   const homeName = match.homeTeam?.name || 'Casa';
   const awayName = match.awayTeam?.name || 'Visitante';
 
-  // Filtra eventos por time
   const homeGoals = detail?.goals.filter(g => g.teamId === match.homeTeam?.id) ?? [];
   const awayGoals = detail?.goals.filter(g => g.teamId === match.awayTeam?.id) ?? [];
   const homeCards = detail?.cards.filter(c => c.teamId === match.homeTeam?.id) ?? [];
   const awayCards = detail?.cards.filter(c => c.teamId === match.awayTeam?.id) ?? [];
   const hasEvents = (detail?.goals.length ?? 0) + (detail?.cards.length ?? 0) > 0;
 
-  function GoalEvent({ g, side }) {
-    return (
-      <div className={`camp-report-event ${side}`}>
-        <span className="camp-report-event-icon">⚽</span>
-        {g.ownGoal
-          ? <span className="camp-report-event-own">Gol Contra</span>
-          : <>
-              {g.player?.number && <span className="camp-report-event-num">{g.player.number}.</span>}
-              <span className="camp-report-event-name">{g.player?.name ?? '—'}</span>
-              {isVet(g.player, tournamentYear) && <VetBadge />}
-            </>
-        }
-      </div>
-    );
-  }
-
-  function CardEvent({ c, side }) {
-    const icon = c.type === 'YELLOW' ? '🟡' : '🔴';
-    return (
-      <div className={`camp-report-event ${side}`}>
-        <span className="camp-report-event-icon">{icon}</span>
-        {c.player?.number && <span className="camp-report-event-num">{c.player.number}.</span>}
-        <span className="camp-report-event-name">{c.player?.name ?? '—'}</span>
-        {isVet(c.player, tournamentYear) && <VetBadge />}
-      </div>
-    );
-  }
-
-  function EventCol({ goals, cards, side }) {
-    if (goals.length === 0 && cards.length === 0) {
-      return <div className={`camp-report-events-col ${side === 'right' ? 'right' : ''}`} />;
-    }
-    return (
-      <div className={`camp-report-events-col ${side === 'right' ? 'right' : ''}`}>
-        {goals.map(g => <GoalEvent key={g.id} g={g} side={side === 'right' ? 'right' : ''} />)}
-        {cards.map(c => <CardEvent key={c.id} c={c} side={side === 'right' ? 'right' : ''} />)}
-      </div>
-    );
+  function EventList({ goals, cards, align }) {
+    const items = [];
+    goals.forEach(g => {
+      const label = g.ownGoal
+        ? <em className="camp-rm-own">Gol Contra</em>
+        : <span className="camp-rm-name">
+            {g.player?.number ? <span className="camp-rm-num">{g.player.number}.</span> : null}
+            {g.player?.name ?? '—'}
+            {isVet(g.player, tournamentYear) && <VetBadge />}
+          </span>;
+      items.push(<div key={`g${g.id}`} className="camp-rm-event"><span className="camp-rm-icon">⚽</span>{label}</div>);
+    });
+    cards.filter(c => c.type === 'YELLOW').forEach(c => {
+      items.push(
+        <div key={`c${c.id}`} className="camp-rm-event">
+          <span className="camp-rm-icon">🟡</span>
+          <span className="camp-rm-name">
+            {c.player?.number ? <span className="camp-rm-num">{c.player.number}.</span> : null}
+            {c.player?.name ?? '—'}
+            {isVet(c.player, tournamentYear) && <VetBadge />}
+          </span>
+        </div>
+      );
+    });
+    cards.filter(c => c.type === 'RED').forEach(c => {
+      items.push(
+        <div key={`c${c.id}`} className="camp-rm-event">
+          <span className="camp-rm-icon">🔴</span>
+          <span className="camp-rm-name">
+            {c.player?.number ? <span className="camp-rm-num">{c.player.number}.</span> : null}
+            {c.player?.name ?? '—'}
+            {isVet(c.player, tournamentYear) && <VetBadge />}
+          </span>
+        </div>
+      );
+    });
+    if (items.length === 0) return <div className="camp-rm-empty">—</div>;
+    return <div className={`camp-rm-list ${align}`}>{items}</div>;
   }
 
   return (
-    <div className="camp-report-overlay" onClick={onClose}>
-      <div className="camp-report-modal" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
+    <div className="camp-rm-overlay" onClick={onClose} role="dialog" aria-modal="true">
+      <div className="camp-rm-modal" onClick={e => e.stopPropagation()}>
 
-        {/* ── Cabeçalho ── */}
-        <div className="camp-report-header">
-          <button className="camp-report-close" onClick={onClose} aria-label="Fechar">✕</button>
+        {/* ── Botão fechar — fora do header, z-index alto ── */}
+        <button className="camp-rm-close" onClick={onClose} aria-label="Fechar" type="button">✕</button>
 
-          <div className="camp-report-meta">
+        {/* ── Cabeçalho com placar ── */}
+        <div className="camp-rm-header">
+          <div className="camp-rm-meta">
             <span>{PHASE_LABELS[match.phase] || match.phase}</span>
             {match.scheduledAt && (
-              <>
-                <span style={{ opacity: 0.4 }}>·</span>
-                <span>{formatDateTime(match.scheduledAt)}</span>
-              </>
+              <span className="camp-rm-meta-sep">{formatDateTime(match.scheduledAt)}</span>
             )}
           </div>
 
-          <div className="camp-report-score-row">
-            <div className={`camp-report-team ${homeWon ? 'winner' : ''}`}>
-              <TeamLogo name={homeName} logoUrl={match.homeTeam?.logoUrl} size={44} shape="shield" />
-              <span className="camp-report-team-name">{homeName}</span>
+          <div className="camp-rm-scoreboard">
+            <div className={`camp-rm-team ${homeWon ? 'won' : ''}`}>
+              <TeamLogo name={homeName} logoUrl={match.homeTeam?.logoUrl} size={40} shape="shield" />
+              <span className="camp-rm-team-name">{homeName}</span>
             </div>
 
-            <div className="camp-report-score-center">
-              <div className="camp-report-score-num">
-                <span>{match.homeScore}</span>
-                <span className="camp-report-score-sep">×</span>
-                <span>{match.awayScore}</span>
-              </div>
+            <div className="camp-rm-score">
+              <span className={homeWon ? 'bold' : ''}>{match.homeScore}</span>
+              <span className="camp-rm-score-sep">×</span>
+              <span className={awayWon ? 'bold' : ''}>{match.awayScore}</span>
               {match.homePenalties != null && (
-                <div className="camp-report-penalties">
-                  ({match.homePenalties} × {match.awayPenalties} pên.)
-                </div>
+                <div className="camp-rm-pen">({match.homePenalties}×{match.awayPenalties} pen.)</div>
               )}
             </div>
 
-            <div className={`camp-report-team ${awayWon ? 'winner' : ''}`}>
-              <TeamLogo name={awayName} logoUrl={match.awayTeam?.logoUrl} size={44} shape="shield" />
-              <span className="camp-report-team-name">{awayName}</span>
+            <div className={`camp-rm-team ${awayWon ? 'won' : ''}`}>
+              <TeamLogo name={awayName} logoUrl={match.awayTeam?.logoUrl} size={40} shape="shield" />
+              <span className="camp-rm-team-name">{awayName}</span>
             </div>
           </div>
         </div>
 
-        {/* ── Corpo ── */}
-        {loading ? (
-          <div className="camp-report-loading">Carregando eventos...</div>
-        ) : (
-          <div className="camp-report-body">
-            <div className="camp-report-events-label">Eventos da partida</div>
+        {/* ── Eventos ── */}
+        <div className="camp-rm-body">
+          {loading ? (
+            <p className="camp-rm-loading">Carregando eventos...</p>
+          ) : (
+            <>
+              <div className="camp-rm-events-label">Eventos da partida</div>
+              {hasEvents ? (
+                <div className="camp-rm-events">
+                  <EventList goals={homeGoals} cards={homeCards} align="left" />
+                  <div className="camp-rm-divider" />
+                  <EventList goals={awayGoals} cards={awayCards} align="right" />
+                </div>
+              ) : (
+                <p className="camp-rm-no-events">Nenhum evento registrado.</p>
+              )}
+            </>
+          )}
 
-            {hasEvents ? (
-              <div className="camp-report-events-cols">
-                <EventCol goals={homeGoals} cards={homeCards} side="left" />
-                <div className="camp-report-col-divider" />
-                <EventCol goals={awayGoals} cards={awayCards} side="right" />
-              </div>
-            ) : (
-              <div className="camp-report-events-cols">
-                <p className="camp-report-no-events">Nenhum evento registrado.</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── Súmula ── */}
-        {!loading && detail?.sumulaUrl && (
-          <div className="camp-report-footer">
-            <button className="camp-report-sumula-btn" onClick={() => setSumulaOpen(true)}>
-              📎 Ver Súmula Digitalizada
-            </button>
-          </div>
-        )}
+          {!loading && detail?.sumulaUrl && (
+            <div className="camp-rm-sumula">
+              <button className="camp-rm-sumula-btn" type="button" onClick={() => setSumulaOpen(true)}>
+                📎 Ver Súmula Digitalizada
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Lightbox da súmula */}
       {sumulaOpen && detail?.sumulaUrl && (
         <div className="camp-sumula-overlay" onClick={() => setSumulaOpen(false)}>
           <div className="camp-sumula-box" onClick={e => e.stopPropagation()}>
-            <button className="camp-sumula-close" onClick={() => setSumulaOpen(false)} aria-label="Fechar súmula">✕</button>
+            <button className="camp-sumula-close" type="button" onClick={() => setSumulaOpen(false)} aria-label="Fechar súmula">✕</button>
             {detail.sumulaUrl.startsWith('data:application/pdf') || detail.sumulaUrl.endsWith('.pdf') ? (
-              <iframe
-                src={detail.sumulaUrl}
-                title="Súmula digitalizada"
-                style={{ width: '100%', height: '80vh', border: 'none', borderRadius: 6 }}
-              />
+              <iframe src={detail.sumulaUrl} title="Súmula" style={{ width: '100%', height: '80vh', border: 'none', borderRadius: 6 }} />
             ) : (
-              <img src={detail.sumulaUrl} alt="Súmula digitalizada"
-                style={{ maxWidth: '100%', maxHeight: '80vh', display: 'block', borderRadius: 6 }} />
+              <img src={detail.sumulaUrl} alt="Súmula" style={{ maxWidth: '100%', maxHeight: '80vh', display: 'block', borderRadius: 6 }} />
             )}
           </div>
         </div>
