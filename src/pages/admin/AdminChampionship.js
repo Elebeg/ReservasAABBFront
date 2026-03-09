@@ -677,7 +677,7 @@ function SumulaModal({ match, tournament, onClose }) {
   .two-col{display:flex;gap:18px}
   .two-col>div{flex:1;min-width:0}
   .sig-row{display:flex;gap:24px;margin-top:14px}
-  .sig-item{flex:1;margin-top:50px;padding-top:5px;text-align:center;font-size:11px;color:#555;border-top:1px solid #444}
+  .sig-item{flex:1;margin-top:25px;padding-top:5px;text-align:center;font-size:11px;color:#555;border-top:1px solid #444}
   @media print{body{padding:8px}button{display:none}}
 </style>
 </head>
