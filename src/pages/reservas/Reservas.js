@@ -16,6 +16,11 @@ function CourtIllustration({ isSelected }) {
           <stop offset="60%"  stopColor="#d4b070" />
           <stop offset="100%" stopColor="#c09050" />
         </radialGradient>
+        {/* Gradiente linear para sombra suave embaixo da rede */}
+        <linearGradient id="netShadowGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="rgba(0,0,0,0.22)" />
+          <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+        </linearGradient>
       </defs>
 
       {/* Moldura externa (madeira/terra) */}
@@ -57,7 +62,15 @@ function CourtIllustration({ isSelected }) {
       {/* Delimitação da quadra — apenas o retângulo externo */}
       <rect x="18" y="12" width="164" height="96" fill="none" stroke={line} strokeWidth="2.5" />
 
+      {/* Sombra projetada da rede no chão — elipse alongada e suave */}
+      <ellipse cx="100" cy="72" rx="82" ry="5" fill="rgba(0,0,0,0.28)" />
+      {/* Degrade escuro sob a rede para reforçar o afastamento do solo */}
+      <rect x="18" y="65" width="164" height="10" fill="url(#netShadowGrad)" rx="1" />
+
       {/* Postes da rede — mais altos para acomodar rede maior */}
+      {/* Sombra dos postes no chão */}
+      <ellipse cx="16"  cy="73" rx="5" ry="2" fill="rgba(0,0,0,0.20)" />
+      <ellipse cx="184" cy="73" rx="5" ry="2" fill="rgba(0,0,0,0.20)" />
       <rect x="12"  y="43" width="7" height="30" rx="2" fill="#5a3d22" />
       <rect x="181" y="43" width="7" height="30" rx="2" fill="#5a3d22" />
 
