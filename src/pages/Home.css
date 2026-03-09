@@ -445,11 +445,21 @@
 /* ── Tournament Event Card ──────────────────────────────────── */
 .event-card--tournament {
   border-left: 4px solid var(--primary-yellow);
-  background-color: var(--primary-blue);
+  background-color: var(--primary-blue) !important;
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
   max-width: 460px;
+  overflow: visible;
+}
+
+.event-card--tournament .event-info {
+  width: 100%;
+}
+
+.event-card--tournament .event-info h3 {
+  overflow: visible;
+  white-space: normal;
 }
 
 .event-date--tournament {
