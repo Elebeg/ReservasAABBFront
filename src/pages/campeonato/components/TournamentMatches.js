@@ -124,7 +124,9 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
   const wrapStyle = {
     position: 'fixed', inset: 0, zIndex: 900,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    padding: '12px',
+    padding: '8px',
+    boxSizing: 'border-box',
+    overflowX: 'hidden',
   };
   // ── Backdrop: irmão do modal, não pai ──
   const backdropStyle = {
@@ -133,14 +135,16 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     backdropFilter: 'blur(3px)',
     WebkitBackdropFilter: 'blur(3px)',
   };
-  // ── Dialog: relativo ao wrap, z=1 para ficar acima do backdrop ──
+  // ── Dialog: nunca ultrapassa a viewport, mesmo em 320px ──
   const dialogStyle = {
     position: 'relative', zIndex: 1,
-    background: '#fff', borderRadius: 16,
-    width: '100%', maxWidth: 540,
+    background: '#fff', borderRadius: 14,
+    width: '100%',
+    maxWidth: 'min(540px, calc(100vw - 16px))',
     maxHeight: '90vh',
     display: 'flex', flexDirection: 'column',
     overflow: 'hidden',
+    boxSizing: 'border-box',
     boxShadow: '0 20px 60px rgba(0,0,0,0.28)',
     animation: 'campRmIn 0.18s ease',
   };
@@ -199,20 +203,22 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
         <div style={{
           background: 'linear-gradient(135deg, var(--camp-primary,#003882) 60%, #0e4f8a 130%)',
           display: 'flex', justifyContent: 'flex-end',
-          padding: '8px 8px 0',
+          padding: '6px 6px 0',
+          flexShrink: 0,
         }}>
           <button
             type="button"
             onClick={onClose}
             aria-label="Fechar"
             style={{
-              width: 44, height: 44, borderRadius: '50%',
+              width: 40, height: 40, borderRadius: '50%',
               border: 'none', cursor: 'pointer',
               background: 'rgba(255,255,255,0.18)',
-              color: '#fff', fontSize: '1.1rem', fontWeight: 700,
+              color: '#fff', fontSize: '1rem', fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               WebkitTapHighlightColor: 'transparent',
               touchAction: 'manipulation',
+              flexShrink: 0,
             }}
           >✕</button>
         </div>
