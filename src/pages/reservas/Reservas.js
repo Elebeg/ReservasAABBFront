@@ -54,20 +54,37 @@ function CourtIllustration({ isSelected }) {
       <circle cx="175" cy="60"  r="0.8" fill="rgba(140,90,20,0.09)" />
       <circle cx="183" cy="42"  r="0.7" fill="rgba(140,90,20,0.08)" />
 
-      {/* Delimitação da quadra */}
+      {/* Delimitação da quadra — apenas o retângulo externo */}
       <rect x="18" y="12" width="164" height="96" fill="none" stroke={line} strokeWidth="2.5" />
-      {/* Linhas de ataque */}
-      <line x1="18" y1="36" x2="182" y2="36" stroke={line} strokeWidth="1.5" strokeOpacity="0.80" />
-      <line x1="18" y1="84" x2="182" y2="84" stroke={line} strokeWidth="1.5" strokeOpacity="0.80" />
-      {/* Linha central tracejada (acima e abaixo da rede) */}
-      <line x1="100" y1="12"  x2="100" y2="55"  stroke={line} strokeWidth="1" strokeOpacity="0.45" strokeDasharray="4,3" />
-      <line x1="100" y1="65"  x2="100" y2="108" stroke={line} strokeWidth="1" strokeOpacity="0.45" strokeDasharray="4,3" />
 
       {/* Postes da rede */}
-      <rect x="12" y="48" width="7" height="24" rx="2" fill="#5a3d22" />
-      <rect x="181" y="48" width="7" height="24" rx="2" fill="#5a3d22" />
-      {/* Rede: apenas faixa escura (sem cabo/linha branca) */}
-      <rect x="18" y="56" width="164" height="8" fill="rgba(20,12,4,0.65)" rx="1" />
+      <rect x="12" y="47" width="7" height="26" rx="2" fill="#5a3d22" />
+      <rect x="181" y="47" width="7" height="26" rx="2" fill="#5a3d22" />
+
+      {/* Cabo superior da rede */}
+      <line x1="12" y1="56" x2="188" y2="56" stroke="#aaa" strokeWidth="1.2" />
+
+      {/* Rede: faixa base escura */}
+      <rect x="18" y="56" width="164" height="9" fill="rgba(15,8,2,0.72)" rx="1" />
+
+      {/* Textura da rede: fios verticais */}
+      <line x1="30"  y1="56" x2="30"  y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="42"  y1="56" x2="42"  y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="54"  y1="56" x2="54"  y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="66"  y1="56" x2="66"  y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="78"  y1="56" x2="78"  y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="90"  y1="56" x2="90"  y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="102" y1="56" x2="102" y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="114" y1="56" x2="114" y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="126" y1="56" x2="126" y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="138" y1="56" x2="138" y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="150" y1="56" x2="150" y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="162" y1="56" x2="162" y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="174" y1="56" x2="174" y2="65" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      {/* Textura da rede: fio horizontal do meio */}
+      <line x1="18" y1="61" x2="182" y2="61" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" />
+      {/* Faixa branca do topo da rede */}
+      <rect x="18" y="56" width="164" height="2" fill="rgba(255,255,255,0.45)" rx="0.5" />
 
       {/* Brilho selecionado */}
       {isSelected && (
