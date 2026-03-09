@@ -445,7 +445,7 @@
 /* ── Tournament Event Card ──────────────────────────────────── */
 .event-card--tournament {
   border-left: 4px solid var(--primary-yellow);
-  background-color: rgba(255, 255, 255, 0.14);
+  background-color: var(--primary-blue);
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
@@ -462,6 +462,22 @@
   color: inherit;
   padding: 0;
   margin: 0 0 12px 0;
+}
+
+.event-card--tournament .event-info h3 {
+  color: #ffffff;
+}
+
+.event-card--tournament .event-info p {
+  color: rgba(255,255,255,0.75);
+}
+
+.event-card--tournament .btn-text {
+  color: var(--primary-yellow);
+}
+
+.event-card--tournament .btn-text:hover {
+  color: #ffffff;
 }
 
 .tournament-icon {
@@ -531,4 +547,34 @@
   font-size: 0.75rem;
   color: rgba(255,255,255,0.80);
   white-space: nowrap;
+}
+
+/* ── Tournament loading / empty state ── */
+.event-card--loading,
+.event-card--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 120px;
+  background-color: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.75);
+  font-size: 0.9rem;
+  border: 2px dashed rgba(255,255,255,0.25);
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.tournament-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255,255,255,0.2);
+  border-top-color: var(--primary-yellow);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

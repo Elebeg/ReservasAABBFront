@@ -23,45 +23,58 @@ const STATUS_COLOR = {
 
 function useTournamentPreview() {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     fetch(`${API_URL}/championship/active/all`)
       .then(r => r.ok ? r.json() : null)
-      .then(json => { if (json?.tournament) setData(json); })
-      .catch(() => {});
+      .then(json => {
+        if (json?.tournament) {
+          // Debug: inspecionar status das partidas no console
+          console.log('[TournamentPreview] matches sample:', json.matches?.slice(0, 3));
+          setData(json);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
-  return data;
+  return { data, loading };
 }
 
 function TournamentEventCard({ data }) {
   const { tournament, matches = [] } = data;
 
-  // Partidas ainda não finalizadas — status 'SCHEDULED' (não 'FINISHED')
-  const upcoming = matches
+  // Partidas finalizadas com pelo menos um time definido
+  const finishedMatches = matches.filter(
+    m => m.status === 'FINISHED' && (m.homeTeam || m.awayTeam)
+  );
+
+  // Partidas agendadas — aceita com ou sem data, com ou sem times definidos
+  const upcomingMatches = matches
     .filter(m => m.status === 'SCHEDULED')
     .sort((a, b) => {
-      // Com data vêm primeiro, ordenadas por data; sem data ficam no final
       if (a.scheduledAt && b.scheduledAt) return new Date(a.scheduledAt) - new Date(b.scheduledAt);
       if (a.scheduledAt) return -1;
       if (b.scheduledAt) return 1;
-      return 0;
+      return a.id - b.id;
     })
     .slice(0, 3);
 
-  // Última partida finalizada — ordena por scheduledAt, cai em id como fallback
-  const lastFinished = [...matches]
-    .filter(m => m.status === 'FINISHED')
-    .sort((a, b) => {
-      if (a.scheduledAt && b.scheduledAt) return new Date(b.scheduledAt) - new Date(a.scheduledAt);
-      if (a.scheduledAt) return -1;
-      if (b.scheduledAt) return 1;
-      return b.id - a.id; // fallback: id maior = mais recente
-    })[0];
+  const lastFinished = finishedMatches.sort((a, b) => {
+    if (a.scheduledAt && b.scheduledAt) return new Date(b.scheduledAt) - new Date(a.scheduledAt);
+    if (b.scheduledAt) return 1;
+    if (a.scheduledAt) return -1;
+    return b.id - a.id;
+  })[0];
+
+  const hasContent = lastFinished || upcomingMatches.length > 0;
 
   const statusColor = STATUS_COLOR[tournament.status] || '#1a56db';
   const statusLabel = STATUS_LABELS[tournament.status] || tournament.status;
 
   const fmtDate = iso => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
   const fmtTime = iso => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+  const teamName = team => team?.name || 'A definir';
 
   return (
     <div className="event-card event-card--tournament">
@@ -81,39 +94,39 @@ function TournamentEventCard({ data }) {
         {lastFinished && (
           <div className="tournament-last-match">
             <span className="tournament-mini-label">Último resultado</span>
-            <span className="tournament-match-line">
-              <strong>{lastFinished.homeTeam?.name}</strong>
+            <div className="tournament-match-line">
+              <strong>{teamName(lastFinished.homeTeam)}</strong>
               <span className="tournament-score">
-                {lastFinished.homeScore} × {lastFinished.awayScore}
+                {lastFinished.homeScore ?? '?'} × {lastFinished.awayScore ?? '?'}
               </span>
-              <strong>{lastFinished.awayTeam?.name}</strong>
-            </span>
+              <strong>{teamName(lastFinished.awayTeam)}</strong>
+            </div>
           </div>
         )}
 
-        {upcoming.length > 0 && (
+        {upcomingMatches.length > 0 && (
           <div className="tournament-upcoming">
             <span className="tournament-mini-label">Próximas partidas</span>
-            {upcoming.map(m => (
+            {upcomingMatches.map(m => (
               <div key={m.id} className="tournament-match-line">
-                <strong>{m.homeTeam?.name || 'A definir'}</strong>
+                <strong>{teamName(m.homeTeam)}</strong>
                 {m.scheduledAt
                   ? <span className="tournament-vs-badge">{fmtDate(m.scheduledAt)} · {fmtTime(m.scheduledAt)}</span>
                   : <span className="tournament-vs-badge">VS</span>
                 }
-                <strong>{m.awayTeam?.name || 'A definir'}</strong>
+                <strong>{teamName(m.awayTeam)}</strong>
               </div>
             ))}
           </div>
         )}
 
-        {upcoming.length === 0 && !lastFinished && (
+        {!hasContent && (
           <p style={{ margin: '6px 0 10px', color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem' }}>
             Campeonato em preparação. Fique de olho!
           </p>
         )}
 
-        <Link to="/campeonato" className="btn-text">Ver campeonato →</Link>
+        <Link to="/campeonato" className="btn-text">Ver campeonato</Link>
       </div>
     </div>
   );
@@ -130,7 +143,7 @@ function Home() {
     ? userFromContext.name.split(' ')[0]
     : null;
 
-  const tournamentData = useTournamentPreview();
+  const { data: tournamentData, loading: tournamentLoading } = useTournamentPreview();
 
   return (
     <div className="home">
@@ -227,7 +240,19 @@ function Home() {
         <div className="container">
           <h2 className="section-title">Próximos Eventos</h2>
           <div className="events-slider">
-            {tournamentData && <TournamentEventCard data={tournamentData} />}
+            {tournamentLoading && (
+              <div className="event-card event-card--loading">
+                <div className="tournament-loading-spinner" />
+                <p>Carregando campeonato...</p>
+              </div>
+            )}
+            {!tournamentLoading && tournamentData && <TournamentEventCard data={tournamentData} />}
+            {!tournamentLoading && !tournamentData && (
+              <div className="event-card event-card--empty">
+                <span style={{ fontSize: '2rem' }}>🏆</span>
+                <p>Nenhum campeonato ativo no momento.</p>
+              </div>
+            )}
 
           </div>
         </div>
