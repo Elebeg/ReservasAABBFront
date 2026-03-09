@@ -57,57 +57,46 @@ function CourtIllustration({ isSelected }) {
       {/* Delimitação da quadra — apenas o retângulo externo */}
       <rect x="18" y="12" width="164" height="96" fill="none" stroke={line} strokeWidth="2.5" />
 
-      {/* ── REDE ── */}
+      {/* Postes da rede — mais altos para acomodar rede maior */}
+      <rect x="12"  y="43" width="7" height="30" rx="2" fill="#5a3d22" />
+      <rect x="181" y="43" width="7" height="30" rx="2" fill="#5a3d22" />
 
-      {/* Sombra dos postes no chão */}
-      <ellipse cx="16"  cy="106" rx="5" ry="2" fill="rgba(0,0,0,0.18)" />
-      <ellipse cx="184" cy="106" rx="5" ry="2" fill="rgba(0,0,0,0.18)" />
+      {/* Cabo superior da rede */}
+      <line x1="12" y1="49" x2="188" y2="49" stroke="#bbb" strokeWidth="1.4" />
 
-      {/* Postes: descem até a areia, dando sensação de estar fincados */}
-      <rect x="12"  y="48" width="8" height="58" rx="2" fill="#6b4c2a" />
-      <rect x="180" y="48" width="8" height="58" rx="2" fill="#6b4c2a" />
-      {/* Brilho lateral dos postes */}
-      <rect x="13"  y="48" width="2" height="58" rx="1" fill="rgba(255,255,255,0.18)" />
-      <rect x="181" y="48" width="2" height="58" rx="1" fill="rgba(255,255,255,0.18)" />
+      {/* Rede: faixa de malha mais alta (18px) */}
+      <rect x="18" y="49" width="164" height="18" fill="rgba(15,8,2,0.68)" rx="1" />
 
-      {/* Sombra da rede projetada na areia */}
-      <ellipse cx="100" cy="68" rx="82" ry="3" fill="rgba(0,0,0,0.12)" />
-
-      {/* Rede: faixa de malha (acima da sombra) */}
-      <rect x="18" y="48" width="164" height="14" fill="rgba(10,5,0,0.65)" rx="1" />
-
-      {/* Textura da rede: fios verticais */}
-      <line x1="30"  y1="48" x2="30"  y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="42"  y1="48" x2="42"  y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="54"  y1="48" x2="54"  y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="66"  y1="48" x2="66"  y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="78"  y1="48" x2="78"  y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="90"  y1="48" x2="90"  y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="102" y1="48" x2="102" y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="114" y1="48" x2="114" y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="126" y1="48" x2="126" y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="138" y1="48" x2="138" y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="150" y1="48" x2="150" y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="162" y1="48" x2="162" y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-      <line x1="174" y1="48" x2="174" y2="62" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
+      {/* Textura: fios verticais */}
+      <line x1="30"  y1="49" x2="30"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="42"  y1="49" x2="42"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="54"  y1="49" x2="54"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="66"  y1="49" x2="66"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="78"  y1="49" x2="78"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="90"  y1="49" x2="90"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="102" y1="49" x2="102" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="114" y1="49" x2="114" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="126" y1="49" x2="126" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="138" y1="49" x2="138" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="150" y1="49" x2="150" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="162" y1="49" x2="162" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
+      <line x1="174" y1="49" x2="174" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
       {/* Fios horizontais da malha */}
-      <line x1="18" y1="54" x2="182" y2="54" stroke="rgba(255,255,255,0.11)" strokeWidth="0.8" />
-      <line x1="18" y1="59" x2="182" y2="59" stroke="rgba(255,255,255,0.11)" strokeWidth="0.8" />
-      {/* Fita branca do topo */}
-      <rect x="18" y="48" width="164" height="3" fill="rgba(255,255,255,0.55)" rx="0.5" />
-      {/* Cabo superior */}
-      <line x1="12" y1="48" x2="188" y2="48" stroke="#bbb" strokeWidth="1.4" />
+      <line x1="18" y1="55" x2="182" y2="55" stroke="rgba(255,255,255,0.11)" strokeWidth="0.8" />
+      <line x1="18" y1="61" x2="182" y2="61" stroke="rgba(255,255,255,0.11)" strokeWidth="0.8" />
+      {/* Faixa branca do topo */}
+      <rect x="18" y="49" width="164" height="3" fill="rgba(255,255,255,0.50)" rx="0.5" />
 
       {/* ── BOLA DE BEACH TENNIS ── */}
-      {/* Sombra da bola */}
-      <ellipse cx="152" cy="92" rx="6" ry="2.2" fill="rgba(0,0,0,0.20)" />
-      {/* Bola (amarelo-limão, cor típica de beach tennis) */}
-      <circle cx="152" cy="88" r="5.5" fill="#c8e600" />
+      {/* Sombra projetada na areia */}
+      <ellipse cx="43" cy="93" rx="5" ry="1.8" fill="rgba(0,0,0,0.22)" />
+      {/* Bola */}
+      <circle cx="40" cy="86" r="5" fill="#d4e800" />
       {/* Brilho */}
-      <circle cx="150" cy="86" r="1.8" fill="rgba(255,255,255,0.55)" />
-      {/* Costura curva */}
-      <path d="M149,84 Q155,88 149,92" stroke="white" strokeWidth="0.9" fill="none" strokeOpacity="0.7" />
-      <path d="M155,84 Q149,88 155,92" stroke="white" strokeWidth="0.9" fill="none" strokeOpacity="0.7" />
+      <circle cx="38" cy="84" r="1.6" fill="rgba(255,255,255,0.50)" />
+      {/* Costuras laranja */}
+      <path d="M37,82 Q43,86 37,90" stroke="#e85000" strokeWidth="1.1" fill="none" />
+      <path d="M43,82 Q37,86 43,90" stroke="#e85000" strokeWidth="1.1" fill="none" />
 
       {/* Brilho selecionado */}
       {isSelected && (
