@@ -488,7 +488,7 @@
 
 .camp-matches-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 12px;
 }
 
@@ -516,7 +516,7 @@
   margin-bottom: 12px;
 }
 
-.camp-match-team { display: flex; align-items: center; }
+.camp-match-team { display: flex; align-items: center; min-width: 0; }
 .camp-match-team.home { justify-content: flex-end; text-align: right; }
 .camp-match-team.away { justify-content: flex-start; }
 
@@ -525,6 +525,10 @@
   font-weight: 650;
   color: var(--camp-gray-900);
   line-height: 1.3;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .camp-match-team.won .camp-match-team-name {
@@ -1498,10 +1502,11 @@
 .camp-rm-divider { background: rgba(0,0,0,0.07); }
 
 .camp-rm-list {
-  padding: 0 12px;
+  padding: 0 8px;
   display: flex;
   flex-direction: column;
   gap: 5px;
+  min-width: 0;
 }
 .camp-rm-list.right {
   align-items: flex-end;
@@ -1512,16 +1517,27 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   line-height: 1.4;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;    /* ícone e nome nunca quebram linha */
+  min-width: 0;
 }
 .camp-rm-list.right .camp-rm-event { flex-direction: row-reverse; }
 
-.camp-rm-icon { font-size: 0.82rem; flex-shrink: 0; }
-.camp-rm-name { font-weight: 600; display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
-.camp-rm-num  { font-size: 0.68rem; color: var(--camp-gray-500); font-weight: 500; }
-.camp-rm-own  { font-style: italic; color: var(--camp-gray-500); font-size: 0.75rem; }
+.camp-rm-icon { font-size: 0.8rem; flex-shrink: 0; }
+.camp-rm-name {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: nowrap;    /* número e nome ficam na mesma linha */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.camp-rm-num  { font-size: 0.68rem; color: var(--camp-gray-500); font-weight: 500; flex-shrink: 0; }
+.camp-rm-own  { font-style: italic; color: var(--camp-gray-500); font-size: 0.75rem; white-space: nowrap; }
 
 .camp-rm-empty    { font-size: 0.8rem; color: var(--camp-gray-500); padding: 4px 12px; }
 .camp-rm-no-events {
