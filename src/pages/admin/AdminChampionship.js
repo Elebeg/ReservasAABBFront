@@ -1493,10 +1493,23 @@ function SumulaUploadModal({ match, onClose, onSaved }) {
             <span style={{ fontSize: '0.82rem', color: 'var(--ac-gray-700)', flex: 1, fontWeight: 600 }}>
               {isImage ? '🖼️ Imagem enviada' : '📄 PDF enviado'}
             </span>
-            <a href={currentUrl} target="_blank" rel="noreferrer"
-              className="ac-btn ac-btn-sm ac-btn-ghost" style={{ fontSize: '0.75rem' }}>
+            <button
+              className="ac-btn ac-btn-sm ac-btn-ghost"
+              style={{ fontSize: '0.75rem' }}
+              onClick={() => {
+                const arr = currentUrl.split(',');
+                const mime = arr[0].match(/:(.*?);/)[1];
+                const bytes = atob(arr[1]);
+                const buf = new Uint8Array(bytes.length);
+                for (let i = 0; i < bytes.length; i++) buf[i] = bytes.charCodeAt(i);
+                const blob = new Blob([buf], { type: mime });
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+              }}
+            >
               Visualizar
-            </a>
+            </button>
             <button className="ac-btn ac-btn-sm" onClick={remove} disabled={loading}
               style={{ fontSize: '0.75rem', color: 'var(--ac-danger)', border: '1px solid var(--ac-danger)' }}>
               🗑 Excluir

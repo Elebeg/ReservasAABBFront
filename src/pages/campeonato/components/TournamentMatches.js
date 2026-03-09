@@ -145,7 +145,49 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     animation: 'campRmIn 0.18s ease',
   };
 
+  const sumulaOverlay = sumulaOpen && detail?.sumulaUrl ? (
+    <div
+      onClick={() => setSumulaOpen(false)}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1100,
+        background: 'rgba(0,0,0,0.85)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 16,
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          position: 'relative', background: '#fff', borderRadius: 12,
+          padding: 10, maxWidth: 900, width: '100%',
+          maxHeight: '92vh', overflow: 'auto',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setSumulaOpen(false)}
+          aria-label="Fechar súmula"
+          style={{
+            position: 'absolute', top: 8, right: 8,
+            width: 36, height: 36, borderRadius: '50%',
+            border: 'none', background: 'rgba(0,0,0,0.12)',
+            cursor: 'pointer', fontSize: '1rem', color: '#333',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 1,
+          }}
+        >✕</button>
+        {detail.sumulaUrl.startsWith('data:application/pdf') || detail.sumulaUrl.endsWith('.pdf') ? (
+          <iframe src={detail.sumulaUrl} title="Súmula" style={{ width: '100%', height: '80vh', border: 'none', borderRadius: 6 }} />
+        ) : (
+          <img src={detail.sumulaUrl} alt="Súmula" style={{ maxWidth: '100%', maxHeight: '80vh', display: 'block', margin: '0 auto', borderRadius: 6 }} />
+        )}
+      </div>
+    </div>
+  ) : null;
+
   return (
+    <>
+    {sumulaOverlay}
     <div style={wrapStyle} role="dialog" aria-modal="true">
       {/* Backdrop — clique fecha, completamente separado do modal */}
       <div style={backdropStyle} onClick={onClose} />
@@ -235,20 +277,8 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
         </div>
       </div>
 
-      {/* Lightbox da súmula */}
-      {sumulaOpen && detail?.sumulaUrl && (
-        <div className="camp-sumula-overlay" onClick={() => setSumulaOpen(false)}>
-          <div className="camp-sumula-box" onClick={e => e.stopPropagation()}>
-            <button className="camp-sumula-close" type="button" onClick={() => setSumulaOpen(false)} aria-label="Fechar súmula">✕</button>
-            {detail.sumulaUrl.startsWith('data:application/pdf') || detail.sumulaUrl.endsWith('.pdf') ? (
-              <iframe src={detail.sumulaUrl} title="Súmula" style={{ width: '100%', height: '80vh', border: 'none', borderRadius: 6 }} />
-            ) : (
-              <img src={detail.sumulaUrl} alt="Súmula" style={{ maxWidth: '100%', maxHeight: '80vh', display: 'block', borderRadius: 6 }} />
-            )}
-          </div>
-        </div>
-      )}
     </div>
+    </>
   );
 }
 
