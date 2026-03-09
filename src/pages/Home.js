@@ -13,6 +13,8 @@ function Home() {
     ? userFromContext.name.split(' ')[0]
     : null;
 
+  const tournamentData = useTournamentPreview();
+
   return (
     <div className="home">
       {/* Hero Section */}
@@ -38,7 +40,7 @@ function Home() {
                 <Link to="/campeonato" className="hero-cta-card hero-cta-card--yellow">
                   <span className="hero-cta-icon">🏆</span>
                   <span className="hero-cta-title">Campeonato</span>
-                  <span className="hero-cta-desc">Inscreva-se e dispute com outros associados</span>
+                  <span className="hero-cta-desc">Veja as atualizações dos Campeonatos</span>
                   <span className="hero-cta-btn">Ver campeonato →</span>
                 </Link>
               </div>
@@ -108,6 +110,7 @@ function Home() {
         <div className="container">
           <h2 className="section-title">Próximos Eventos</h2>
           <div className="events-slider">
+            {tournamentData && <TournamentEventCard data={tournamentData} />}
             <div className="event-card">
               <div className="event-date">
                 <span className="day">15</span>
