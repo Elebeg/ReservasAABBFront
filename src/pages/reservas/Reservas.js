@@ -95,7 +95,7 @@ function CourtIllustration({ isSelected }) {
       {/* Brilho */}
       <circle cx="38" cy="84" r="1.6" fill="rgba(255,255,255,0.50)" />
       {/* Costuras laranja */}
-      <path d="M37,82 Q43,86 37,90" stroke="#e85000" strokeWidth="1.6" fill="none" />
+      <path d="M37,82 Q43,86 37,90" stroke="#e85000" strokeWidth="3.0" fill="none" />
 
       {/* Brilho selecionado */}
       {isSelected && (
