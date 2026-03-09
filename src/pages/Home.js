@@ -35,8 +35,6 @@ function useTournamentPreview() {
 function TournamentEventCard({ data }) {
   const { tournament, matches = [] } = data;
 
-  const now = new Date();
-
   // Partidas ainda não finalizadas — status 'SCHEDULED' (não 'FINISHED')
   const upcoming = matches
     .filter(m => m.status === 'SCHEDULED')
