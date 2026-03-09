@@ -615,9 +615,10 @@ function SumulaModal({ match, tournament, onClose }) {
         const vetBadge  = isVeteran(p, year) ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">V</span>' : '';
         const suspBadge = p.suspended      ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1.5px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">SUSP</span>' : '';
         const pendBadge = !p.suspended && p.yellowCardAccum === 1 ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">PEN</span>' : '';
+        const noDobMark = !p.birthDate ? '<sup style="font-size:9px;color:#000;font-weight:700">*</sup>' : '';
         const nameCell  = p.suspended
-          ? `<del>${p.name}</del>${vetBadge}${suspBadge}`
-          : `${p.name}${vetBadge}${pendBadge}`;
+          ? `<del>${p.name}</del>${noDobMark}${vetBadge}${suspBadge}`
+          : `${p.name}${noDobMark}${vetBadge}${pendBadge}`;
         return `<tr>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;text-align:center;width:24px;font-size:11px">${numCell}</td>
           <td style="padding:3px 4px;border-bottom:1px solid #eee;font-size:12px">${nameCell}</td>
@@ -737,7 +738,11 @@ function SumulaModal({ match, tournament, onClose }) {
   <div class="sig-item">Capitão — ${awayName}</div>
   <div class="sig-item">Responsável AABB</div>
 </div>
-<p style="text-align:center;font-size:10px;color:#bbb;margin-top:20px">
+<p style="font-size:10px;color:#555;margin-top:14px;border-top:1px solid #ddd;padding-top:8px">
+  <strong>Legenda:</strong>
+  V = Veterano &nbsp;|&nbsp; SUSP = Suspenso &nbsp;|&nbsp; PEN = Pendurado (1 amarelo) &nbsp;|&nbsp; <sup>*</sup> = Data de nascimento não cadastrada
+</p>
+<p style="text-align:center;font-size:10px;color:#bbb;margin-top:10px">
   Documento gerado em ${new Date().toLocaleString('pt-BR')} — Sistema de Reservas AABB
 </p>
 </body>
