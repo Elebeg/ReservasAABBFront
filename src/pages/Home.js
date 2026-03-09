@@ -28,9 +28,18 @@ function Home() {
                 Agora você tem acesso ao sistema exclusivo de reservas. Escolha a quadra,
                 o dia e o horário que preferir e organize seus jogos com facilidade.
               </p>
-              <div className="hero-buttons">
-                <Link to="/reservas" className="btn-primary">
-                  Reservar quadra
+              <div className="hero-cta-cards">
+                <Link to="/reservas" className="hero-cta-card">
+                  <span className="hero-cta-icon">🎾</span>
+                  <span className="hero-cta-title">Reservar Quadra</span>
+                  <span className="hero-cta-desc">Escolha o dia e horário da sua partida</span>
+                  <span className="hero-cta-btn">Reservar agora →</span>
+                </Link>
+                <Link to="/campeonato" className="hero-cta-card hero-cta-card--yellow">
+                  <span className="hero-cta-icon">🏆</span>
+                  <span className="hero-cta-title">Campeonato</span>
+                  <span className="hero-cta-desc">Inscreva-se e dispute com outros associados</span>
+                  <span className="hero-cta-btn">Ver campeonato →</span>
                 </Link>
               </div>
             </>
