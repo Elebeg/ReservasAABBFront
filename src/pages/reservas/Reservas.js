@@ -75,30 +75,49 @@ function CourtIllustration({ isSelected }) {
       <rect x="181" y="43" width="7" height="30" rx="2" fill="#5a3d22" />
 
       {/* Cabo superior da rede */}
-      <line x1="12" y1="49" x2="188" y2="49" stroke="#bbb" strokeWidth="1.4" />
+      <line x1="12" y1="49" x2="188" y2="49" stroke="#cccccc" strokeWidth="1.8" />
 
-      {/* Rede: faixa de malha mais alta (18px) */}
-      <rect x="18" y="49" width="164" height="18" fill="rgba(15,8,2,0.68)" rx="1" />
-
-      {/* Textura: fios verticais */}
-      <line x1="30"  y1="49" x2="30"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="42"  y1="49" x2="42"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="54"  y1="49" x2="54"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="66"  y1="49" x2="66"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="78"  y1="49" x2="78"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="90"  y1="49" x2="90"  y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="102" y1="49" x2="102" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="114" y1="49" x2="114" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="126" y1="49" x2="126" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="138" y1="49" x2="138" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="150" y1="49" x2="150" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="162" y1="49" x2="162" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      <line x1="174" y1="49" x2="174" y2="67" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
-      {/* Fios horizontais da malha */}
-      <line x1="18" y1="55" x2="182" y2="55" stroke="rgba(255,255,255,0.11)" strokeWidth="0.8" />
-      <line x1="18" y1="61" x2="182" y2="61" stroke="rgba(255,255,255,0.11)" strokeWidth="0.8" />
-      {/* Faixa branca do topo */}
-      <rect x="18" y="49" width="164" height="3" fill="rgba(255,255,255,0.50)" rx="0.5" />
+      {/* ── REDE BRANCA REALISTA — fundo transparente, malha de losangos ── */}
+      {/* Fios verticais */}
+      <line x1="18"  y1="49" x2="18"  y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="24"  y1="49" x2="24"  y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="30"  y1="49" x2="30"  y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="36"  y1="49" x2="36"  y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="42"  y1="49" x2="42"  y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="48"  y1="49" x2="48"  y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="54"  y1="49" x2="54"  y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="60"  y1="49" x2="60"  y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="66"  y1="49" x2="66"  y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="72"  y1="49" x2="72"  y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="78"  y1="49" x2="78"  y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="84"  y1="49" x2="84"  y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="90"  y1="49" x2="90"  y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="96"  y1="49" x2="96"  y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="102" y1="49" x2="102" y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="108" y1="49" x2="108" y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="114" y1="49" x2="114" y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="120" y1="49" x2="120" y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="126" y1="49" x2="126" y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="132" y1="49" x2="132" y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="138" y1="49" x2="138" y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="144" y1="49" x2="144" y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="150" y1="49" x2="150" y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="156" y1="49" x2="156" y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="162" y1="49" x2="162" y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="168" y1="49" x2="168" y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      <line x1="174" y1="49" x2="174" y2="67" stroke="rgba(255,255,255,0.90)" strokeWidth="0.9" />
+      <line x1="180" y1="49" x2="180" y2="67" stroke="rgba(255,255,255,0.80)" strokeWidth="0.8" />
+      {/* Fios horizontais — espaçamento de 3px criando células pequenas */}
+      <line x1="18" y1="52" x2="182" y2="52" stroke="rgba(255,255,255,0.85)" strokeWidth="0.8" />
+      <line x1="18" y1="55" x2="182" y2="55" stroke="rgba(255,255,255,0.85)" strokeWidth="0.8" />
+      <line x1="18" y1="58" x2="182" y2="58" stroke="rgba(255,255,255,0.85)" strokeWidth="0.8" />
+      <line x1="18" y1="61" x2="182" y2="61" stroke="rgba(255,255,255,0.85)" strokeWidth="0.8" />
+      <line x1="18" y1="64" x2="182" y2="64" stroke="rgba(255,255,255,0.85)" strokeWidth="0.8" />
+      <line x1="18" y1="67" x2="182" y2="67" stroke="rgba(255,255,255,0.85)" strokeWidth="0.8" />
+      {/* Faixa branca do topo (antena) */}
+      <rect x="18" y="49" width="164" height="3" fill="rgba(255,255,255,0.95)" rx="0.5" />
+      {/* Faixa branca do fundo */}
+      <rect x="18" y="64" width="164" height="3" fill="rgba(255,255,255,0.85)" rx="0.5" />
 
       {/* ── BOLA DE BEACH TENNIS ── */}
       {/* Sombra projetada na areia */}
