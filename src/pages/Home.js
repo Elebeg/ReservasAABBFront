@@ -1,14 +1,118 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Home.css';
 import { useAuth } from '../contexts/AuthContext';
+
+// ── Campeonato preview ────────────────────────────────────────────────────────
+
+const API_URL = 'https://reservasaabb-production.up.railway.app';
+
+const STATUS_LABELS = {
+  DRAFT:          'Em breve',
+  GROUP_STAGE:    'Fase de Grupos',
+  KNOCKOUT_STAGE: 'Mata-Mata',
+  FINISHED:       'Encerrado',
+};
+
+const STATUS_COLOR = {
+  DRAFT:          '#6b7280',
+  GROUP_STAGE:    '#1a56db',
+  KNOCKOUT_STAGE: '#dc2626',
+  FINISHED:       '#059669',
+};
+
+function useTournamentPreview() {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    fetch(`${API_URL}/championship/active/all`)
+      .then(r => r.ok ? r.json() : null)
+      .then(json => { if (json?.tournament) setData(json); })
+      .catch(() => {});
+  }, []);
+  return data;
+}
+
+function TournamentEventCard({ data }) {
+  const { tournament, matches = [] } = data;
+
+  const now = new Date();
+  const upcoming = matches
+    .filter(m => m.scheduledAt && m.status !== 'FINISHED' && new Date(m.scheduledAt) >= now)
+    .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))
+    .slice(0, 2);
+
+  const lastFinished = [...matches]
+    .filter(m => m.status === 'FINISHED')
+    .sort((a, b) => new Date(b.scheduledAt || 0) - new Date(a.scheduledAt || 0))[0];
+
+  const statusColor = STATUS_COLOR[tournament.status] || '#1a56db';
+  const statusLabel = STATUS_LABELS[tournament.status] || tournament.status;
+
+  const fmtDate = iso => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  const fmtTime = iso => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+  return (
+    <div className="event-card event-card--tournament">
+      <div className="event-date event-date--tournament">
+        <span className="tournament-icon">🏆</span>
+        <span className="tournament-status-badge" style={{ background: statusColor }}>
+          {statusLabel}
+        </span>
+      </div>
+
+      <div className="event-info">
+        <h3>{tournament.name}</h3>
+        {tournament.description && (
+          <p className="tournament-desc">{tournament.description}</p>
+        )}
+
+        {lastFinished && (
+          <div className="tournament-last-match">
+            <span className="tournament-mini-label">Último resultado</span>
+            <span className="tournament-match-line">
+              <strong>{lastFinished.homeTeam?.name}</strong>
+              <span className="tournament-score">
+                {lastFinished.homeScore} × {lastFinished.awayScore}
+              </span>
+              <strong>{lastFinished.awayTeam?.name}</strong>
+            </span>
+          </div>
+        )}
+
+        {upcoming.length > 0 && (
+          <div className="tournament-upcoming">
+            <span className="tournament-mini-label">Próximas partidas</span>
+            {upcoming.map(m => (
+              <div key={m.id} className="tournament-match-line">
+                <strong>{m.homeTeam?.name || 'A definir'}</strong>
+                <span className="tournament-vs-badge">
+                  {fmtDate(m.scheduledAt)} · {fmtTime(m.scheduledAt)}
+                </span>
+                <strong>{m.awayTeam?.name || 'A definir'}</strong>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {upcoming.length === 0 && !lastFinished && (
+          <p style={{ margin: '6px 0 10px', color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem' }}>
+            Campeonato em preparação. Fique de olho!
+          </p>
+        )}
+
+        <Link to="/campeonato" className="btn-text">Ver campeonato →</Link>
+      </div>
+    </div>
+  );
+}
+
+// ── Componente principal ──────────────────────────────────────────────────────
 
 function Home() {
   const auth = useAuth();
   const userFromContext = auth?.user || auth?.currentUser || auth?.loggedUser || null;
   const isAuthenticated = !!userFromContext;
 
-  // Pega só o primeiro nome, se existir
   const firstName = userFromContext?.name
     ? userFromContext.name.split(' ')[0]
     : null;
@@ -25,10 +129,10 @@ function Home() {
               <h1>
                 Bem-vindo{firstName ? `, ${firstName}` : ''} 👋
               </h1>
-              <h2>Sistema de Reservas de Quadras - AABB Jandaia do Sul</h2>
+              <h2>AABB Jandaia do Sul</h2>
               <p>
-                Agora você tem acesso ao sistema exclusivo de reservas. Escolha a quadra,
-                o dia e o horário que preferir e organize seus jogos com facilidade.
+                Reserve quadras, acompanhe o campeonato e fique por dentro de tudo que
+                acontece no clube — tudo em um só lugar.
               </p>
               <div className="hero-cta-cards">
                 <Link to="/reservas" className="hero-cta-card">
@@ -63,7 +167,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Activities Section (mantém igual para os dois casos) */}
+      {/* Activities Section */}
       <section className="activities">
         <div className="container">
           <h2 className="section-title">Nossas Atividades</h2>
@@ -119,10 +223,7 @@ function Home() {
               <div className="event-info">
                 <h3>Torneio de Beach Tennis</h3>
                 <p>Torneio aberto para duplas masculinas, femininas e mistas.</p>
-                <Link
-                  to="/eventos/torneio-beach-tennis"
-                  className="btn-text"
-                >
+                <Link to="/eventos/torneio-beach-tennis" className="btn-text">
                   Saiba mais
                 </Link>
               </div>
