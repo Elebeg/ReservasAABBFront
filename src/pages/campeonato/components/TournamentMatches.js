@@ -90,7 +90,7 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
             {g.player?.name ?? '—'}
             {isVet(g.player, tournamentYear) && <VetBadge />}
           </span>;
-      items.push(<div key={`g${g.id}`} className="camp-rm-event"><span className="camp-rm-icon camp-rm-icon--goal" />{label}</div>);
+      items.push(<div key={`g${g.id}`} className="camp-rm-event"><span className="camp-rm-icon camp-rm-icon--goal">⚽</span>{label}</div>);
     });
     cards.filter(c => c.type === 'YELLOW').forEach(c => {
       items.push(

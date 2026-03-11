@@ -229,6 +229,9 @@
 .camp-tabs::-webkit-scrollbar { display: none; }
 
 .camp-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: 10px 14px;
   background: transparent;
   border: 1px solid transparent;
@@ -240,6 +243,18 @@
   white-space: nowrap;
   transition: all 0.15s ease;
   font-family: inherit;
+}
+
+.camp-tab-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.camp-tab-icon svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
 }
 
 .camp-tab:hover {
@@ -1657,10 +1672,13 @@
   flex-shrink: 0;
 }
 
-/* Gol: círculo verde */
+/* Gol: emoji ⚽ */
 .camp-rm-icon--goal {
-  background: #16a34a;
-  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  font-size: 0.85rem;
+  background: none;
 }
 
 /* Cartão amarelo: retângulo arredondado amarelo */
