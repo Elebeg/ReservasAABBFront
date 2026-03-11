@@ -69,9 +69,11 @@ export default function Campeonato() {
         .filter(m => m.status === 'FINISHED')
         .reduce((acc, m) => acc + (m.homeScore ?? 0) + (m.awayScore ?? 0), 0)
     : 0;
-  const numTeams = standings
-    ? standings.reduce((acc, g) => acc + (g.entries?.length ?? 0), 0)
-    : 0;
+  const numTeams = standings && standings.length > 0
+    ? standings.reduce((acc, g) => acc + (g.standings?.length ?? 0), 0)
+    : matches
+      ? new Set(matches.flatMap(m => [m.homeTeam?.id, m.awayTeam?.id]).filter(Boolean)).size
+      : 0;
 
   const tabs = [
     { key: 'matches',   label: '🗓️ Partidas',      show: true },
