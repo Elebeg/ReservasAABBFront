@@ -94,6 +94,7 @@ export default function AdminDashboard() {
             </button>
           ))}
         </nav>
+        <a href="/" style={styles.backSiteBtn}>← Voltar ao site</a>
         <button onClick={logout} style={styles.logoutBtn}>Sair</button>
       </aside>
 
@@ -189,7 +190,8 @@ const styles = {
   nav:           { display: 'flex', flexDirection: 'column', gap: 4, flex: 1 },
   navItem:       { background: 'transparent', border: 'none', color: '#94a3b8', textAlign: 'left', padding: '10px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 14, fontWeight: 500 },
   navItemActive: { background: '#334155', color: '#f8fafc' },
-  logoutBtn:     { marginTop: 'auto', background: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: 8, padding: '10px 12px', cursor: 'pointer', fontSize: 14 },
+  backSiteBtn:   { display: 'block', textAlign: 'center', marginTop: 'auto', marginBottom: 8, background: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: 8, padding: '10px 12px', cursor: 'pointer', fontSize: 13, textDecoration: 'none' },
+  logoutBtn:     { background: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: 8, padding: '10px 12px', cursor: 'pointer', fontSize: 14 },
   main:          { flex: 1, padding: '32px 40px', overflowY: 'auto' },
   heading:       { color: '#f8fafc', fontSize: 22, fontWeight: 700, marginBottom: 24 },
   loading:       { color: '#94a3b8', fontSize: 14 },

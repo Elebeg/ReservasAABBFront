@@ -28,7 +28,7 @@ export default function AdminLogin() {
         return;
       }
 
-      const { access_token } = await loginRes.json();
+      const { access_token, user: userData } = await loginRes.json();
 
       // 2. Valida se o token tem permissão de admin
       const checkRes = await fetch(`${API_URL}/admin/dashboard`, {
@@ -40,7 +40,11 @@ export default function AdminLogin() {
         return;
       }
 
+      // Salva token para o admin e também para o site normal
       localStorage.setItem('admin_token', access_token);
+      localStorage.setItem('token', access_token);
+      if (userData) localStorage.setItem('user', JSON.stringify(userData));
+
       navigate('/admin/dashboard');
     } catch {
       setError('Erro ao conectar com o servidor. Verifique se o backend está rodando.');

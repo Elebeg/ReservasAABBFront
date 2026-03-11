@@ -2521,6 +2521,9 @@ export default function AdminChampionship() {
             <span className="ac-badge-admin">Admin</span>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
+            <a className="ac-btn ac-btn-ghost" href="/" style={{ textDecoration: 'none' }}>
+              🌐 Site
+            </a>
             <button className="ac-btn ac-btn-ghost" onClick={() => navigate('/admin/dashboard')}>
               ← Painel Admin
             </button>
