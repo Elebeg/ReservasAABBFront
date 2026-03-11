@@ -90,12 +90,12 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
             {g.player?.name ?? '—'}
             {isVet(g.player, tournamentYear) && <VetBadge />}
           </span>;
-      items.push(<div key={`g${g.id}`} className="camp-rm-event"><span className="camp-rm-icon">⚽</span>{label}</div>);
+      items.push(<div key={`g${g.id}`} className="camp-rm-event"><span className="camp-rm-icon camp-rm-icon--goal" />{label}</div>);
     });
     cards.filter(c => c.type === 'YELLOW').forEach(c => {
       items.push(
         <div key={`c${c.id}`} className="camp-rm-event">
-          <span className="camp-rm-icon">🟡</span>
+          <span className="camp-rm-icon camp-rm-icon--yellow" />
           <span className="camp-rm-name">
             {c.player?.number ? <span className="camp-rm-num">{c.player.number}.</span> : null}
             {c.player?.name ?? '—'}
@@ -107,7 +107,7 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     cards.filter(c => c.type === 'RED').forEach(c => {
       items.push(
         <div key={`c${c.id}`} className="camp-rm-event">
-          <span className="camp-rm-icon">🔴</span>
+          <span className="camp-rm-icon camp-rm-icon--red" />
           <span className="camp-rm-name">
             {c.player?.number ? <span className="camp-rm-num">{c.player.number}.</span> : null}
             {c.player?.name ?? '—'}
@@ -276,7 +276,7 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
           {!loading && detail?.sumulaUrl && (
             <div className="camp-rm-sumula">
               <button className="camp-rm-sumula-btn" type="button" onClick={() => setSumulaOpen(true)}>
-                📎 Ver Súmula Digitalizada
+                Ver Súmula Digitalizada
               </button>
             </div>
           )}
@@ -304,7 +304,7 @@ function MatchCard({ match, tournamentYear, onTeamClick }) {
   return (
     <>
       <div className={`camp-match-card ${finished ? 'finished' : ''}`}>
-        {time && <div className="camp-match-time">🕐 {time}</div>}
+        {time && <div className="camp-match-time">{time}</div>}
 
         <div className="camp-match-teams">
           <div className={`camp-match-team home ${finished && match.homeScore > match.awayScore ? 'won' : ''}`}>
@@ -360,7 +360,7 @@ function MatchCard({ match, tournamentYear, onTeamClick }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             {finished ? (
               <button className="camp-detail-chip" onClick={() => setReportOpen(true)}>
-                📊 Ver detalhes
+                Ver detalhes
                 {match.hasSumula && <span className="camp-sumula-dot" title="Súmula disponível" />}
               </button>
             ) : (
@@ -385,7 +385,7 @@ export default function TournamentMatches({ matches, tournamentYear = new Date()
   if (!matches || matches.length === 0) {
     return (
       <div className="camp-empty">
-        <span className="camp-empty-icon">🗓️</span>
+        <span className="camp-empty-icon">—</span>
         <p>Nenhuma partida disponível ainda.</p>
       </div>
     );
@@ -439,7 +439,7 @@ export default function TournamentMatches({ matches, tournamentYear = new Date()
       {filteredDays.map(day => (
         <div className="camp-phase-section" key={day}>
           <h3 className="camp-phase-title camp-phase-title--date">
-            📅 {formatDateHeader(day)}
+            {formatDateHeader(day)}
             <span className="camp-day-count">{byDay[day].length} partida{byDay[day].length > 1 ? 's' : ''}</span>
           </h3>
           <div className="camp-matches-grid">
