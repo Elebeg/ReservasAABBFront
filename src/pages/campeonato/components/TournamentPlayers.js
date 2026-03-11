@@ -88,8 +88,8 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
                 <th className="camp-th team" style={{ minWidth: 160 }}>Time</th>
                 <th className="camp-th center">Pos.</th>
                 <th className="camp-th center pts">Gols</th>
-                <th className="camp-th center" title="Cartões Amarelos">🟡</th>
-                <th className="camp-th center" title="Cartões Vermelhos">🔴</th>
+                <th className="camp-th center" title="Cartões Amarelos"><svg viewBox="0 0 10 14" width="10" height="14"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#eab308"/></svg></th>
+                <th className="camp-th center" title="Cartões Vermelhos"><svg viewBox="0 0 10 14" width="10" height="14"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#dc2626"/></svg></th>
               </tr>
             </thead>
             <tbody>
@@ -157,15 +157,15 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
       {/* ── Ranking Disciplinar ── */}
       {disciplinary.length > 0 && (
         <div className="camp-group-section" style={{ marginTop: 32 }}>
-          <h3 className="camp-group-title">🟡 Ranking Disciplinar</h3>
+          <h3 className="camp-group-title">Ranking Disciplinar</h3>
           <div className="camp-table-wrap">
             <table className="camp-table">
               <thead>
                 <tr>
                   <th className="camp-th">Jogador</th>
                   <th className="camp-th team" style={{ minWidth: 160 }}>Time</th>
-                  <th className="camp-th center">🟡 Amarelos</th>
-                  <th className="camp-th center">🔴 Vermelhos</th>
+                  <th className="camp-th center"><svg viewBox="0 0 10 14" width="10" height="14" style={{marginRight:4,verticalAlign:'middle'}}><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#eab308"/></svg>Amarelos</th>
+                  <th className="camp-th center"><svg viewBox="0 0 10 14" width="10" height="14" style={{marginRight:4,verticalAlign:'middle'}}><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#dc2626"/></svg>Vermelhos</th>
                 </tr>
               </thead>
               <tbody>

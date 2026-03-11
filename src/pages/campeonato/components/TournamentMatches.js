@@ -95,7 +95,7 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     cards.filter(c => c.type === 'YELLOW').forEach(c => {
       items.push(
         <div key={`c${c.id}`} className="camp-rm-event">
-          <span className="camp-rm-icon camp-rm-icon--yellow" />
+          <svg viewBox="0 0 10 14" width="11" height="15" style={{flexShrink:0}}><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#eab308"/></svg>
           <span className="camp-rm-name">
             {c.player?.number ? <span className="camp-rm-num">{c.player.number}.</span> : null}
             {c.player?.name ?? '—'}
@@ -107,7 +107,7 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     cards.filter(c => c.type === 'RED').forEach(c => {
       items.push(
         <div key={`c${c.id}`} className="camp-rm-event">
-          <span className="camp-rm-icon camp-rm-icon--red" />
+          <svg viewBox="0 0 10 14" width="11" height="15" style={{flexShrink:0}}><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#dc2626"/></svg>
           <span className="camp-rm-name">
             {c.player?.number ? <span className="camp-rm-num">{c.player.number}.</span> : null}
             {c.player?.name ?? '—'}

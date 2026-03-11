@@ -114,7 +114,7 @@ export default function TeamProfile({ team, players, standings, matches, tournam
           {/* Desempenho */}
           {standing && (
             <section>
-              <h3 style={sectionTitle}>📊 Desempenho</h3>
+              <h3 style={sectionTitle}>Desempenho</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
                 <StatBox label="Pts"  value={standing.points}   primary />
                 <StatBox label="J"    value={standing.played} />
@@ -124,8 +124,8 @@ export default function TeamProfile({ team, players, standings, matches, tournam
                 <StatBox label="GP"   value={standing.goalsFor} />
                 <StatBox label="GC"   value={standing.goalsAgainst} />
                 <StatBox label="SG"   value={standing.goalDiff > 0 ? `+${standing.goalDiff}` : standing.goalDiff} />
-                <StatBox label="🟡"  value={standing.yellowCards ?? 0} />
-                <StatBox label="🔴"  value={standing.redCards ?? 0} />
+                <StatBox label={<svg viewBox="0 0 10 14" width="9" height="13"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#eab308"/></svg>} value={standing.yellowCards ?? 0} />
+                <StatBox label={<svg viewBox="0 0 10 14" width="9" height="13"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#dc2626"/></svg>} value={standing.redCards ?? 0} />
               </div>
             </section>
           )}
@@ -133,16 +133,16 @@ export default function TeamProfile({ team, players, standings, matches, tournam
           {/* Elenco */}
           {teamPlayers.length > 0 && (
             <section>
-              <h3 style={sectionTitle}>👤 Elenco ({teamPlayers.length})</h3>
+              <h3 style={sectionTitle}>Elenco ({teamPlayers.length})</h3>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem' }}>
                   <thead>
                     <tr style={{ background: '#f8f9fa' }}>
                       <th style={th()}>Nome</th>
                       <th style={th('center')}>Pos.</th>
-                      <th style={th('center')}>⚽</th>
-                      <th style={th('center')}>🟡</th>
-                      <th style={th('center')}>🔴</th>
+                      <th style={th('center')} title="Gols">G</th>
+                      <th style={th('center')} title="Cartões Amarelos"><svg viewBox="0 0 10 14" width="9" height="13"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#eab308"/></svg></th>
+                      <th style={th('center')} title="Cartões Vermelhos"><svg viewBox="0 0 10 14" width="9" height="13"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#dc2626"/></svg></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -184,7 +184,7 @@ export default function TeamProfile({ team, players, standings, matches, tournam
           {/* Partidas */}
           {teamMatches.length > 0 && (
             <section>
-              <h3 style={sectionTitle}>🗓️ Partidas</h3>
+              <h3 style={sectionTitle}>Partidas</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {teamMatches.map(m => {
                   const result  = matchResult(m);

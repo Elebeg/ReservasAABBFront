@@ -29,8 +29,8 @@ export default function TournamentStandings({ standings, teamsAdvancing, onTeamC
                   <th className="camp-th center" title="Gols Contra">GC</th>
                   <th className="camp-th center" title="Saldo">SG</th>
                   <th className="camp-th center pts" title="Pontos">Pts</th>
-                  <th className="camp-th center" title="Cartões Amarelos">🟡</th>
-                  <th className="camp-th center" title="Cartões Vermelhos">🔴</th>
+                  <th className="camp-th center" title="Cartões Amarelos"><svg viewBox="0 0 10 14" width="10" height="14"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#eab308"/></svg></th>
+                  <th className="camp-th center" title="Cartões Vermelhos"><svg viewBox="0 0 10 14" width="10" height="14"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#dc2626"/></svg></th>
                 </tr>
               </thead>
               <tbody>
