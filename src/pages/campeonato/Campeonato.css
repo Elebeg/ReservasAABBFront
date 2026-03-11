@@ -278,6 +278,131 @@
   to { opacity: 1; transform: none; }
 }
 
+/* ─── TEAMS GRID ─────────────────────────────────────────────────────────────── */
+.camp-teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.camp-team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: var(--camp-white);
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 14px;
+  padding: 20px 16px 16px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  box-shadow: var(--camp-shadow-sm);
+  font-family: inherit;
+  width: 100%;
+}
+
+.camp-team-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  border-color: rgba(8, 92, 166, 0.2);
+}
+
+.camp-team-card-logo {
+  position: relative;
+  display: inline-flex;
+}
+
+.camp-team-card-pos {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: var(--camp-primary);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+
+.camp-team-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.camp-team-card-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--camp-gray-900);
+  line-height: 1.2;
+}
+
+.camp-team-card-group {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--camp-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+
+.camp-team-card-stats {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 10px 0;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  width: 100%;
+}
+
+.camp-team-card-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.camp-team-card-stat-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--camp-gray-900);
+  line-height: 1;
+}
+
+.camp-team-card-stat-pts {
+  color: var(--camp-primary);
+}
+
+.camp-team-card-stat-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--camp-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.camp-team-card-cta {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--camp-primary);
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.camp-team-card:hover .camp-team-card-cta {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .camp-teams-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+}
+
 /* ─── EMPTY / LOADING ───────────────────────────────────────────────────────── */
 .camp-empty {
   text-align: center;

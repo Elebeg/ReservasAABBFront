@@ -4,6 +4,7 @@ import TournamentStandings from './components/TournamentStandings';
 import TournamentBracket   from './components/TournamentBracket';
 import TournamentMatches   from './components/TournamentMatches';
 import TournamentPlayers   from './components/TournamentPlayers';
+import TournamentTeams     from './components/TournamentTeams';
 import TeamProfile         from './components/TeamProfile';
 import './Campeonato.css';
 
@@ -88,7 +89,14 @@ export default function Campeonato() {
       key: 'bracket', show: true, label: 'Bracket',
       icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="18" y2="12"/><rect x="10" y="9" width="4" height="6" rx="1"/></svg>,
     },
-    { key: 'players',   label: '⚽ Artilharia',    show: hasPlayers },
+    {
+      key: 'teams', show: true, label: 'Times',
+      icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg>,
+    },
+    {
+      key: 'players', show: hasPlayers, label: 'Artilharia',
+      icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>,
+    },
   ].filter((t) => t.show);
 
   if (loading) {
@@ -221,6 +229,15 @@ export default function Campeonato() {
           )}
           {tab === 'bracket' && (
             <TournamentBracket bracket={bracket} tournament={tournament} standings={standings} />
+          )}
+          {tab === 'teams' && (
+            <TournamentTeams
+              matches={matches}
+              standings={standings}
+              players={players}
+              tournamentYear={tournamentYear}
+              tournament={tournament}
+            />
           )}
           {tab === 'players' && (
             <TournamentPlayers players={players} tournamentYear={tournamentYear} onTeamClick={setSelectedTeam} />
