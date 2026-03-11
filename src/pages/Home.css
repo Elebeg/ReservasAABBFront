@@ -545,12 +545,20 @@
   font-size: 0.82rem;
   color: rgba(255,255,255,0.92);
   margin-bottom: 3px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .tournament-match-line strong {
+  flex: 1;
   font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.tournament-match-line strong:last-child {
+  text-align: right;
 }
 
 .tournament-score {
@@ -579,12 +587,13 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  min-height: 120px;
-  background-color: rgba(255, 255, 255, 0.1);
+  min-height: 140px;
+  background-color: var(--primary-blue) !important;
+  border-left: 4px solid var(--primary-yellow);
   color: var(--white);
   font-size: 0.9rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  max-width: 320px;
+  max-width: 460px;
   margin: 0 auto;
 }
 
