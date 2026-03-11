@@ -42,6 +42,13 @@ function EmptyState() {
   );
 }
 
+const STATUS_COLORS = {
+  DRAFT:          { bg: 'rgba(107,114,128,0.25)', border: 'rgba(107,114,128,0.5)', text: '#d1d5db' },
+  GROUP_STAGE:    { bg: 'rgba(59,130,246,0.25)',  border: 'rgba(59,130,246,0.5)',  text: '#93c5fd' },
+  KNOCKOUT_STAGE: { bg: 'rgba(239,68,68,0.25)',   border: 'rgba(239,68,68,0.5)',   text: '#fca5a5' },
+  FINISHED:       { bg: 'rgba(16,185,129,0.25)',  border: 'rgba(16,185,129,0.5)',  text: '#6ee7b7' },
+};
+
 export default function Campeonato() {
   const { tournament, standings, bracket, matches, players, loading, error } = useChampionship();
   const [tab, setTab] = useState('matches');
@@ -53,6 +60,18 @@ export default function Campeonato() {
 
   const showStandings = tournament && ['GROUPS', 'LEAGUE'].includes(tournament.format);
   const hasPlayers    = players && players.length > 0;
+
+  // Stats do hero
+  const matchesPlayed = matches ? matches.filter(m => m.status === 'FINISHED').length : 0;
+  const totalMatches  = matches ? matches.length : 0;
+  const totalGoals    = matches
+    ? matches
+        .filter(m => m.status === 'FINISHED')
+        .reduce((acc, m) => acc + (m.homeScore ?? 0) + (m.awayScore ?? 0), 0)
+    : 0;
+  const numTeams = standings
+    ? standings.reduce((acc, g) => acc + (g.entries?.length ?? 0), 0)
+    : 0;
 
   const tabs = [
     { key: 'matches',   label: '🗓️ Partidas',      show: true },
@@ -109,23 +128,56 @@ export default function Campeonato() {
         <div className="camp-container">
           <div className="camp-hero-content">
             <div className="camp-hero-text">
-              <span className="camp-hero-badge">
+              <span
+                className="camp-hero-badge"
+                style={{
+                  background: STATUS_COLORS[tournament.status]?.bg,
+                  borderColor: STATUS_COLORS[tournament.status]?.border,
+                  color: STATUS_COLORS[tournament.status]?.text,
+                }}
+              >
+                <span className="camp-hero-badge-dot" style={{ background: STATUS_COLORS[tournament.status]?.text }} />
                 {STATUS_LABELS[tournament.status] || tournament.status}
               </span>
+
               <h1 className="camp-hero-title">{tournament.name}</h1>
+
               {tournament.description && (
                 <p className="camp-hero-desc">{tournament.description}</p>
               )}
-              <div className="camp-hero-meta">
-                <span>📋 {FORMAT_LABELS[tournament.format] || tournament.format}</span>
+
+              <div className="camp-hero-chips">
+                <span className="camp-hero-chip">
+                  📋 {FORMAT_LABELS[tournament.format] || tournament.format}
+                </span>
                 {tournament.startDate && (
-                  <span>
+                  <span className="camp-hero-chip">
                     📅 {new Date(tournament.startDate).toLocaleDateString('pt-BR', {
-                      day: '2-digit', month: 'long', year: 'numeric',
+                      day: '2-digit', month: 'short', year: 'numeric',
                     })}
                   </span>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Stats row */}
+          <div className="camp-hero-stats">
+            <div className="camp-hero-stat">
+              <span className="camp-hero-stat-value">{numTeams || '—'}</span>
+              <span className="camp-hero-stat-label">Equipes</span>
+            </div>
+            <div className="camp-hero-stat-divider" />
+            <div className="camp-hero-stat">
+              <span className="camp-hero-stat-value">
+                {matchesPlayed}<span className="camp-hero-stat-total">/{totalMatches}</span>
+              </span>
+              <span className="camp-hero-stat-label">Partidas jogadas</span>
+            </div>
+            <div className="camp-hero-stat-divider" />
+            <div className="camp-hero-stat">
+              <span className="camp-hero-stat-value">{totalGoals}</span>
+              <span className="camp-hero-stat-label">Gols marcados</span>
             </div>
           </div>
         </div>
