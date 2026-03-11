@@ -43,14 +43,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
 
-  // Inicializa sessão a partir do localStorage — SEM chamadas de rede
+    // Inicializa sessão — verifica localStorage e sessionStorage
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
     if (!token || !isTokenValid(token)) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('admin_token');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       setUser(null);
       setLoading(false);
       return;
@@ -58,7 +60,7 @@ export const AuthProvider = ({ children }) => {
 
     // Token válido: restaura usuário salvo
     try {
-      const stored = localStorage.getItem('user');
+      const stored = localStorage.getItem('user') || sessionStorage.getItem('user');
       if (stored) setUser(JSON.parse(stored));
     } catch {
       setUser(null);
@@ -68,15 +70,16 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, rememberMe = true) => {
     setLoading(true);
     setError(null);
     try {
       const response = await api.post('/auth/login', { email, password });
       const { access_token, user: userData } = response.data;
 
-      localStorage.setItem('token', access_token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem('token', access_token);
+      storage.setItem('user', JSON.stringify(userData));
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       setUser(userData);
 
@@ -96,7 +99,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const googleLogin = async (credential) => {
+  const googleLogin = async (credential, rememberMe = true) => {
     setLoading(true);
     setError(null);
     try {
@@ -105,8 +108,9 @@ export const AuthProvider = ({ children }) => {
 
       if (!access_token) throw new Error('Token não recebido do servidor');
 
-      localStorage.setItem('token', access_token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem('token', access_token);
+      storage.setItem('user', JSON.stringify(userData));
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       setUser(userData);
 
@@ -144,17 +148,19 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('admin_token');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
   };
 
   const isAuthenticated = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     return token ? isTokenValid(token) : false;
   };
 
   const getUserId = () => user?.id ?? null;
-  const getToken  = () => localStorage.getItem('token');
+  const getToken  = () => localStorage.getItem('token') || sessionStorage.getItem('token');
   const hasRole   = (role) => user?.roles?.includes(role) ?? false;
 
   return (

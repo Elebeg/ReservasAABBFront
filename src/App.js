@@ -14,6 +14,7 @@ import Register from './pages/auth/Register';
 import Reservas from './pages/reservas/Reservas';
 import Campeonato from './pages/campeonato/Campeonato';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { PrivateRoute } from './components/PrivateRoute';
 
 // Admin
 import AdminLogin from './admin/AdminLogin';
@@ -40,13 +41,13 @@ function App() {
                     <Route path="/"          element={<Home />} />
                     <Route path="/login"     element={<Login />} />
                     <Route path="/register"  element={<Register />} />
-                    <Route path="/reservas"  element={<Reservas />} />
-                    <Route path="/sobre"     element={<Sobre />} />
-                    <Route path="/estrutura" element={<Estrutura />} />
-                    <Route path="/esportes"  element={<Esportes />} />
-                    <Route path="/eventos"   element={<Eventos />} />
-                    
-                    <Route path="/campeonato" element={<Campeonato />} />
+                    <Route path="/reservas"   element={<PrivateRoute><Reservas /></PrivateRoute>} />
+                    <Route path="/sobre"      element={<Sobre />} />
+                    <Route path="/estrutura"  element={<Estrutura />} />
+                    <Route path="/esportes"   element={<Esportes />} />
+                    <Route path="/eventos"    element={<Eventos />} />
+
+                    <Route path="/campeonato" element={<PrivateRoute><Campeonato /></PrivateRoute>} />
                   </Routes>
                 </main>
                 <Footer />

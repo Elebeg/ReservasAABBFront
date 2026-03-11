@@ -9,6 +9,7 @@ function Login() {
     email: '',
     password: ''
   });
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const [toast, setToast] = useState({
@@ -53,7 +54,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const success = await login(formData.email, formData.password);
+      const success = await login(formData.email, formData.password, rememberMe);
       if (success) {
         showToast('success', 'Login realizado com sucesso! Redirecionando para o painel...');
         setTimeout(() => {
@@ -76,7 +77,7 @@ function Login() {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       setLoading(true);
-      const success = await googleLogin(credentialResponse.credential);
+      const success = await googleLogin(credentialResponse.credential, rememberMe);
       if (success) {
         showToast('success', 'Login com Google realizado! Redirecionando...');
         setTimeout(() => {
@@ -171,6 +172,15 @@ function Login() {
                 autoComplete="current-password"
               />
             </div>
+
+            <label className="remember-me">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+              />
+              <span>Lembrar de mim</span>
+            </label>
 
             <button
               type="submit"

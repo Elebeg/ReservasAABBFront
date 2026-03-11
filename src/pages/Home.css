@@ -427,6 +427,18 @@
   .events-slider {
     grid-template-columns: 1fr;
   }
+
+  .event-card--tournament,
+  .event-card--loading,
+  .event-card--empty {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .event-card--tournament {
+    align-items: flex-start;
+    text-align: left;
+  }
   
   .testimonials-grid {
     grid-template-columns: 1fr;
@@ -568,10 +580,10 @@
   justify-content: center;
   gap: 12px;
   min-height: 120px;
-  background-color: rgba(255,255,255,0.10);
-  color: rgba(255,255,255,0.75);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--white);
   font-size: 0.9rem;
-  border: 2px dashed rgba(255,255,255,0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   max-width: 320px;
   margin: 0 auto;
 }

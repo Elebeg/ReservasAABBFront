@@ -243,7 +243,7 @@ function Home() {
             {tournamentLoading && (
               <div className="event-card event-card--loading">
                 <div className="tournament-loading-spinner" />
-                <p>Carregando campeonato...</p>
+                <span>Carregando...</span>
               </div>
             )}
             {!tournamentLoading && tournamentData && <TournamentEventCard data={tournamentData} />}
