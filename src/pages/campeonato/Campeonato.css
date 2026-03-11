@@ -70,7 +70,7 @@
 .camp-hero-text {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0;
 }
 
 .camp-hero-badge {
@@ -85,6 +85,7 @@
   border-radius: 999px;
   border: 1px solid;
   width: fit-content;
+  margin-bottom: 16px;
 }
 
 .camp-hero-badge-dot {
@@ -101,19 +102,39 @@
 }
 
 .camp-hero-title {
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
   font-weight: 800;
-  margin: 0;
-  line-height: 1.12;
+  margin: 0 0 10px;
+  line-height: 1.1;
   color: var(--camp-white);
+  letter-spacing: -0.02em;
+}
+
+/* Linha de metadado: formato · data de início */
+.camp-hero-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+}
+
+.camp-hero-meta-dot {
+  color: rgba(255,255,255,0.3);
+  font-size: 1rem;
 }
 
 .camp-hero-desc {
-  font-size: 1.05rem;
-  color: rgba(255,255,255,0.9);
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.65);
   margin: 0;
-  max-width: 620px;
-  line-height: 1.65;
+  max-width: 560px;
+  line-height: 1.6;
+  font-weight: 400;
 }
 
 .camp-hero-meta {
@@ -131,27 +152,6 @@
   gap: 6px;
 }
 
-/* Chips de formato/data */
-.camp-hero-chips {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-
-.camp-hero-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.9);
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 5px 12px;
-  border-radius: 999px;
-  backdrop-filter: blur(4px);
-}
 
 /* Stats row no hero */
 .camp-hero-stats {

@@ -144,22 +144,21 @@ export default function Campeonato() {
 
               <h1 className="camp-hero-title">{tournament.name}</h1>
 
+              <div className="camp-hero-meta-row">
+                <span>{FORMAT_LABELS[tournament.format] || tournament.format}</span>
+                {tournament.startDate && (
+                  <>
+                    <span className="camp-hero-meta-dot">·</span>
+                    <span>Início em {new Date(tournament.startDate).toLocaleDateString('pt-BR', {
+                      day: '2-digit', month: 'long', year: 'numeric',
+                    })}</span>
+                  </>
+                )}
+              </div>
+
               {tournament.description && (
                 <p className="camp-hero-desc">{tournament.description}</p>
               )}
-
-              <div className="camp-hero-chips">
-                <span className="camp-hero-chip">
-                  📋 {FORMAT_LABELS[tournament.format] || tournament.format}
-                </span>
-                {tournament.startDate && (
-                  <span className="camp-hero-chip">
-                    📅 {new Date(tournament.startDate).toLocaleDateString('pt-BR', {
-                      day: '2-digit', month: 'short', year: 'numeric',
-                    })}
-                  </span>
-                )}
-              </div>
             </div>
           </div>
 
