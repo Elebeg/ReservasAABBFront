@@ -614,7 +614,7 @@ function SumulaModal({ match, tournament, onClose }) {
         const numCell = p.number != null ? p.number : numBox;
         const vetBadge  = isVeteran(p, year) ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">V</span>' : '';
         const suspBadge = p.suspended      ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1.5px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">SUSP</span>' : '';
-        const pendBadge = !p.suspended && p.yellowCardAccum === 1 ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">PEN</span>' : '';
+        const pendBadge = !p.suspended && p.yellowCardAccum === 2 ? ' <span style="font-size:9px;font-weight:700;color:#000;border:1px solid #000;border-radius:2px;padding:0 3px;vertical-align:middle">PEN</span>' : '';
         const noDobMark = !p.birthDate ? '<sup style="font-size:9px;color:#000;font-weight:700">*</sup>' : '';
         const nameCell  = p.suspended
           ? `<del>${p.name}</del>${noDobMark}${vetBadge}${suspBadge}`
@@ -2216,7 +2216,7 @@ function PlayersTab({ tournament }) {
                       </thead>
                       <tbody>
                         {teamPlayers.map(p => (
-                          <tr key={p.id} style={p.suspended ? { background: '#fef2f2' } : p.yellowCardAccum === 1 ? { background: '#fffbeb' } : {}}>
+                          <tr key={p.id} style={p.suspended ? { background: '#fef2f2' } : p.yellowCardAccum === 2 ? { background: '#fffbeb' } : {}}>
                             <td className="center">
                               <input
                                 type="number" min={1} max={99}
@@ -2234,7 +2234,7 @@ function PlayersTab({ tournament }) {
                               {p.suspended && (
                                 <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#dc2626', borderRadius: 3, padding: '1px 5px' }}>SUSPENSO</span>
                               )}
-                              {!p.suspended && p.yellowCardAccum === 1 && (
+                              {!p.suspended && p.yellowCardAccum === 2 && (
                                 <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#92400e', background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 3, padding: '1px 5px' }}>⚠️ PENDURADO</span>
                               )}
                             </td>

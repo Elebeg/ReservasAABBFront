@@ -155,7 +155,7 @@ export default function TeamProfile({ team, players, standings, matches, tournam
                           <span style={{ fontWeight: 600, textDecoration: p.suspended ? 'line-through' : 'none', color: p.suspended ? '#aaa' : undefined }}>{p.name}</span>
                           {isVet(p, tournamentYear) && <VetBadge />}
                           {p.suspended && <SuspBadge />}
-                          {!p.suspended && p.yellowCardAccum === 1 && <PendBadge />}
+                          {!p.suspended && p.yellowCardAccum === 2 && <PendBadge />}
                         </td>
                         <td style={td('center')}>
                           {p.position ? (

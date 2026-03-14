@@ -107,7 +107,7 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
                       {p.name}
                       {isVet(p, tournamentYear) && <VetBadge />}
                       {p.suspended && <SuspBadge />}
-                      {!p.suspended && p.yellowCardAccum === 1 && <PendBadge />}
+                      {!p.suspended && p.yellowCardAccum === 2 && <PendBadge />}
                     </td>
                     <td className="camp-td">
                       <span
@@ -175,7 +175,7 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
                       {p.name}
                       {isVet(p, tournamentYear) && <VetBadge />}
                       {p.suspended && <SuspBadge />}
-                      {!p.suspended && p.yellowCardAccum === 1 && <PendBadge />}
+                      {!p.suspended && p.yellowCardAccum === 2 && <PendBadge />}
                     </td>
                     <td className="camp-td">
                       <span className="ts-team-cell">
