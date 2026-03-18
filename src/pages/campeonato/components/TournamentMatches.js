@@ -44,6 +44,43 @@ function toDateKey(iso) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
+// ─── Chip de local ─────────────────────────────────────────────────────────────
+function VenueChip({ venue, style = {} }) {
+  if (!venue) return null;
+  const label = [venue.name, venue.city].filter(Boolean).join(' · ');
+  const inner = (
+    <span className="camp-venue-chip" style={style}>
+      {/* ícone pin */}
+      <svg viewBox="0 0 14 18" width="10" height="13" style={{ flexShrink: 0 }}>
+        <path d="M7 0C4.24 0 2 2.24 2 5c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5z"
+              fill="currentColor" opacity="0.85" />
+        <circle cx="7" cy="5" r="2" fill="#fff" />
+      </svg>
+      <span className="camp-venue-chip-label">{label}</span>
+    </span>
+  );
+
+  if (venue.mapUrl) {
+    return (
+      <a
+        href={venue.mapUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="camp-venue-chip-link"
+        title="Ver no mapa"
+      >
+        {inner}
+        {/* ícone externo */}
+        <svg viewBox="0 0 12 12" width="9" height="9" style={{ flexShrink: 0, opacity: 0.55, marginLeft: 2 }}>
+          <path d="M10 1H7V2.5H8.79L5.15 6.15L6.21 7.21L9.5 3.71V5.5H11V2C11 1.45 10.55 1 10 1Z" fill="currentColor"/>
+          <path d="M9.5 9.5H2.5V2.5H6V1H2.5C1.67 1 1 1.67 1 2.5V9.5C1 10.33 1.67 11 2.5 11H9.5C10.33 11 11 10.33 11 9.5V6H9.5V9.5Z" fill="currentColor"/>
+        </svg>
+      </a>
+    );
+  }
+  return inner;
+}
+
 // ─── Modal de relatório de jogo ───────────────────────────────────────────────
 
 function MatchReportModal({ match, tournamentYear, onClose }) {
@@ -120,7 +157,6 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     return <div className={`camp-rm-list ${align}`}>{items}</div>;
   }
 
-  // ── Container fixo que cobre toda a tela ──
   const wrapStyle = {
     position: 'fixed', inset: 0, zIndex: 900,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -128,14 +164,12 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     boxSizing: 'border-box',
     overflowX: 'hidden',
   };
-  // ── Backdrop: irmão do modal, não pai ──
   const backdropStyle = {
     position: 'absolute', inset: 0,
     background: 'rgba(0,0,0,0.55)',
     backdropFilter: 'blur(3px)',
     WebkitBackdropFilter: 'blur(3px)',
   };
-  // ── Dialog: nunca ultrapassa a viewport, mesmo em 320px ──
   const dialogStyle = {
     position: 'relative', zIndex: 1,
     background: '#fff', borderRadius: 14,
@@ -193,13 +227,11 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
     <>
     {sumulaOverlay}
     <div style={wrapStyle} role="dialog" aria-modal="true">
-      {/* Backdrop — clique fecha, completamente separado do modal */}
       <div style={backdropStyle} onClick={onClose} />
 
-      {/* Modal */}
       <div style={dialogStyle}>
 
-        {/* ── Barra do topo: só o botão fechar, no fluxo normal ── */}
+        {/* ── Barra do topo: botão fechar ── */}
         <div style={{
           background: 'linear-gradient(135deg, var(--camp-primary,#003882) 60%, #0e4f8a 130%)',
           display: 'flex', justifyContent: 'flex-end',
@@ -231,6 +263,13 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
               <span className="camp-rm-meta-sep">{formatDateTime(match.scheduledAt)}</span>
             )}
           </div>
+
+          {/* ── Local no modal ── */}
+          {match.venue && (
+            <div className="camp-rm-venue">
+              <VenueChip venue={match.venue} />
+            </div>
+          )}
 
           <div className="camp-rm-scoreboard">
             <div className={`camp-rm-team ${homeWon ? 'won' : ''}`}>
@@ -354,6 +393,13 @@ function MatchCard({ match, tournamentYear, onTeamClick }) {
             }
           </div>
         </div>
+
+        {/* ── Local no card ── */}
+        {match.venue && (
+          <div className="camp-match-venue">
+            <VenueChip venue={match.venue} />
+          </div>
+        )}
 
         <div className="camp-match-footer">
           <span className="camp-match-phase-label">{PHASE_LABELS[match.phase] || match.phase}</span>

@@ -1927,3 +1927,102 @@
   vertical-align: middle;
   opacity: 0.7;
 }
+
+/* ─── VENUE CHIP (local da partida) ────────────────────────────────────────── */
+
+/* Área entre o placar e o footer no card de partida */
+.camp-match-venue {
+  padding: 0 12px 8px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Chip compartilhado: card + modal */
+.camp-venue-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--camp-gray-700);
+  background: var(--camp-gray-200);
+  border: 1px solid var(--camp-gray-300);
+  border-radius: 20px;
+  padding: 3px 10px 3px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  transition: background 0.15s, color 0.15s;
+}
+
+/* Wrapper-link (quando tem mapUrl) */
+.camp-venue-chip-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 20px;
+}
+.camp-venue-chip-link:hover .camp-venue-chip {
+  background: rgba(26, 86, 219, 0.1);
+  color: var(--camp-primary);
+  border-color: rgba(26, 86, 219, 0.3);
+}
+
+/* Texto do label dentro do chip */
+.camp-venue-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Local no modal de relatório */
+.camp-rm-venue {
+  display: flex;
+  justify-content: center;
+  padding: 4px 16px 10px;
+}
+.camp-rm-venue .camp-venue-chip {
+  font-size: 0.75rem;
+  padding: 4px 12px 4px 9px;
+}
+
+/* ─── VENUE NO BRACKET (wb-venue) ──────────────────────────────────────────── */
+
+/* Agrupa data + local no topo do card do bracket */
+.wb-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 4px;
+}
+
+/* Tag de local — tom mais discreto para caber no card compacto */
+.wb-venue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #6c757d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Link no bracket */
+.wb-venue-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  gap: 3px;
+}
+.wb-venue-link:hover .wb-venue {
+  color: var(--camp-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

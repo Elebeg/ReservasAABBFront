@@ -1335,7 +1335,7 @@ function GroupsTab({ tournament, onRefresh }) {
 
 // ─── AGENDAMENTO DE PARTIDA ───────────────────────────────────────────────────
 
-function ScheduleModal({ match, onClose, onSaved }) {
+function ScheduleModal({ match, tournamentId, onClose, onSaved }) {
   // Converte timestamp ISO para formato datetime-local (YYYY-MM-DDTHH:mm)
   const toLocal = (iso) => {
     if (!iso) return '';
@@ -1344,9 +1344,19 @@ function ScheduleModal({ match, onClose, onSaved }) {
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   };
 
-  const [value, setValue] = useState(toLocal(match.scheduledAt));
+  const [value, setValue]     = useState(toLocal(match.scheduledAt));
+  const [venueId, setVenueId] = useState(match.venueId ?? '');
+  const [venues, setVenues]   = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError]   = useState('');
+  const [error, setError]     = useState('');
+
+  // Carrega locais do torneio para o seletor
+  useEffect(() => {
+    if (!tournamentId) return;
+    apiFetch(`/admin/championship/tournaments/${tournamentId}/venues`)
+      .then(d => setVenues(d || []))
+      .catch(() => {});
+  }, [tournamentId]);
 
   async function submit(e) {
     e.preventDefault();
@@ -1354,8 +1364,11 @@ function ScheduleModal({ match, onClose, onSaved }) {
     try {
       await apiFetch(`/admin/championship/matches/${match.id}/schedule`, {
         method: 'PATCH',
-        // Appenda -03:00 (BRT) para o backend receber a hora correta em UTC
-        body: JSON.stringify({ scheduledAt: value ? value + ':00-03:00' : null }),
+        body: JSON.stringify({
+          // Appenda -03:00 (BRT) para o backend receber a hora correta em UTC
+          scheduledAt: value ? value + ':00-03:00' : null,
+          venueId: venueId ? Number(venueId) : null,
+        }),
       });
       onSaved();
     } catch (err) {
@@ -1370,7 +1383,7 @@ function ScheduleModal({ match, onClose, onSaved }) {
     try {
       await apiFetch(`/admin/championship/matches/${match.id}/schedule`, {
         method: 'PATCH',
-        body: JSON.stringify({ scheduledAt: null }),
+        body: JSON.stringify({ scheduledAt: null, venueId: null }),
       });
       onSaved();
     } catch (err) {
@@ -1392,17 +1405,36 @@ function ScheduleModal({ match, onClose, onSaved }) {
           {homeLabel} <span style={{ color: 'var(--ac-gray-400)', fontWeight: 400 }}>vs</span> {awayLabel}
         </p>
 
-        <div className="ac-form-group">
-          <label>Data e Hora</label>
-          <input
-            type="datetime-local"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
+        <div className="ac-form-row">
+          <div className="ac-form-group" style={{ flex: 2 }}>
+            <label>Data e Hora</label>
+            <input
+              type="datetime-local"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+            />
+          </div>
+
+          <div className="ac-form-group" style={{ flex: 2 }}>
+            <label>Local</label>
+            <select value={venueId} onChange={(e) => setVenueId(e.target.value)}>
+              <option value="">— Sem local definido —</option>
+              {venues.map(v => (
+                <option key={v.id} value={v.id}>
+                  {v.name}{v.city ? ` · ${v.city}` : ''}
+                </option>
+              ))}
+            </select>
+            {venues.length === 0 && (
+              <span style={{ fontSize: '0.75rem', color: 'var(--ac-gray-500)', marginTop: 4, display: 'block' }}>
+                Nenhum local cadastrado. Vá à aba <strong>📍 Locais</strong> para adicionar.
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="ac-form-actions" style={{ flexWrap: 'wrap', gap: 8 }}>
-          {match.scheduledAt && (
+          {(match.scheduledAt || match.venueId) && (
             <button
               type="button"
               className="ac-btn ac-btn-ghost"
@@ -1410,7 +1442,7 @@ function ScheduleModal({ match, onClose, onSaved }) {
               disabled={loading}
               style={{ color: 'var(--ac-danger)' }}
             >
-              🗑 Remover Data
+              🗑 Remover Data e Local
             </button>
           )}
           <button type="button" className="ac-btn ac-btn-ghost" onClick={onClose}>Cancelar</button>
@@ -1605,6 +1637,7 @@ function MatchesTab({ tournament, onRefresh }) {
       {scheduleMatch && (
         <ScheduleModal
           match={scheduleMatch}
+          tournamentId={tournament.id}
           onClose={() => setScheduleMatch(null)}
           onSaved={() => { setScheduleMatch(null); loadMatches(); }}
         />
@@ -1675,6 +1708,17 @@ function MatchesTab({ tournament, onRefresh }) {
                   ) : (
                     <span className="ac-match-date-tag ac-match-date-tag--empty">
                       📅 Sem data
+                    </span>
+                  )}
+
+                  {/* Local agendado */}
+                  {m.venue ? (
+                    <span className="ac-match-venue-tag">
+                      📍 {[m.venue.name, m.venue.city].filter(Boolean).join(' · ')}
+                    </span>
+                  ) : (
+                    <span className="ac-match-venue-tag ac-match-venue-tag--empty">
+                      📍 Sem local
                     </span>
                   )}
 
@@ -2413,6 +2457,221 @@ function PlayersTab({ tournament }) {
   );
 }
 
+// ─── ABA: LOCAIS ──────────────────────────────────────────────────────────────
+
+function VenuesTab({ tournament }) {
+  const tid = tournament.id;
+  const [venues, setVenues]   = useState([]);
+  const [alert, setAlert]     = useState(null);
+  const [saving, setSaving]   = useState(false);
+  const [editingId, setEditingId] = useState(null); // null = novo, number = editar
+  const emptyForm = { name: '', address: '', city: '', mapUrl: '', capacity: '' };
+  const [form, setForm]       = useState(emptyForm);
+  const [showForm, setShowForm] = useState(false);
+
+  const loadVenues = useCallback(async () => {
+    try {
+      const d = await apiFetch(`/admin/championship/tournaments/${tid}/venues`);
+      setVenues(d || []);
+    } catch {}
+  }, [tid]);
+
+  useEffect(() => { loadVenues(); }, [loadVenues]);
+
+  function openNew() {
+    setForm(emptyForm);
+    setEditingId(null);
+    setShowForm(true);
+  }
+
+  function openEdit(v) {
+    setForm({
+      name:     v.name     || '',
+      address:  v.address  || '',
+      city:     v.city     || '',
+      mapUrl:   v.mapUrl   || '',
+      capacity: v.capacity != null ? String(v.capacity) : '',
+    });
+    setEditingId(v.id);
+    setShowForm(true);
+  }
+
+  function cancelForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setForm(emptyForm);
+  }
+
+  const handle = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!form.name.trim()) return;
+    setSaving(true); setAlert(null);
+    try {
+      const payload = {
+        name:     form.name.trim(),
+        address:  form.address.trim()  || null,
+        city:     form.city.trim()     || null,
+        mapUrl:   form.mapUrl.trim()   || null,
+        capacity: form.capacity ? Number(form.capacity) : null,
+      };
+      if (editingId) {
+        await apiFetch(`/admin/championship/venues/${editingId}`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        });
+        setAlert({ type: 'success', msg: 'Local atualizado!' });
+      } else {
+        await apiFetch(`/admin/championship/tournaments/${tid}/venues`, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        setAlert({ type: 'success', msg: 'Local cadastrado!' });
+      }
+      cancelForm();
+      loadVenues();
+    } catch (err) {
+      setAlert({ type: 'error', msg: err.message });
+    } finally { setSaving(false); }
+  }
+
+  async function remove(venueId, name) {
+    if (!window.confirm(`Excluir "${name}"? As partidas vinculadas perderão o local.`)) return;
+    try {
+      await apiFetch(`/admin/championship/venues/${venueId}`, { method: 'DELETE' });
+      loadVenues();
+    } catch (err) {
+      setAlert({ type: 'error', msg: err.message });
+    }
+  }
+
+  return (
+    <div>
+      <Alert type={alert?.type} message={alert?.msg} onClose={() => setAlert(null)} />
+
+      {/* ── Cabeçalho da aba ── */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <p style={{ fontSize: '0.875rem', color: 'var(--ac-gray-700)', margin: 0 }}>
+          Cadastre os campos e ginásios do torneio para vincular às partidas.
+        </p>
+        <button className="ac-btn ac-btn-primary ac-btn-sm" onClick={openNew}>
+          + Novo Local
+        </button>
+      </div>
+
+      {/* ── Formulário (novo ou edição) ── */}
+      {showForm && (
+        <div className="ac-venue-form-card">
+          <h4 style={{ margin: '0 0 14px', fontSize: '0.95rem', fontWeight: 700 }}>
+            {editingId ? '✏️ Editar Local' : '📍 Novo Local'}
+          </h4>
+          <form className="ac-form" onSubmit={submit}>
+            <div className="ac-form-row">
+              <div className="ac-form-group" style={{ flex: 2 }}>
+                <label>Nome do Local *</label>
+                <input
+                  value={form.name}
+                  onChange={(e) => handle('name', e.target.value)}
+                  placeholder="Ex: Campo do Parque, Ginásio Central"
+                  required
+                />
+              </div>
+              <div className="ac-form-group" style={{ flex: 1 }}>
+                <label>Cidade</label>
+                <input
+                  value={form.city}
+                  onChange={(e) => handle('city', e.target.value)}
+                  placeholder="Ex: São Paulo"
+                />
+              </div>
+            </div>
+
+            <div className="ac-form-group">
+              <label>Endereço</label>
+              <input
+                value={form.address}
+                onChange={(e) => handle('address', e.target.value)}
+                placeholder="Ex: Rua das Flores, 123 – Bairro"
+              />
+            </div>
+
+            <div className="ac-form-row">
+              <div className="ac-form-group" style={{ flex: 3 }}>
+                <label>Link do Mapa (Google Maps)</label>
+                <input
+                  value={form.mapUrl}
+                  onChange={(e) => handle('mapUrl', e.target.value)}
+                  placeholder="https://maps.google.com/..."
+                  type="url"
+                />
+              </div>
+              <div className="ac-form-group" style={{ flex: 1 }}>
+                <label>Capacidade</label>
+                <input
+                  value={form.capacity}
+                  onChange={(e) => handle('capacity', e.target.value)}
+                  placeholder="Ex: 500"
+                  type="number"
+                  min={1}
+                />
+              </div>
+            </div>
+
+            <div className="ac-form-actions">
+              <button type="button" className="ac-btn ac-btn-ghost" onClick={cancelForm}>Cancelar</button>
+              <button type="submit" className="ac-btn ac-btn-primary" disabled={saving}>
+                {saving ? <span className="ac-spinner" /> : (editingId ? '💾 Atualizar' : '💾 Cadastrar')}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* ── Lista de locais ── */}
+      {venues.length === 0 ? (
+        <div className="ac-empty">
+          <div className="ac-empty-icon">📍</div>
+          <h3>Nenhum local cadastrado</h3>
+          <p>Cadastre os campos e ginásios para vinculá-los às partidas.</p>
+        </div>
+      ) : (
+        <div className="ac-venues-list">
+          {venues.map((v) => (
+            <div className="ac-venue-card" key={v.id}>
+              <div className="ac-venue-card-info">
+                <strong className="ac-venue-card-name">📍 {v.name}</strong>
+                <div className="ac-venue-card-meta">
+                  {v.city && <span>{v.city}</span>}
+                  {v.address && <span className="ac-venue-card-meta-sep">{v.address}</span>}
+                  {v.capacity && <span>🏟 {v.capacity.toLocaleString('pt-BR')} lugares</span>}
+                  {v.mapUrl && (
+                    <a href={v.mapUrl} target="_blank" rel="noopener noreferrer" className="ac-venue-map-link">
+                      🗺 Ver no mapa
+                    </a>
+                  )}
+                </div>
+              </div>
+              <div className="ac-venue-card-actions">
+                <button className="ac-btn ac-btn-sm ac-btn-ghost" onClick={() => openEdit(v)}>
+                  ✏️ Editar
+                </button>
+                <button
+                  className="ac-btn ac-btn-sm ac-btn-ghost"
+                  style={{ color: 'var(--ac-danger)' }}
+                  onClick={() => remove(v.id, v.name)}
+                >
+                  🗑 Excluir
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── DETALHE DO TORNEIO ───────────────────────────────────────────────────────
 
 function TournamentDetail({ tournament, onBack, onRefresh }) {
@@ -2422,6 +2681,7 @@ function TournamentDetail({ tournament, onBack, onRefresh }) {
     { key: 'teams',     label: '⚽ Times' },
     { key: 'groups',    label: '📋 Grupos', hide: tournament.format !== 'GROUPS' },
     { key: 'players',   label: '👤 Jogadores' },
+    { key: 'venues',    label: '📍 Locais' },
     { key: 'matches',   label: '🗓️ Partidas' },
     { key: 'standings', label: '📊 Classificação' },
     { key: 'bracket',   label: '🏆 Bracket' },
@@ -2454,6 +2714,7 @@ function TournamentDetail({ tournament, onBack, onRefresh }) {
       {tab === 'teams'     && <TeamsTab     tournament={tournament} onRefresh={onRefresh} />}
       {tab === 'groups'    && <GroupsTab    tournament={tournament} onRefresh={onRefresh} />}
       {tab === 'players'   && <PlayersTab   tournament={tournament} />}
+      {tab === 'venues'    && <VenuesTab    tournament={tournament} />}
       {tab === 'matches'   && <MatchesTab   tournament={tournament} onRefresh={onRefresh} />}
       {tab === 'standings' && <StandingsTab tournament={tournament} />}
       {tab === 'bracket'   && <BracketTab   tournament={tournament} />}

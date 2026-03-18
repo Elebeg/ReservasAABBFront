@@ -1091,3 +1091,106 @@
   color: var(--ac-gray-400);
   font-style: italic;
 }
+
+/* ─── VENUES TAB ─────────────────────────────────────────────────────────────── */
+
+/* Formulário de cadastro/edição de local */
+.ac-venue-form-card {
+  background: var(--ac-primary-light);
+  border: 1.5px solid rgba(26,110,60,0.2);
+  border-radius: var(--ac-radius);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Lista de locais */
+.ac-venues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Card individual de local */
+.ac-venue-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--ac-white);
+  border: 1.5px solid var(--ac-gray-200);
+  border-radius: var(--ac-radius);
+  flex-wrap: wrap;
+}
+
+.ac-venue-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ac-venue-card-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ac-gray-900);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.ac-venue-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--ac-gray-700);
+}
+
+.ac-venue-card-meta-sep::before {
+  content: '·';
+  margin-right: 10px;
+  color: var(--ac-gray-500);
+}
+
+.ac-venue-map-link {
+  color: var(--ac-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+.ac-venue-map-link:hover { text-decoration: underline; }
+
+.ac-venue-card-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ─── TAG DE LOCAL NO CARD DE PARTIDA ─────────────────────────────────────────── */
+
+.ac-match-date-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--ac-info-light);
+  color: var(--ac-info);
+  white-space: nowrap;
+}
+.ac-match-date-tag--empty {
+  background: var(--ac-gray-100);
+  color: var(--ac-gray-500);
+}
+
+.ac-match-venue-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #edf7f0;
+  color: var(--ac-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+.ac-match-venue-tag--empty {
+  background: var(--ac-gray-100);
+  color: var(--ac-gray-500);
+}

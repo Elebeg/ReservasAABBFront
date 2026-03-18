@@ -9,10 +9,8 @@ const PHASE_SHORT = {
   FINAL:         'Final',
 };
 
-// ── Bracket vazio (preview antes do mata-mata) ────────────────────────────────
 const PHASE_MIN_TEAMS = { ROUND_OF_16: 16, QUARTER_FINAL: 8, SEMI_FINAL: 4, FINAL: 2 };
 
-// Seeding padrão: 1 vs n, 2 vs n-1... estruturado recursivamente
 function generateSeeds(n) {
   if (n <= 2) return [1, 2];
   const prev = generateSeeds(n / 2);
@@ -23,12 +21,11 @@ function generateSeeds(n) {
 
 function buildEmptyBracket(teamCount) {
   if (!teamCount || teamCount < 2) return null;
-  // Arredonda para próxima potência de 2
   const n = Math.pow(2, Math.ceil(Math.log2(Math.max(teamCount, 2))));
   const phases = PHASE_ORDER.filter(p => n >= PHASE_MIN_TEAMS[p]);
   if (!phases.length) return null;
 
-  const seeds = generateSeeds(n); // ex: n=4 → [1,4,2,3]; n=8 → [1,8,4,5,2,7,3,6]
+  const seeds = generateSeeds(n);
 
   return {
     rounds: phases.map((phase, phaseIndex) => {
@@ -51,6 +48,7 @@ function buildEmptyBracket(teamCount) {
             awayTeam,
             status:      'PENDING',
             scheduledAt: null,
+            venue:       null,
             winner:      null,
             homeScore:   null,
             awayScore:   null,
@@ -72,6 +70,31 @@ function knockoutTeamCount(tournament, standings) {
 
 const SLOT_MIN  = 96;
 const HEADER_H  = 38;
+
+// ─── Chip de local (inline, sem link externo no bracket) ─────────────────────
+function VenueTag({ venue }) {
+  if (!venue) return null;
+  const label = [venue.name, venue.city].filter(Boolean).join(' · ');
+  const tag = (
+    <span className="wb-venue">
+      <svg viewBox="0 0 14 18" width="8" height="10" style={{ flexShrink: 0 }}>
+        <path d="M7 0C4.24 0 2 2.24 2 5c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5z"
+              fill="currentColor" opacity="0.8" />
+        <circle cx="7" cy="5" r="2" fill="white" />
+      </svg>
+      {label}
+    </span>
+  );
+
+  if (venue.mapUrl) {
+    return (
+      <a href={venue.mapUrl} target="_blank" rel="noopener noreferrer" className="wb-venue-link">
+        {tag}
+      </a>
+    );
+  }
+  return tag;
+}
 
 function TeamSlot({ team, won, finished, score }) {
   const isPlaceholder = team?.isPlaceholder;
@@ -95,7 +118,7 @@ function MatchCard({ match, isFinal = false }) {
   const homeWon     = !!(winnerId && match.homeTeam?.id === winnerId);
   const awayWon     = !!(winnerId && match.awayTeam?.id === winnerId);
   const finished    = match.status === 'FINISHED';
-  const isPreview   = !match.homeTeam?.id && !match.awayTeam?.id; // ambos slots ainda vazios
+  const isPreview   = !match.homeTeam?.id && !match.awayTeam?.id;
 
   const fmtDate = match.scheduledAt
     ? new Date(match.scheduledAt).toLocaleString('pt-BR', {
@@ -106,7 +129,14 @@ function MatchCard({ match, isFinal = false }) {
 
   return (
     <div className={`wb-card${isFinal ? ' wb-card--final' : ''}${finished ? ' wb-card--done' : ''}${isPreview ? ' wb-card--preview' : ''}`}>
-      {fmtDate && <div className="wb-date">📅 {fmtDate}</div>}
+      {/* Data/hora + Local agrupados no topo do card */}
+      {(fmtDate || match.venue) && (
+        <div className="wb-card-meta">
+          {fmtDate && <div className="wb-date">📅 {fmtDate}</div>}
+          {match.venue && <VenueTag venue={match.venue} />}
+        </div>
+      )}
+
       <TeamSlot team={match.homeTeam} won={homeWon} finished={finished} score={match.homeScore} />
       <div className="wb-sep" />
       <TeamSlot team={match.awayTeam} won={awayWon} finished={finished} score={match.awayScore} />
