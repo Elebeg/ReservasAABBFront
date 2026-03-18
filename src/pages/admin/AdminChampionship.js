@@ -1350,6 +1350,12 @@ function ScheduleModal({ match, tournamentId, onClose, onSaved }) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
 
+  // Sincroniza quando a prop match muda (ex: trocar local de uma partida já agendada)
+  useEffect(() => {
+    setValue(toLocal(match.scheduledAt));
+    setVenueId(match.venueId ?? '');
+  }, [match.id, match.scheduledAt, match.venueId]);
+
   // Carrega locais do torneio para o seletor
   useEffect(() => {
     if (!tournamentId) return;
@@ -1636,6 +1642,7 @@ function MatchesTab({ tournament, onRefresh }) {
 
       {scheduleMatch && (
         <ScheduleModal
+          key={scheduleMatch.id}
           match={scheduleMatch}
           tournamentId={tournament.id}
           onClose={() => setScheduleMatch(null)}
