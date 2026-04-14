@@ -2097,6 +2097,18 @@ function PlayersTab({ tournament }) {
     } catch (err) { setAlert({ type: 'error', msg: err.message }); }
   }
 
+  async function updateName(playerId, value) {
+    const name = value.trim();
+    if (!name) return; // não salva nome vazio
+    try {
+      await apiFetch(`/admin/championship/players/${playerId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ name }),
+      });
+      loadTeamPlayers(); loadAllPlayers();
+    } catch (err) { setAlert({ type: 'error', msg: err.message }); }
+  }
+
   async function clearSuspension(playerId) {
     try {
       await apiFetch(`/admin/championship/players/${playerId}/suspension/clear`, { method: 'PATCH' });
@@ -2278,16 +2290,25 @@ function PlayersTab({ tournament }) {
                               />
                             </td>
                             <td style={{ fontWeight: 600 }}>
-                              {p.name}
-                              {isVeteran(p, getTournamentYear(tournament)) && (
-                                <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 5px' }}>VET</span>
-                              )}
-                              {p.suspended && (
-                                <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#dc2626', borderRadius: 3, padding: '1px 5px' }}>SUSPENSO</span>
-                              )}
-                              {!p.suspended && p.yellowCardAccum === 2 && (
-                                <span style={{ marginLeft: 5, fontSize: '0.65rem', fontWeight: 700, color: '#92400e', background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 3, padding: '1px 5px' }}>⚠️ PENDURADO</span>
-                              )}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                <input
+                                  key={p.id}
+                                  defaultValue={p.name}
+                                  onBlur={e => { if (e.target.value.trim() !== p.name) updateName(p.id, e.target.value); }}
+                                  onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); }}
+                                  style={{ fontWeight: 600, fontSize: '0.875rem', padding: '2px 6px', borderRadius: 4, border: '1px solid var(--ac-gray-300)', background: 'var(--ac-gray-100)', minWidth: 120, maxWidth: 180 }}
+                                  title="Clique para editar o nome"
+                                />
+                                {isVeteran(p, getTournamentYear(tournament)) && (
+                                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 5px' }}>VET</span>
+                                )}
+                                {p.suspended && (
+                                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#fff', background: '#dc2626', borderRadius: 3, padding: '1px 5px' }}>SUSPENSO</span>
+                                )}
+                                {!p.suspended && p.yellowCardAccum === 2 && (
+                                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#92400e', background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 3, padding: '1px 5px' }}>⚠️ PENDURADO</span>
+                                )}
+                              </div>
                             </td>
                             <td className="center">
                               <select
