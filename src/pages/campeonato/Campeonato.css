@@ -4,7 +4,7 @@
   /* Mapeia o "tema campeonato" para as cores globais da landing */
   --camp-primary:       var(--primary-blue);
   --camp-primary-dark:  #08365f;                 /* azul mais escuro p/ gradiente */
-  --camp-primary-light: rgba(255, 204, 0, 0.14); /* amarelo suave */
+  --camp-primary-light: rgba(200, 149, 37, 0.14); /* amarelo suave */
   --camp-accent:        var(--primary-yellow);
 
   --camp-gray-100:      var(--light-gray);
@@ -259,14 +259,14 @@
 
 .camp-tab:hover {
   color: var(--camp-primary);
-  background: rgba(8, 92, 166, 0.06); /* azul suave */
-  border-color: rgba(8, 92, 166, 0.12);
+  background: rgba(28, 58, 114, 0.06); /* azul suave */
+  border-color: rgba(28, 58, 114, 0.12);
 }
 
 .camp-tab.active {
   color: var(--camp-primary);
-  background: rgba(255, 204, 0, 0.22); /* amarelo suave */
-  border-color: rgba(255, 204, 0, 0.35);
+  background: rgba(200, 149, 37, 0.22); /* amarelo suave */
+  border-color: rgba(200, 149, 37, 0.35);
 }
 
 .camp-tab-content {
@@ -305,7 +305,7 @@
 .camp-team-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  border-color: rgba(8, 92, 166, 0.2);
+  border-color: rgba(28, 58, 114, 0.2);
 }
 
 .camp-team-card-logo {
@@ -468,7 +468,7 @@
   color: var(--camp-primary);
   margin: 0 0 12px;
   padding-bottom: 10px;
-  border-bottom: 3px solid rgba(255, 204, 0, 0.45);
+  border-bottom: 3px solid rgba(200, 149, 37, 0.45);
 }
 
 .camp-table-wrap {
@@ -501,10 +501,10 @@
 .camp-th.pts    { color: var(--camp-primary); }
 
 .camp-tr { transition: background 0.12s ease; }
-.camp-tr:hover td { background: rgba(8, 92, 166, 0.04); }
+.camp-tr:hover td { background: rgba(28, 58, 114, 0.04); }
 
 .camp-tr.advancing td {
-  background: rgba(255, 204, 0, 0.14);
+  background: rgba(200, 149, 37, 0.14);
 }
 
 .camp-td {
@@ -583,8 +583,8 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, rgba(255, 204, 0, 0.22), rgba(8, 92, 166, 0.06));
-  border: 2px solid rgba(255, 204, 0, 0.65);
+  background: linear-gradient(135deg, rgba(200, 149, 37, 0.22), rgba(28, 58, 114, 0.06));
+  border: 2px solid rgba(200, 149, 37, 0.65);
   border-radius: 14px;
   padding: 26px 32px;
   text-align: center;
@@ -670,7 +670,7 @@
 .camp-bracket-team:last-of-type { border-bottom: none; }
 
 .camp-bracket-team.winner {
-  background: rgba(255, 204, 0, 0.18);
+  background: rgba(200, 149, 37, 0.18);
   color: #143b63;
 }
 
@@ -695,8 +695,8 @@
   font-size: 0.72rem;
   font-weight: 800;
   color: #8a6a00;
-  background: rgba(255, 204, 0, 0.18);
-  border-top: 1px solid rgba(255, 204, 0, 0.25);
+  background: rgba(200, 149, 37, 0.18);
+  border-top: 1px solid rgba(200, 149, 37, 0.25);
   text-align: center;
 }
 
@@ -711,7 +711,7 @@
   color: var(--camp-primary);
   margin: 0 0 14px;
   padding-bottom: 10px;
-  border-bottom: 3px solid rgba(255, 204, 0, 0.45);
+  border-bottom: 3px solid rgba(200, 149, 37, 0.45);
 }
 
 .camp-matches-grid {
@@ -796,8 +796,8 @@
   color: rgba(0,0,0,0.55);
   letter-spacing: 0.05em;
   padding: 4px 8px;
-  background: rgba(8, 92, 166, 0.06);
-  border: 1px solid rgba(8, 92, 166, 0.12);
+  background: rgba(28, 58, 114, 0.06);
+  border: 1px solid rgba(28, 58, 114, 0.12);
   border-radius: 999px;
 }
 
@@ -826,14 +826,14 @@
 }
 
 .camp-match-status.done {
-  background: rgba(255, 204, 0, 0.22);
-  border-color: rgba(255, 204, 0, 0.3);
+  background: rgba(200, 149, 37, 0.22);
+  border-color: rgba(200, 149, 37, 0.3);
   color: #143b63;
 }
 
 .camp-match-status.scheduled {
-  background: rgba(8, 92, 166, 0.08);
-  border-color: rgba(8, 92, 166, 0.16);
+  background: rgba(28, 58, 114, 0.08);
+  border-color: rgba(28, 58, 114, 0.16);
   color: var(--camp-primary);
 }
 
@@ -1388,14 +1388,14 @@
 .camp-day-btn:hover {
   border-color: var(--camp-primary);
   color: var(--camp-primary);
-  background: rgba(8, 92, 166, 0.05);
+  background: rgba(28, 58, 114, 0.05);
 }
 
 .camp-day-btn.active {
   background: var(--camp-primary);
   border-color: var(--camp-primary);
   color: #fff;
-  box-shadow: 0 2px 10px rgba(8, 92, 166, 0.25);
+  box-shadow: 0 2px 10px rgba(28, 58, 114, 0.25);
 }
 
 /* ── Título com data ─────────────────────────────────────────────────────────── */
@@ -1419,9 +1419,9 @@
 .camp-day-count {
   font-size: 0.72rem;
   font-weight: 700;
-  background: rgba(8, 92, 166, 0.08);
+  background: rgba(28, 58, 114, 0.08);
   color: var(--camp-primary);
-  border: 1px solid rgba(8, 92, 166, 0.14);
+  border: 1px solid rgba(28, 58, 114, 0.14);
   border-radius: 999px;
   padding: 3px 10px;
   white-space: nowrap;
@@ -1475,8 +1475,8 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--ac-primary);
-  background: rgba(8, 92, 166, 0.07);
-  border: 1px solid rgba(8, 92, 166, 0.14);
+  background: rgba(28, 58, 114, 0.07);
+  border: 1px solid rgba(28, 58, 114, 0.14);
   border-radius: 6px;
   padding: 3px 8px;
   display: inline-block;
@@ -1587,7 +1587,7 @@
   transition: background 0.15s;
 }
 .camp-match-score.clickable:hover {
-  background: rgba(8, 92, 166, 0.07);
+  background: rgba(28, 58, 114, 0.07);
 }
 
 /* Chip "Ver detalhes" no footer da partida encerrada */
@@ -1598,8 +1598,8 @@
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--camp-primary);
-  background: rgba(8, 92, 166, 0.07);
-  border: 1px solid rgba(8, 92, 166, 0.15);
+  background: rgba(28, 58, 114, 0.07);
+  border: 1px solid rgba(28, 58, 114, 0.15);
   border-radius: 999px;
   padding: 3px 10px;
   cursor: pointer;
@@ -1607,7 +1607,7 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.camp-detail-chip:hover { background: rgba(8, 92, 166, 0.14); }
+.camp-detail-chip:hover { background: rgba(28, 58, 114, 0.14); }
 
 /* ─── MATCH REPORT MODAL (camp-rm-*) ────────────────────────────────────────── */
 
@@ -1864,15 +1864,15 @@
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--camp-primary);
-  background: rgba(8,92,166,0.06);
-  border: 1.5px solid rgba(8,92,166,0.2);
+  background: rgba(28, 58, 114,0.06);
+  border: 1.5px solid rgba(28, 58, 114,0.2);
   border-radius: 999px;
   padding: 8px 20px;
   cursor: pointer;
   transition: background 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
-.camp-rm-sumula-btn:hover { background: rgba(8,92,166,0.12); }
+.camp-rm-sumula-btn:hover { background: rgba(28, 58, 114,0.12); }
 
 /* Lightbox da súmula */
 .camp-sumula-overlay {
@@ -2026,3 +2026,71 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   OVERRIDE · tema clubístico (ink + ouro + creme)
+   Re-mapeia os tokens --camp-* e ajusta fontes e elementos-chave
+   para alinhar o campeonato ao restante do site redesenhado.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --camp-primary:       var(--ink);
+  --camp-primary-dark:  #0a1a36;
+  --camp-primary-light: rgba(200, 149, 37, 0.14);
+  --camp-accent:        var(--gold);
+
+  --camp-gray-100:      var(--bone);
+  --camp-gray-200:      #e4d9b8;
+  --camp-gray-300:      rgba(13, 23, 48, 0.18);
+  --camp-gray-500:      rgba(13, 23, 48, 0.45);
+  --camp-gray-700:      var(--ink-2);
+  --camp-gray-900:      var(--ink);
+  --camp-white:         #fffdf6;
+
+  --camp-radius:        4px;
+  --camp-radius-sm:     2px;
+}
+
+.camp-page { font-family: var(--sans); color: var(--ink); }
+.camp-page h1, .camp-page h2, .camp-page h3 { font-family: var(--display); letter-spacing: 0.01em; }
+
+/* hero */
+.camp-hero { border-bottom: 4px solid var(--gold); }
+.camp-hero-title { font-family: var(--display); font-weight: 900; letter-spacing: -0.02em; }
+.camp-hero-badge { border-radius: 1px; font-family: var(--display); }
+.camp-hero-stat-value { font-family: var(--display); color: var(--gold-3); }
+.camp-hero-stat-total { color: rgba(239, 230, 206, 0.5); }
+.camp-hero-meta-row { font-family: var(--display); }
+
+/* tabs */
+.camp-tabs {
+  background: var(--bone-2);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  top: 72px;
+  backdrop-filter: none;
+}
+.camp-tab {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.camp-tab:hover {
+  color: var(--ink);
+  background: rgba(200, 149, 37, 0.14);
+  border-color: rgba(200, 149, 37, 0.25);
+}
+.camp-tab.active {
+  color: var(--ink);
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+/* spinner do loading no tom ouro */
+.camp-spinner { border-top-color: var(--gold) !important; }
+
+/* estado vazio */
+.camp-no-tournament h2 { font-family: var(--display); }

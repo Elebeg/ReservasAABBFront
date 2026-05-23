@@ -33,7 +33,6 @@ function LoadingState() {
 function EmptyState() {
   return (
     <div className="camp-no-tournament">
-      <div className="camp-no-tournament-icon">🏖️</div>
       <h2>Nenhum campeonato ativo no momento</h2>
       <p>
         Fique de olho! Assim que um novo campeonato for iniciado ele
@@ -44,10 +43,10 @@ function EmptyState() {
 }
 
 const STATUS_COLORS = {
-  DRAFT:          { bg: 'rgba(107,114,128,0.25)', border: 'rgba(107,114,128,0.5)', text: '#d1d5db' },
-  GROUP_STAGE:    { bg: 'rgba(59,130,246,0.25)',  border: 'rgba(59,130,246,0.5)',  text: '#93c5fd' },
-  KNOCKOUT_STAGE: { bg: 'rgba(239,68,68,0.25)',   border: 'rgba(239,68,68,0.5)',   text: '#fca5a5' },
-  FINISHED:       { bg: 'rgba(16,185,129,0.25)',  border: 'rgba(16,185,129,0.5)',  text: '#6ee7b7' },
+  DRAFT:          { bg: 'rgba(239,230,206,0.12)', border: 'rgba(239,230,206,0.35)', text: '#efe6ce' },
+  GROUP_STAGE:    { bg: 'rgba(200,149,37,0.22)',  border: 'rgba(200,149,37,0.55)',  text: '#e8b647' },
+  KNOCKOUT_STAGE: { bg: 'rgba(167,48,34,0.28)',   border: 'rgba(167,48,34,0.6)',    text: '#e8857a' },
+  FINISHED:       { bg: 'rgba(41,81,47,0.32)',    border: 'rgba(41,81,47,0.65)',    text: '#9cc79f' },
 };
 
 export default function Campeonato() {
