@@ -146,16 +146,9 @@ export default function Campeonato() {
         <div className="camp-container">
           <div className="camp-hero-content">
             <div className="camp-hero-text">
-              <span
-                className="camp-hero-badge"
-                style={{
-                  background: STATUS_COLORS[tournament.status]?.bg,
-                  borderColor: STATUS_COLORS[tournament.status]?.border,
-                  color: STATUS_COLORS[tournament.status]?.text,
-                }}
-              >
-                <span className="camp-hero-badge-dot" style={{ background: STATUS_COLORS[tournament.status]?.text }} />
-                {STATUS_LABELS[tournament.status] || tournament.status}
+              <span className="camp-hero-eyebrow">
+                <span className="camp-hero-eyebrow-dot" style={{ background: STATUS_COLORS[tournament.status]?.text }} />
+                {STATUS_LABELS[tournament.status] || tournament.status} · Edição {tournamentYear}
               </span>
 
               <h1 className="camp-hero-title">{tournament.name}</h1>

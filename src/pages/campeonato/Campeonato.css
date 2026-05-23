@@ -48,12 +48,18 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    var(--camp-primary) 70%,
-    var(--camp-accent) 160%
-  );
   z-index: 0;
+  pointer-events: none;
+  opacity: 0.1;
+  background-image: repeating-linear-gradient(
+    -28deg,
+    transparent 0 26px,
+    var(--bone) 26px 28px,
+    transparent 28px 56px,
+    var(--gold) 56px 58px
+  );
+  -webkit-mask-image: linear-gradient(180deg, transparent, black 35%, black 78%, transparent);
+  mask-image: linear-gradient(180deg, transparent, black 35%, black 78%, transparent);
 }
 
 .camp-hero .camp-container {
@@ -2263,3 +2269,62 @@
   width: 9px; height: 9px; border-radius: 50%; background: var(--gold); display: inline-block; flex-shrink: 0;
 }
 .camp-rm-events-label, .camp-rm-no-events { font-family: var(--display); }
+
+/* ── Hero alinhado às demais páginas internas ── */
+.camp-page .camp-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-3);
+  border: none;
+  padding: 0;
+  background: none;
+}
+.camp-page .camp-hero-eyebrow::before {
+  content: "";
+  width: 40px;
+  height: 1px;
+  background: var(--gold-3);
+  opacity: 0.7;
+}
+.camp-page .camp-hero-eyebrow-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: camp-pulse 2s ease-in-out infinite;
+}
+.camp-page .camp-hero-title {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(38px, 5.5vw, 68px);
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px;
+}
+.camp-page .camp-hero-meta-row {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(239, 230, 206, 0.82);
+}
+.camp-page .camp-hero-meta-dot { color: var(--gold-3); }
+.camp-page .camp-hero-desc {
+  font-family: var(--serif);
+  font-size: 16px;
+  color: rgba(239, 230, 206, 0.7);
+}
+.camp-page .camp-hero-stat-label {
+  font-family: var(--display);
+  letter-spacing: 0.08em;
+  color: rgba(239, 230, 206, 0.6);
+}

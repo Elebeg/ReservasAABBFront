@@ -60,6 +60,9 @@ function Header() {
   }, [mobileMenuOpen]);
 
   const firstName = user?.name ? user.name.split(' ')[0] : null;
+  const initials = user?.name
+    ? user.name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase()
+    : 'S';
 
   return (
     <header className={`header ${scrolled ? 'scrolled' : ''}`}>
@@ -147,13 +150,7 @@ function Header() {
             {loggedIn && user ? (
               <li className="nav-item nav-auth-mobile">
                 <div className="nav-mobile-user">
-                  <div className="nav-mobile-avatar">
-                    <img
-                      src={user?.avatar || '/images/default-avatar.png'}
-                      alt="Avatar"
-                      onError={(e) => { e.target.src = '/images/default-avatar.png'; }}
-                    />
-                  </div>
+                  <div className="nav-mobile-avatar" aria-hidden="true">{initials}</div>
                   <div className="nav-mobile-user-info">
                     <span className="nav-mobile-user-name">
                       Olá{firstName ? `, ${firstName}` : ''}!
@@ -183,14 +180,7 @@ function Header() {
         <div className="auth-buttons">
           {loggedIn && user ? (
             <div className="user-info">
-              <div className="user-avatar" title={user?.name || 'Usuário'}>
-                <img
-                  src={user?.avatar || '/images/default-avatar.png'}
-                  alt="Avatar"
-                  className="avatar-img"
-                  onError={(e) => { e.target.src = '/images/default-avatar.png'; }}
-                />
-              </div>
+              <div className="user-avatar" title={user?.name || 'Usuário'} aria-hidden="true">{initials}</div>
               <span className="user-name">{firstName || 'Sócio'}</span>
               <button
                 onClick={handleLogout}

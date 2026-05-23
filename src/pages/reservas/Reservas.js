@@ -515,10 +515,10 @@ function ReservationsPage() {
                           <span className="res-item-tag">Finalizada</span>
                         ) : (
                           <div className="res-item-actions">
-                            <button className="res-link" onClick={() => handleEditReservation(reservation)}>
+                            <button className="res-ibtn" onClick={() => handleEditReservation(reservation)}>
                               Editar
                             </button>
-                            <button className="res-link res-link--danger" onClick={() => setCancelTarget(reservation)}>
+                            <button className="res-ibtn res-ibtn--danger" onClick={() => setCancelTarget(reservation)}>
                               Cancelar
                             </button>
                           </div>

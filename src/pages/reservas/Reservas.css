@@ -547,24 +547,24 @@
   color: var(--felt);
   flex-shrink: 0;
 }
-.res-item-actions { display: flex; gap: 14px; flex-shrink: 0; }
-.res-link {
-  background: none;
-  border: none;
+.res-item-actions { display: flex; gap: 10px; flex-shrink: 0; }
+.res-ibtn {
+  background: transparent;
+  border: 1.5px solid var(--rule);
+  border-radius: 2px;
   cursor: pointer;
   font-family: var(--display);
   font-weight: 700;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink-2);
-  padding: 4px 0;
-  border-bottom: 1.5px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
+  color: var(--ink);
+  padding: 9px 16px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.res-link:hover { color: var(--ink); border-color: var(--gold); }
-.res-link--danger { color: var(--red); }
-.res-link--danger:hover { color: var(--red); border-color: var(--red); }
+.res-ibtn:hover { background: var(--ink); border-color: var(--ink); color: var(--bone); }
+.res-ibtn--danger { color: var(--red); border-color: rgba(167, 48, 34, 0.45); }
+.res-ibtn--danger:hover { background: var(--red); border-color: var(--red); color: var(--bone); }
 
 /* ─── Agenda ─── */
 .res-schedule { padding-bottom: 22px; }
