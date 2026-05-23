@@ -2995,3 +2995,250 @@
     padding: 14px !important;
   }
 }
+
+/* Mobile hardening: evita que o Resumo e cards internos escapem da tela */
+.camp-page,
+.camp-page * {
+  box-sizing: border-box;
+}
+
+.camp-page .rs-wrap,
+.camp-page .rs-highlights,
+.camp-page .rs-cols,
+.camp-page .rs-hl,
+.camp-page .rs-block,
+.camp-page .rs-mini,
+.camp-page .rs-mini-row {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.camp-page .rs-hl,
+.camp-page .rs-block {
+  width: 100%;
+}
+
+.camp-page .rs-mini-game,
+.camp-page .rs-mini-team,
+.camp-page .rs-hl-info {
+  min-width: 0;
+}
+
+@media (max-width: 700px) {
+  .camp-container {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .camp-main {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .camp-page .rs-wrap {
+    gap: 16px;
+    overflow-x: hidden;
+  }
+
+  .camp-page .rs-highlights,
+  .camp-page .rs-cols {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    width: 100%;
+  }
+
+  .camp-page .rs-hl {
+    padding: 16px 14px 16px 18px;
+  }
+
+  .camp-page .rs-hl-main {
+    gap: 10px;
+  }
+
+  .camp-page .rs-hl-main > svg,
+  .camp-page .rs-hl-main > .ts-shield,
+  .camp-page .rs-hl-main > img {
+    flex-shrink: 0;
+  }
+
+  .camp-page .rs-hl-name {
+    font-size: 20px;
+    max-width: 100%;
+  }
+
+  .camp-page .rs-hl-sub {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .camp-page .rs-hl-goals {
+    min-width: 42px;
+  }
+
+  .camp-page .rs-hl-goals-num {
+    font-size: 36px;
+  }
+
+  .camp-page .rs-block {
+    padding: 14px;
+  }
+
+  .camp-page .rs-block-head {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .camp-page .rs-link {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .camp-page .rs-mini-row {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 420px) {
+  .camp-container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .camp-main {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .camp-page .rs-mini-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .camp-page .rs-mini-when {
+    width: auto;
+  }
+
+  .camp-page .rs-mini-game {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .camp-page .rs-mini-row--result {
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .camp-page .rs-mini-score {
+    padding: 3px 7px;
+  }
+}
+
+/* Artilharia mobile: cards e tabelas contidos no viewport */
+.camp-page .camp-players,
+.camp-page .camp-group-section {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.camp-page .camp-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.camp-page .camp-players .camp-table {
+  min-width: 620px;
+}
+
+.camp-page .cp-top-scorers,
+.camp-page .cp-scorer-card,
+.camp-page .cp-scorer-info,
+.camp-page .cp-scorer-stats {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 700px) {
+  .camp-page .camp-section-head {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .camp-page .camp-section-head .camp-group-title {
+    width: 100%;
+  }
+
+  .camp-page .camp-segmented {
+    width: 100%;
+  }
+
+  .camp-page .camp-segmented button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .camp-page .cp-top-scorers {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .camp-page .cp-scorer-card {
+    align-items: stretch;
+    padding: 14px 12px;
+    overflow: hidden;
+  }
+
+  .camp-page .cp-scorer-medal {
+    right: 8px;
+    top: 8px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .camp-page .cp-scorer-info {
+    padding-right: 36px;
+  }
+
+  .camp-page .cp-scorer-name,
+  .camp-page .cp-scorer-team {
+    max-width: 100%;
+  }
+
+  .camp-page .cp-scorer-stats {
+    gap: 6px;
+  }
+
+  .camp-page .camp-search-row input {
+    font-size: 16px;
+  }
+
+  .camp-page .camp-players .camp-th,
+  .camp-page .camp-players .camp-td {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+  .camp-page .camp-players .camp-th.team {
+    min-width: 132px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .camp-page .camp-players .camp-table {
+    min-width: 560px;
+  }
+
+  .camp-page .camp-players .camp-th.team {
+    min-width: 116px !important;
+  }
+
+  .camp-page .cp-scorer-card {
+    padding: 12px 10px;
+  }
+}
