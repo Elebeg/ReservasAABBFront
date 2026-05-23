@@ -1,84 +1,184 @@
-.eventos {
-    padding: 4rem 0;
-    background-color: #f9f9f9;
-  }
-  
-  .section-title {
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-    color: #1e293b;
-  }
-  
-  .events-slider {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-  }
-  
-  .event-card {
-    background-color: #fff;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    display: flex;
-    align-items: center;
-    padding: 1.5rem;
-    gap: 1.5rem;
-    max-width: 500px;
-    transition: transform 0.2s ease;
-  }
-  
-  .event-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .event-date {
-    background-color: #1e40af;
-    color: white;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
-    text-align: center;
-  }
-  
-  .event-date .day {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .event-date .month {
-    text-transform: uppercase;
-    font-size: 1rem;
-  }
-  
-  .event-info h3 {
-    margin: 0;
-    font-size: 1.25rem;
-    color: #0f172a;
-  }
-  
-  .event-info p {
-    margin: 0.5rem 0;
-    color: #475569;
-  }
-  
-  .btn-text {
-    color: #1d4ed8;
-    text-decoration: none;
-    font-weight: 500;
-  }
-  
-  .btn-text:hover {
-    text-decoration: underline;
-  }
-  
-  .sem-eventos {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #64748b;
-    background-color: #f1f5f9;
-    padding: 2rem;
-    border-radius: 1rem;
-  }
-  
+/* ─────────────────────────────────────────────────────────────
+   Eventos · AABB Jandaia do Sul (redesign clubístico)
+   Cards estilo ingresso com canhoto de data destacável.
+───────────────────────────────────────────────────────────── */
+
+.eventos-lista { padding: 80px 0; background: var(--bone); }
+
+.eventos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 28px;
+}
+
+.evento-ticket {
+  display: grid;
+  grid-template-columns: 110px 0 1fr;
+  align-items: stretch;
+  background: var(--bone-2);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px -22px rgba(13, 23, 48, 0.45);
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.evento-ticket:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 44px -24px rgba(13, 23, 48, 0.5);
+}
+
+/* canhoto de data */
+.evento-data {
+  background: var(--ink);
+  color: var(--bone);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 8px;
+  border-right: 2px dashed rgba(239, 230, 206, 0.3);
+}
+.evento-dia {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 52px;
+  line-height: 0.9;
+  color: var(--gold-3);
+  letter-spacing: -0.03em;
+}
+.evento-mes {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bone);
+  margin-top: 4px;
+}
+/* recortes do "perfuro" do ingresso */
+.evento-perfuro { position: relative; width: 0; }
+.evento-perfuro::before,
+.evento-perfuro::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bone);
+  border: 1px solid var(--rule);
+}
+.evento-perfuro::before { top: -8px; }
+.evento-perfuro::after { bottom: -8px; }
+
+.evento-info { padding: 24px 28px; }
+.evento-tag {
+  display: inline-block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+  border: 1px solid var(--gold);
+  border-radius: 1px;
+  padding: 3px 8px;
+  margin-bottom: 12px;
+}
+.evento-info h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0 0 10px;
+  line-height: 1.05;
+}
+.evento-info p {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin: 0 0 16px;
+}
+.evento-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold);
+  padding-bottom: 3px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.evento-link:hover { color: var(--ink); border-color: var(--ink); }
+.evento-link .btn-arrow { font-family: var(--serif); font-style: italic; }
+
+/* vazio */
+.eventos-vazio {
+  text-align: center;
+  padding: 64px 24px;
+  border: 1px dashed var(--rule);
+  border-radius: 4px;
+  background: var(--bone-2);
+}
+.eventos-vazio p {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.eventos-vazio span {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+}
+
+/* rodapé da seção */
+.eventos-rodape {
+  margin-top: 48px;
+  padding-top: 28px;
+  border-top: 2px solid var(--rule);
+  text-align: center;
+}
+.eventos-rodape-eye {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+  margin-bottom: 8px;
+}
+.eventos-rodape p {
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--ink-2);
+  margin: 0;
+}
+.eventos-rodape a {
+  color: var(--gold-2);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold);
+}
+.eventos-rodape a:hover { color: var(--ink); border-color: var(--ink); }
+
+/* Responsivo */
+@media (max-width: 760px) {
+  .eventos-lista { padding: 56px 0; }
+  .eventos-grid { grid-template-columns: 1fr; }
+  .evento-ticket { grid-template-columns: 88px 0 1fr; }
+  .evento-dia { font-size: 40px; }
+  .evento-info { padding: 20px 22px; }
+}

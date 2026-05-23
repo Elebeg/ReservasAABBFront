@@ -1,0 +1,202 @@
+/* ─────────────────────────────────────────────────────────────
+   AABB Jandaia do Sul · Tema do clube (redesign)
+   Tokens de cor/tipografia + container .wrap.
+   Importado globalmente em App.js — usado por Header, Footer e Home.
+   Nomes de variáveis novos (não conflitam com App.css).
+───────────────────────────────────────────────────────────── */
+
+:root {
+  --bone:   #efe6ce;
+  --bone-2: #e4d9b8;
+  --bone-3: #d9caa0;
+  --ink:    #0e244a;
+  --ink-2:  #1c3a72;
+  --ink-3:  #2a4e8f;
+  --gold:   #c89525;
+  --gold-2: #a07415;
+  --gold-3: #e8b647;
+  --gold-4: #f2cf6c;
+  --tile:   #1a5f9e;
+  --felt:   #29512f;
+  --red:    #a73022;
+
+  --display: "Big Shoulders Display", "Impact", sans-serif;
+  --serif:   "Newsreader", "Times New Roman", serif;
+  --sans:    "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono:    "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  --shadow-ink: 0 24px 60px -28px rgba(13,23,48,0.45);
+  --rule:       rgba(13, 23, 48, 0.18);
+  --rule-light: rgba(239, 230, 206, 0.22);
+}
+
+/* rolagem suave para âncoras de seção (#esportes, #semana, ...) */
+html { scroll-behavior: smooth; }
+
+/* container largo do redesign (o site mantém .container do App.css) */
+.wrap {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+@media (max-width: 760px) {
+  .wrap { padding: 0 20px; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Blocos compartilhados das páginas internas (Sobre, Esportes,
+   Eventos, Estrutura) — mesmo molde da Home.
+───────────────────────────────────────────────────────────── */
+.clube-page {
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+.clube-page em { font-family: var(--serif); font-style: italic; font-weight: 400; }
+
+/* Hero de página (tinta-marinho com faixas) */
+.clube-hero {
+  position: relative;
+  background: var(--ink);
+  color: var(--bone);
+  padding: 88px 0 76px;
+  overflow: hidden;
+  border-bottom: 4px solid var(--gold);
+}
+.clube-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.10;
+  background-image: repeating-linear-gradient(
+    -28deg,
+    transparent 0 26px,
+    var(--bone) 26px 28px,
+    transparent 28px 56px,
+    var(--gold) 56px 58px
+  );
+  -webkit-mask-image: linear-gradient(180deg, transparent, black 35%, black 75%, transparent);
+  mask-image: linear-gradient(180deg, transparent, black 35%, black 75%, transparent);
+}
+.clube-hero .wrap { position: relative; z-index: 1; max-width: 920px; }
+.clube-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-3);
+}
+.clube-hero-eyebrow::before {
+  content: "";
+  width: 40px;
+  height: 1px;
+  background: var(--gold-3);
+  opacity: 0.7;
+}
+.clube-hero-title {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(44px, 6vw, 84px);
+  line-height: 0.94;
+  letter-spacing: -0.02em;
+  margin: 0 0 22px;
+  color: var(--bone);
+}
+.clube-hero-title em { color: var(--gold-3); }
+.clube-hero-sub {
+  font-family: var(--serif);
+  font-size: clamp(18px, 2.2vw, 22px);
+  line-height: 1.42;
+  color: var(--bone);
+  opacity: 0.85;
+  margin: 0;
+  max-width: 40em;
+  text-wrap: pretty;
+}
+
+/* Eyebrow numerado de seção */
+.clube-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+}
+.clube-bn {
+  background: var(--gold);
+  color: var(--ink);
+  padding: 4px 8px 3px;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  border-radius: 1px;
+}
+.clube-eyebrow--light { color: var(--gold-3); }
+.clube-eyebrow--gold { color: var(--gold-2); }
+.clube-section-title {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(40px, 5vw, 72px);
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  margin: 0 0 24px;
+  color: var(--ink);
+}
+.clube-section-title em { color: var(--gold-2); }
+.clube-section-title--light { color: var(--bone); }
+.clube-section-title--light em { color: var(--gold-3); }
+
+/* Botões reaproveitados (escopados na página) */
+.clube-page .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--ink);
+  color: var(--bone);
+  text-decoration: none;
+  padding: 16px 24px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 1px;
+  border: 2px solid var(--ink);
+  transition: background 0.15s, transform 0.15s, color 0.15s;
+}
+.clube-page .btn-primary:hover {
+  background: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+.clube-page .btn-arrow { font-family: var(--serif); font-size: 18px; font-style: italic; }
+.clube-page .btn-ghost {
+  display: inline-block;
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 14px;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 2px;
+  transition: opacity 0.15s;
+}
+.clube-page .btn-ghost:hover { opacity: 0.65; }
+
+@media (max-width: 760px) {
+  .clube-hero { padding: 60px 0 52px; }
+}

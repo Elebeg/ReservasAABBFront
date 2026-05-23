@@ -1,133 +1,156 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Sobre.css';
+
+const diretoria = [
+  { nome: 'Claudemir Foppa', cargo: 'Presidente' },
+  { nome: 'José Carlos Quintanilha', cargo: 'Vice-Presidente' },
+  { nome: 'André Saddi', cargo: 'Diretor de Esportes' },
+];
+
+const numeros = [
+  { n: '1978', l: 'Ano de fundação' },
+  { n: '500+', l: 'Famílias associadas' },
+  { n: '20 mil', l: 'Metros quadrados' },
+  { n: '4', l: 'Modalidades esportivas' },
+];
 
 function Sobre() {
   return (
-    <div className="sobre-page">
-      {/* Hero Section */}
-      <section className="page-hero">
-        <div className="container">
-          <h1>Sobre a AABB Jandaia do Sul</h1>
-          <p>Conheça nossa história, missão e valores</p>
+    <div className="clube-page clube-sobre">
+
+      {/* Hero */}
+      <section className="clube-hero">
+        <div className="wrap">
+          <span className="clube-hero-eyebrow">O Clube · Desde 1978</span>
+          <h1 className="clube-hero-title">Sobre a <em>AABB</em><br />Jandaia do Sul.</h1>
+          <p className="clube-hero-sub">
+            Um clube de bairro feito de gente: história, missão e as pessoas que mantêm
+            as portas abertas para a família bancária e a comunidade.
+          </p>
         </div>
       </section>
 
-      {/* História Section */}
-      <section className="historia-section">
-        <div className="container">
-          <div className="section-content">
-            <div className="text-content">
-              <h2 className="section-title">Nossa História</h2>
-              <p>Fundada em 1978, a Associação Atlética Banco do Brasil (AABB) de Jandaia do Sul nasceu da iniciativa de funcionários do Banco do Brasil que desejavam criar um espaço de lazer, integração e prática esportiva para toda a comunidade bancária.</p>
-              <p>Inicialmente com uma estrutura modesta, o clube foi crescendo ao longo dos anos graças ao empenho de suas sucessivas diretorias e ao apoio dos associados, tornando-se hoje uma referência de lazer e esporte na região.</p>
-              <p>Em mais de quatro décadas de história, a AABB Jandaia do Sul já foi palco de inúmeros eventos esportivos, sociais e culturais, mantendo viva a tradição de proporcionar momentos inesquecíveis aos seus frequentadores.</p>
+      {/* História */}
+      <section className="sobre-historia">
+        <div className="wrap historia-grid">
+          <div className="historia-text">
+            <div className="clube-eyebrow"><span className="clube-bn">01</span><span>Nossa história</span></div>
+            <h2 className="clube-section-title">Quase meio século<br />no <em>mesmo terreno</em>.</h2>
+            <p className="sobre-lede">
+              Fundada em 1978 por funcionários do Banco do Brasil que queriam um espaço de
+              lazer, integração e esporte para toda a comunidade bancária.
+            </p>
+            <p>
+              Começou com uma estrutura modesta e cresceu ao longo das décadas graças ao
+              empenho das sucessivas diretorias e ao apoio dos associados — tornando-se uma
+              referência de lazer e esporte na região.
+            </p>
+            <p>
+              Em mais de quatro décadas, a AABB Jandaia do Sul foi palco de inúmeros eventos
+              esportivos, sociais e culturais, mantendo viva a tradição de proporcionar
+              momentos inesquecíveis a quem frequenta o clube.
+            </p>
+          </div>
+          <div className="historia-media">
+            <div className="historia-frame">
+              <img src="/images/history-image.jpg" alt="História da AABB Jandaia do Sul" />
             </div>
-            <div className="image-content">
-              <img src="/images/history-image.jpg" alt="Inauguração Piscina" className="section-image" />
-            </div>
+            <span className="historia-cap">Arquivo do clube · sede própria</span>
           </div>
         </div>
       </section>
 
-      {/* Missão e Valores */}
-      <section className="missao-section">
-        <div className="container">
-          <h2 className="section-title">Missão, Visão e Valores</h2>
-          
-          <div className="valores-grid">
-            <div className="valor-card">
-              <div className="valor-icon">🎯</div>
+      {/* Missão, Visão e Valores */}
+      <section className="sobre-principios">
+        <div className="wrap">
+          <div className="clube-eyebrow clube-eyebrow--light"><span className="clube-bn">02</span><span>Princípios do clube</span></div>
+          <h2 className="clube-section-title clube-section-title--light">Missão, visão<br />e <em>valores</em>.</h2>
+
+          <div className="principios-grid">
+            <article className="principio-card">
+              <span className="principio-num">I</span>
               <h3>Missão</h3>
-              <p>Promover o bem-estar e a qualidade de vida dos funcionários do Banco do Brasil, seus familiares e da comunidade por meio de atividades sociais, culturais, esportivas e de lazer.</p>
-            </div>
-            
-            <div className="valor-card">
-              <div className="valor-icon">👁️</div>
+              <p>
+                Promover o bem-estar e a qualidade de vida dos funcionários do Banco do Brasil,
+                seus familiares e da comunidade por meio de atividades sociais, culturais,
+                esportivas e de lazer.
+              </p>
+            </article>
+            <article className="principio-card">
+              <span className="principio-num">II</span>
               <h3>Visão</h3>
-              <p>Ser reconhecida como referência entre os clubes sociais e esportivos da região, oferecendo excelência em infraestrutura, atendimento e programação de eventos.</p>
-            </div>
-            
-            <div className="valor-card">
-              <div className="valor-icon">⭐</div>
+              <p>
+                Ser referência entre os clubes sociais e esportivos da região, com excelência
+                em infraestrutura, atendimento e programação de eventos.
+              </p>
+            </article>
+            <article className="principio-card">
+              <span className="principio-num">III</span>
               <h3>Valores</h3>
-              <ul>
+              <ul className="principio-list">
                 <li>Ética e transparência</li>
                 <li>Respeito à diversidade</li>
                 <li>Sustentabilidade</li>
                 <li>Compromisso com os associados</li>
                 <li>Espírito de comunidade</li>
               </ul>
-            </div>
+            </article>
           </div>
         </div>
       </section>
 
       {/* Diretoria */}
-      <section className="diretoria-section">
-        <div className="container">
-          <h2 className="section-title">Diretoria Atual</h2>
-          <p className="diretoria-intro">Nossa diretoria é formada por associados comprometidos com o desenvolvimento contínuo da AABB Jandaia do Sul.</p>
-          
+      <section className="sobre-diretoria">
+        <div className="wrap">
+          <div className="clube-eyebrow"><span className="clube-bn">03</span><span>Quem conduz o clube</span></div>
+          <h2 className="clube-section-title">A <em>diretoria</em>.</h2>
+          <p className="sobre-lede sobre-lede--center">
+            Associados comprometidos com o desenvolvimento contínuo da AABB Jandaia do Sul.
+            Gestão 2024–2027.
+          </p>
+
           <div className="diretoria-grid">
-            <div className="diretor-card">
-              <div className="diretor-avatar">
-                <img src="/images/default-avatar.png" alt="Presidente" className="diretor-img" />
-              </div>
-              <h3>Claudemir Foppa</h3>
-              <p className="diretor-cargo">Presidente</p>
-              <p>Gestão 2024-2027</p>
-            </div>
-            
-            <div className="diretor-card">
-              <div className="diretor-avatar">
-                <img src="/images/default-avatar.png" alt="Vice-Presidente" className="diretor-img" />
-              </div>
-              <h3>José Carlos Quintanilha</h3>
-              <p className="diretor-cargo">Vice-Presidente</p>
-              <p>Gestão 2024-2027</p>
-            </div>
-            
-            <div className="diretor-card">
-              <div className="diretor-avatar">
-                <img src="/images/default-avatar.png" alt="Diretor de Esportes" className="diretor-img" />
-              </div>
-              <h3>André Saddi</h3>
-              <p className="diretor-cargo">Diretor de Esportes</p>
-              <p>Gestão 2024-2027</p>
-            </div>
-            
+            {diretoria.map((d) => (
+              <article className="diretor-card" key={d.nome}>
+                <div className="diretor-avatar">
+                  <img
+                    src="/images/default-avatar.png"
+                    alt={d.cargo}
+                    onError={(e) => { e.target.style.visibility = 'hidden'; }}
+                  />
+                  <span className="diretor-mono">{d.nome.split(' ').map(w => w[0]).slice(0, 2).join('')}</span>
+                </div>
+                <div className="diretor-cargo">{d.cargo}</div>
+                <h3>{d.nome}</h3>
+                <span className="diretor-gestao">Triênio 2024–2027</span>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Números */}
-      <section className="numeros-section">
-        <div className="container">
-          <h2 className="section-title">AABB em Números</h2>
-          
+      <section className="sobre-numeros">
+        <div className="wrap">
+          <div className="clube-eyebrow clube-eyebrow--gold"><span className="clube-bn">04</span><span>O clube em números</span></div>
           <div className="numeros-grid">
-            <div className="numero-card">
-              <div className="numero">40+</div>
-              <p>Anos de história</p>
-            </div>
-            
-            <div className="numero-card">
-              <div className="numero">500+</div>
-              <p>Famílias associadas</p>
-            </div>
-            
-            <div className="numero-card">
-              <div className="numero">20.000m²</div>
-              <p>De área total</p>
-            </div>
-            
-            <div className="numero-card">
-              <div className="numero">12</div>
-              <p>Modalidades esportivas</p>
-            </div>
+            {numeros.map((x) => (
+              <div className="numero-card" key={x.l}>
+                <div className="numero-n">{x.n}</div>
+                <div className="numero-l">{x.l}</div>
+              </div>
+            ))}
+          </div>
+          <div className="sobre-cta">
+            <Link to="/estrutura" className="btn-primary">
+              <span>Conheça a estrutura</span><span className="btn-arrow">→</span>
+            </Link>
+            <Link to="/register" className="btn-ghost">Quero ser sócio →</Link>
           </div>
         </div>
       </section>
+
     </div>
   );
 }

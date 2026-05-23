@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { CrestMini } from '../../components/Crest';
 import './Auth.css';
 
 function Register() {
@@ -77,6 +78,14 @@ function Register() {
       <div className="auth-wrapper">
         {/* Lado visual / marketing */}
         <div className="auth-info">
+          <div className="auth-brand">
+            <CrestMini className="auth-crest" />
+            <span className="auth-brand-name">
+              <span>Associação Atlética Banco do Brasil</span>
+              <span>Jandaia do Sul · Paraná</span>
+            </span>
+          </div>
+
           <span className="auth-badge">Sistema de Reservas de Quadra</span>
           <h1>Crie sua conta e comece a reservar</h1>
           <p className="auth-info-subtitle">

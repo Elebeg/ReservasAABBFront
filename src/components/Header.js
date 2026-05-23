@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { CrestMini } from './Crest';
 import './Header.css';
 
 function Header() {
@@ -62,14 +63,15 @@ function Header() {
 
   return (
     <header className={`header ${scrolled ? 'scrolled' : ''}`}>
-      <div className="container header-content">
+      <div className="wrap header-content">
 
-        {/* Logo */}
-        <Link to="/" className="logo-link">
-          <div className="logo-container">
-            <div className="logo"><h1>AABB</h1></div>
-            <span className="logo-subtitle">Jandaia do Sul</span>
-          </div>
+        {/* Marca: escudo + nome do clube */}
+        <Link to="/" className="logo-link" aria-label="AABB Jandaia do Sul — início">
+          <CrestMini />
+          <span className="logo-name">
+            <span className="logo-name-1">Associação Atlética Banco do Brasil</span>
+            <span className="logo-name-2">Jandaia do Sul · Paraná · desde 1978</span>
+          </span>
         </Link>
 
         {/* Hamburguer */}
@@ -136,7 +138,7 @@ function Header() {
             {isAdmin && (
               <li className="nav-item">
                 <Link to="/admin/dashboard" className="nav-link nav-link-admin">
-                  ⚙️ Admin
+                  Admin
                 </Link>
               </li>
             )}
@@ -189,7 +191,7 @@ function Header() {
                   onError={(e) => { e.target.src = '/images/default-avatar.png'; }}
                 />
               </div>
-              <span className="user-name">{user?.name || 'Usuário'}</span>
+              <span className="user-name">{firstName || 'Sócio'}</span>
               <button
                 onClick={handleLogout}
                 className="logout-icon"
@@ -207,7 +209,7 @@ function Header() {
           ) : (
             <div className="auth-buttons-container">
               <Link to="/login"    className="btn-login">Entrar</Link>
-              <Link to="/register" className="btn-register">Registre-se</Link>
+              <Link to="/register" className="btn-register">Sócio · cadastrar</Link>
             </div>
           )}
         </div>

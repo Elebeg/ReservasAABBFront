@@ -23,6 +23,7 @@ import AdminChampionship from './pages/admin/AdminChampionship';
 import { AdminRoute } from './admin/AdminRoute';
 
 import './App.css';
+import './styles/clube-theme.css';
 
 function App() {
   return (

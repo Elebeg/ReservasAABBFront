@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
+import { CrestMini } from '../../components/Crest';
 import './Auth.css';
 
 function Login() {
@@ -114,6 +115,14 @@ function Login() {
       <div className="auth-wrapper">
         {/* Lado visual / marketing */}
         <div className="auth-info">
+          <div className="auth-brand">
+            <CrestMini className="auth-crest" />
+            <span className="auth-brand-name">
+              <span>Associação Atlética Banco do Brasil</span>
+              <span>Jandaia do Sul · Paraná</span>
+            </span>
+          </div>
+
           <span className="auth-badge">Sistema de Reservas de Quadra</span>
           <h1>Organize seus jogos em poucos cliques</h1>
           <p className="auth-info-subtitle">

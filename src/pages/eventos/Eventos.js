@@ -6,50 +6,84 @@ const eventos = [
   {
     id: 1,
     titulo: 'Torneio de Beach Tennis',
-    descricao: 'Torneio aberto para duplas masculinas e femininas.',
+    descricao: 'Torneio aberto para duplas masculinas e femininas, nas três quadras de areia do clube.',
     dia: '17',
     mes: 'Mai',
-    link: '/tournaments'
+    tag: 'Esporte',
+    cta: { label: 'Ver campeonato', to: '/campeonato' },
   },
   {
     id: 2,
-    titulo: 'Festa Junina AABB',
-    descricao: 'Tradicional festa junina com comidas típicas, música ao vivo e brincadeiras para toda família.',
+    titulo: 'Festa Junina da AABB',
+    descricao: 'Tradicional festa junina com comidas típicas, música ao vivo e brincadeiras para toda a família.',
     dia: '22',
     mes: 'Jun',
-    link: '/eventos/festa-junina'
-  }
+    tag: 'Para a família',
+    cta: null,
+  },
 ];
 
 const Eventos = () => {
   return (
-    <section className="eventos">
-      <div className="container">
-        <h2 className="section-title">Próximos Eventos</h2>
+    <div className="clube-page clube-eventos">
 
-        {eventos.length === 0 ? (
-          <div className="sem-eventos">
-            <p>Atualmente não temos eventos programados.<br />Fique atento às novidades!</p>
+      {/* Hero */}
+      <section className="clube-hero">
+        <div className="wrap">
+          <span className="clube-hero-eyebrow">Agenda do clube</span>
+          <h1 className="clube-hero-title">Próximos <em>eventos</em>.</h1>
+          <p className="clube-hero-sub">
+            Torneios, festas e encontros que fazem do fim de semana no clube o ponto alto
+            da semana. Marque na agenda e traga a família.
+          </p>
+        </div>
+      </section>
+
+      {/* Lista */}
+      <section className="eventos-lista">
+        <div className="wrap">
+          {eventos.length === 0 ? (
+            <div className="eventos-vazio">
+              <p>Nenhum evento programado no momento.</p>
+              <span>Fique de olho — a próxima data vem aí.</span>
+            </div>
+          ) : (
+            <div className="eventos-grid">
+              {eventos.map((evento) => (
+                <article className="evento-ticket" key={evento.id}>
+                  <div className="evento-data">
+                    <span className="evento-dia">{evento.dia}</span>
+                    <span className="evento-mes">{evento.mes}</span>
+                  </div>
+                  <div className="evento-perfuro" aria-hidden="true" />
+                  <div className="evento-info">
+                    {evento.tag && <span className="evento-tag">{evento.tag}</span>}
+                    <h3>{evento.titulo}</h3>
+                    <p>{evento.descricao}</p>
+                    {evento.cta && (
+                      <Link to={evento.cta.to} className="evento-link">
+                        {evento.cta.label} <span className="btn-arrow">→</span>
+                      </Link>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          <div className="eventos-rodape">
+            <span className="eventos-rodape-eye">Programação</span>
+            <p>
+              A agenda completa é divulgada nos canais do clube. Acompanhe pelo
+              {' '}
+              <a href="https://www.instagram.com/_aabbjandaia/" target="_blank" rel="noopener noreferrer">Instagram</a>
+              {' '}e na Secretaria.
+            </p>
           </div>
-        ) : (
-          <div className="events-slider">
-            {eventos.map((evento) => (
-              <div className="event-card" key={evento.id}>
-                <div className="event-date">
-                  <span className="day">{evento.dia}</span>
-                  <span className="month">{evento.mes}</span>
-                </div>
-                <div className="event-info">
-                  <h3>{evento.titulo}</h3>
-                  <p>{evento.descricao}</p>
-                  <Link to={evento.link} className="btn-text">Saiba mais</Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
+        </div>
+      </section>
+
+    </div>
   );
 };
 
