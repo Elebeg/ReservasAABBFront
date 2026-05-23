@@ -191,21 +191,21 @@ function SlotDetailPanel({ slot, onClose, onEdit, onDelete, onQuickReserve, curr
         {/* Body */}
         <div className="sdp-body">
           <div className="sdp-info-row">
-            <span className="sdp-info-icon">🏟️</span>
+            <span className="sdp-info-icon" />
             <div>
               <span className="sdp-info-label">Quadra</span>
               <span className="sdp-info-value">{court.name}</span>
             </div>
           </div>
           <div className="sdp-info-row">
-            <span className="sdp-info-icon">📅</span>
+            <span className="sdp-info-icon" />
             <div>
               <span className="sdp-info-label">Data</span>
               <span className="sdp-info-value">{formattedDate}</span>
             </div>
           </div>
           <div className="sdp-info-row">
-            <span className="sdp-info-icon">🕐</span>
+            <span className="sdp-info-icon" />
             <div>
               <span className="sdp-info-label">Horário</span>
               <span className="sdp-info-value">{time} às {endHour}</span>
@@ -213,7 +213,7 @@ function SlotDetailPanel({ slot, onClose, onEdit, onDelete, onQuickReserve, curr
           </div>
           {!isAvailable && (
             <div className="sdp-info-row">
-              <span className="sdp-info-icon">👤</span>
+              <span className="sdp-info-icon" />
               <div>
                 <span className="sdp-info-label">Reservado por</span>
                 <span className="sdp-info-value">
@@ -593,8 +593,8 @@ function ReservationsPage() {
 
   if (loading && userReservations.length === 0) {
     return (
-      <div className="loading">
-        <div className="loading-spinner"></div>
+      <div className="res-loading">
+        <div className="res-loading-spinner"></div>
         <span>Carregando reservas...</span>
       </div>
     );
