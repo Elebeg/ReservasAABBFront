@@ -41,7 +41,7 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
     );
   }
 
-  const scorers      = [...players].sort((a, b) => b.goals - a.goals || a.yellowCards - b.yellowCards || a.name.localeCompare(b.name));
+  const scorers      = [...players].sort((a, b) => b.goals - a.goals || b.yellowCards - a.yellowCards || a.name.localeCompare(b.name, 'pt-BR'));
   const disciplinary = [...players].filter(p => p.yellowCards > 0 || p.redCards > 0)
     .sort((a, b) => b.redCards - a.redCards || b.yellowCards - a.yellowCards);
 
@@ -51,14 +51,56 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
   const trimmed = query.trim();
   const visibleScorers = trimmed
     ? scorers.filter(p => normalize(p.name).includes(normalize(trimmed)))
-    : scorers.slice(0, 15);
+    : scorers;
+  
+  // Top 3 para destaque
+  const topThree = scorers.slice(0, 3);
 
   return (
     <div className="camp-players">
 
-      {/* ── Artilharia ── */}
+      {/* ── Top 3 Artilheiros ── */}
+      {topThree.length > 0 && (
+        <div style={{ marginBottom: 28 }}>
+          <h3 className="camp-group-title">⚽ Artilheiros em Destaque</h3>
+          <div className="cp-top-scorers">
+            {topThree.map((p, idx) => (
+              <div key={p.id} className={`cp-scorer-card cp-scorer-rank-${idx + 1}`}>
+                <div className="cp-scorer-medal">
+                  <span className="cp-scorer-pos">#{idx + 1}</span>
+                </div>
+                <TeamLogo name={p.team?.name || '?'} logoUrl={p.team?.logoUrl || null} size={36} shape="shield" />
+                <div className="cp-scorer-info">
+                  <span className="cp-scorer-name">{p.name}</span>
+                  <span className="cp-scorer-team">{p.team?.name ?? '—'}</span>
+                </div>
+                <div className="cp-scorer-stats">
+                  <div className="cp-scorer-stat">
+                    <span className="cp-scorer-stat-value">{p.goals}</span>
+                    <span className="cp-scorer-stat-label">Gols</span>
+                  </div>
+                  {p.yellowCards > 0 && (
+                    <div className="cp-scorer-stat">
+                      <span className="cp-scorer-stat-value" style={{ color: '#d68910' }}>{p.yellowCards}</span>
+                      <span className="cp-scorer-stat-label">AM</span>
+                    </div>
+                  )}
+                  {p.redCards > 0 && (
+                    <div className="cp-scorer-stat">
+                      <span className="cp-scorer-stat-value" style={{ color: '#c0392b' }}>{p.redCards}</span>
+                      <span className="cp-scorer-stat-label">VM</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Artilharia Completa ── */}
       <div className="camp-group-section">
-        <h3 className="camp-group-title">⚽ Artilharia</h3>
+        <h3 className="camp-group-title">Artilharia Completa</h3>
 
         {/* Barra de busca */}
         <div style={{ marginBottom: 12 }}>
@@ -146,12 +188,6 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
             </tbody>
           </table>
         </div>
-
-        {!trimmed && scorers.length > 15 && (
-          <p style={{ fontSize: '0.78rem', color: '#888', marginTop: 8 }}>
-            Exibindo os 15 primeiros. Use a busca acima para encontrar outros jogadores.
-          </p>
-        )}
       </div>
 
       {/* ── Ranking Disciplinar ── */}

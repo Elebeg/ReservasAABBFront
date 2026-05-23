@@ -2562,3 +2562,161 @@
   .camp-page .ag-team { gap: 6px; }
   .camp-page .rs-hl-goals-num { font-size: 38px; }
 }
+
+/* ─── TOP SCORERS CARDS (Artilheiros em Destaque) ─────────────────────────── */
+.cp-top-scorers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.cp-scorer-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: var(--camp-white);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--camp-shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  text-align: center;
+  position: relative;
+}
+
+.cp-scorer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--camp-shadow-md);
+  border-color: rgba(200,149,37,0.3);
+}
+
+/* Variações de posição (1º, 2º, 3º) */
+.cp-scorer-rank-1 {
+  border-color: rgba(200,149,37,0.45);
+  background: linear-gradient(135deg, rgba(200,149,37,0.12), rgba(200,149,37,0.04));
+}
+
+.cp-scorer-rank-1 .cp-scorer-medal {
+  background: linear-gradient(135deg, #d4a500 0%, #c89525 100%);
+  box-shadow: 0 4px 14px rgba(200,149,37,0.3);
+}
+
+.cp-scorer-rank-2 {
+  border-color: rgba(192,192,192,0.35);
+  background: linear-gradient(135deg, rgba(192,192,192,0.08), rgba(192,192,192,0.02));
+}
+
+.cp-scorer-rank-2 .cp-scorer-medal {
+  background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+  box-shadow: 0 4px 14px rgba(192,192,192,0.25);
+}
+
+.cp-scorer-rank-3 {
+  border-color: rgba(205,127,50,0.35);
+  background: linear-gradient(135deg, rgba(205,127,50,0.08), rgba(205,127,50,0.02));
+}
+
+.cp-scorer-rank-3 .cp-scorer-medal {
+  background: linear-gradient(135deg, #cd7f32, #b8652a);
+  box-shadow: 0 4px 14px rgba(205,127,50,0.25);
+}
+
+.cp-scorer-medal {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+.cp-scorer-pos {
+  font-family: var(--display);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cp-scorer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.cp-scorer-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--camp-gray-900);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cp-scorer-team {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--camp-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.75;
+}
+
+.cp-scorer-stats {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.cp-scorer-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+.cp-scorer-stat-value {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--camp-gray-900);
+  line-height: 1;
+}
+
+.cp-scorer-stat-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--camp-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 768px) {
+  .cp-top-scorers {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  
+  .cp-scorer-card {
+    padding: 14px;
+  }
+  
+  .cp-scorer-name {
+    font-size: 0.85rem;
+  }
+}

@@ -50,6 +50,8 @@ export default function TournamentStandings({ standings, teamsAdvancing, matches
                   <th className="cs-hide-sm">V</th>
                   <th className="cs-hide-sm">E</th>
                   <th className="cs-hide-sm">D</th>
+                  <th className="cs-hide-sm">GP</th>
+                  <th className="cs-hide-sm">GC</th>
                   <th>SG</th>
                 </tr>
               </thead>
@@ -76,6 +78,8 @@ export default function TournamentStandings({ standings, teamsAdvancing, matches
                       <td className="cs-hide-sm">{s.wins}</td>
                       <td className="cs-hide-sm">{s.draws}</td>
                       <td className="cs-hide-sm">{s.losses}</td>
+                      <td className="cs-hide-sm">{s.goalsFor || 0}</td>
+                      <td className="cs-hide-sm">{s.goalsAgainst || 0}</td>
                       <td className="cs-sg">{s.goalDiff > 0 ? `+${s.goalDiff}` : s.goalDiff}</td>
                     </tr>
                   );
