@@ -239,7 +239,6 @@ function Home() {
                 <>
                   <Link to="/reservas" className="btn-primary">
                     <span>Reservar quadra</span>
-                    <span className="btn-arrow">→</span>
                   </Link>
                   <Link to="/campeonato" className="btn-ghost">Ver o campeonato</Link>
                 </>

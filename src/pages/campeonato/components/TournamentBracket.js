@@ -11,6 +11,16 @@ const PHASE_SHORT = {
 
 const PHASE_MIN_TEAMS = { ROUND_OF_16: 16, QUARTER_FINAL: 8, SEMI_FINAL: 4, FINAL: 2 };
 
+/* Troféu do clube (SVG) — substitui o emoji 🏆 */
+const TrophyGlyph = ({ size = 28 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+    <path d="M5 4h14v3a7 7 0 0 1-14 0V4Z" fill="#c89525" />
+    <path d="M5 5H3.4a2.6 2.6 0 0 0 3.1 3M19 5h1.6a2.6 2.6 0 0 1-3.1 3" stroke="#c89525" strokeWidth="1.5" fill="none" />
+    <rect x="10.5" y="11" width="3" height="5" fill="#a07415" />
+    <rect x="7.5" y="16" width="9" height="3" rx="1" fill="#0e244a" />
+  </svg>
+);
+
 function generateSeeds(n) {
   if (n <= 2) return [1, 2];
   const prev = generateSeeds(n / 2);
@@ -132,7 +142,7 @@ function MatchCard({ match, isFinal = false }) {
       {/* Data/hora + Local agrupados no topo do card */}
       {(fmtDate || match.venue) && (
         <div className="wb-card-meta">
-          {fmtDate && <div className="wb-date">📅 {fmtDate}</div>}
+          {fmtDate && <div className="wb-date">{fmtDate}</div>}
           {match.venue && <VenueTag venue={match.venue} />}
         </div>
       )}
@@ -172,7 +182,6 @@ export default function TournamentBracket({ bracket, tournament, standings }) {
   if (!resolved) {
     return (
       <div className="camp-empty">
-        <span className="camp-empty-icon">🏆</span>
         <p>O bracket será exibido quando o torneio avançar para o mata-mata.</p>
       </div>
     );
@@ -210,13 +219,13 @@ export default function TournamentBracket({ bracket, tournament, standings }) {
       <div className="wb-wrapper">
         {champion && (
           <div className="wb-champion">
-            <span className="wb-champion-trophy">🏆</span>
+            <span className="wb-champion-trophy"><TrophyGlyph size={46} /></span>
             <span className="wb-champion-label">CAMPEÃO</span>
             <span className="wb-champion-name">{champion.name}</span>
           </div>
         )}
         <div className="wb-final-only">
-          <div className="wb-final-badge">🏆 FINAL</div>
+          <div className="wb-final-badge">FINAL</div>
           <MatchCard match={finalMatch} isFinal />
         </div>
       </div>
@@ -227,7 +236,7 @@ export default function TournamentBracket({ bracket, tournament, standings }) {
     <div className="wb-wrapper">
       {champion && (
         <div className="wb-champion">
-          <span className="wb-champion-trophy">🏆</span>
+          <span className="wb-champion-trophy"><TrophyGlyph size={46} /></span>
           <span className="wb-champion-label">CAMPEÃO</span>
           <TeamLogo name={champion.name} logoUrl={champion.logoUrl || null} size={72} shape="shield" />
           <span className="wb-champion-name">{champion.name}</span>
@@ -236,13 +245,13 @@ export default function TournamentBracket({ bracket, tournament, standings }) {
 
       <div className="wb-top-bar">
         <span className="wb-top-bar-side">Chave A</span>
-        <span className="wb-top-bar-center">⚔ Mata-Mata</span>
+        <span className="wb-top-bar-center">Mata-Mata</span>
         <span className="wb-top-bar-side">Chave B</span>
       </div>
 
       <div className="wb-scroll-wrap">
         <div className="wb-arena" style={{ minHeight: colH + 20 }}>
-          <div className="wb-trophy-bg" aria-hidden="true">🏆</div>
+          <div className="wb-trophy-bg" aria-hidden="true"><TrophyGlyph size={200} /></div>
 
           <div className="wb-side wb-side--left">
             {leftRounds.map(round => (
@@ -251,13 +260,13 @@ export default function TournamentBracket({ bracket, tournament, standings }) {
           </div>
 
           <div className="wb-final-zone" style={{ height: colH }}>
-            <div className="wb-final-badge">🏆 FINAL</div>
+            <div className="wb-final-badge">FINAL</div>
             <div className="wb-final-body" style={{ height: colH - HEADER_H }}>
               {finalMatch
                 ? <MatchCard match={finalMatch} isFinal />
                 : (
                   <div className="wb-final-tbd">
-                    <span className="wb-final-tbd-icon">⚔</span>
+                    <span className="wb-final-tbd-icon" aria-hidden="true" />
                     <span>Aguardando semifinais</span>
                   </div>
                 )

@@ -7,15 +7,15 @@ function isVet(player, year) {
 }
 
 const VetBadge = () => (
-  <span style={{ marginLeft: 5, fontSize: '0.6rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle' }}>VET</span>
+  <span style={{ marginLeft: 5, fontSize: '0.6rem', fontWeight: 700, color: '#fff', background: '#0e244a', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle' }}>VET</span>
 );
 
 const SuspBadge = () => (
-  <span style={{ marginLeft: 5, fontSize: '0.6rem', fontWeight: 700, color: '#fff', background: '#dc2626', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle' }}>SUSPENSO</span>
+  <span style={{ marginLeft: 5, fontSize: '0.6rem', fontWeight: 700, color: '#fff', background: '#a73022', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle' }}>SUSPENSO</span>
 );
 
 const PendBadge = () => (
-  <span style={{ marginLeft: 5, fontSize: '0.6rem', fontWeight: 700, color: '#92400e', background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle' }}>⚠️ pendurado</span>
+  <span style={{ marginLeft: 5, fontSize: '0.6rem', fontWeight: 700, color: '#0e244a', background: '#c89525', border: '1px solid #a07415', borderRadius: 3, padding: '1px 6px', verticalAlign: 'middle' }}>pendurado</span>
 );
 
 const POSITION_SHORT = {

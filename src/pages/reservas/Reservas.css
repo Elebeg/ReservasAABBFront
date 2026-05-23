@@ -400,6 +400,101 @@
 }
 .res-btn--ghost { background: transparent; border-color: var(--rule-light); color: var(--bone); }
 .res-btn--ghost:hover { border-color: var(--gold-3); color: var(--gold-3); }
+.res-btn--ghost-ink { background: transparent; border-color: var(--rule); color: var(--ink); }
+.res-btn--ghost-ink:hover:not(:disabled) { background: var(--ink); border-color: var(--ink); color: var(--bone); }
+.res-btn--danger { background: var(--red); border-color: var(--red); color: var(--bone); }
+.res-btn--danger:hover:not(:disabled) { background: #8c2618; border-color: #8c2618; transform: translateY(-1px); }
+.res-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ─── Modal de cancelamento ─── */
+.res-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 26, 54, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: res-modal-fade 0.18s ease;
+}
+@keyframes res-modal-fade { from { opacity: 0; } to { opacity: 1; } }
+.res-modal {
+  width: min(440px, 100%);
+  background: linear-gradient(135deg, #fdf6e0 0%, var(--bone) 60%, #e8ddbe 100%);
+  border: 1px solid var(--gold-2);
+  border-radius: 6px;
+  box-shadow: 0 40px 80px -30px rgba(13, 23, 48, 0.6);
+  overflow: hidden;
+  animation: res-modal-pop 0.2s ease;
+}
+@keyframes res-modal-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.res-modal-head {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 22px 26px;
+  border-bottom: 4px solid var(--gold);
+}
+.res-modal-eyebrow {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-3);
+  margin-bottom: 6px;
+}
+.res-modal-head h3 {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  color: var(--bone);
+  margin: 0;
+}
+.res-modal-body { padding: 24px 26px; }
+.res-modal-body p {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin: 0 0 18px;
+}
+.res-modal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  background: var(--bone-2);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--gold);
+  border-radius: 2px;
+}
+.res-modal-court {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.res-modal-when {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  color: var(--ink-2);
+  text-transform: capitalize;
+}
+.res-modal-actions {
+  display: flex;
+  gap: 12px;
+  padding: 0 26px 26px;
+}
+.res-modal-actions .res-btn { flex: 1; }
 
 /* ─── Minhas reservas ─── */
 .res-empty {

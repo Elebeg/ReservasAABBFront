@@ -9,7 +9,7 @@ function isVet(player, year) {
 }
 
 const VetBadge = () => (
-  <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#fff', background: '#7c3aed', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle', marginLeft: 4 }}>VET</span>
+  <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#fff', background: '#0e244a', borderRadius: 3, padding: '1px 4px', verticalAlign: 'middle', marginLeft: 4 }}>VET</span>
 );
 
 const PHASE_LABELS = {
@@ -127,7 +127,7 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
             {g.player?.name ?? '—'}
             {isVet(g.player, tournamentYear) && <VetBadge />}
           </span>;
-      items.push(<div key={`g${g.id}`} className="camp-rm-event"><span className="camp-rm-icon camp-rm-icon--goal">⚽</span>{label}</div>);
+      items.push(<div key={`g${g.id}`} className="camp-rm-event"><span className="camp-rm-icon camp-rm-icon--goal" aria-hidden="true" />{label}</div>);
     });
     cards.filter(c => c.type === 'YELLOW').forEach(c => {
       items.push(

@@ -2094,3 +2094,172 @@
 
 /* estado vazio */
 .camp-no-tournament h2 { font-family: var(--display); }
+
+/* ═══════════════════════════════════════════════════════════════
+   POLIMENTO DOS SUBCOMPONENTES · molde clubístico
+   (.camp-page eleva a especificidade acima das regras-base)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Estados vazios ── */
+.camp-page .camp-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; padding: 56px 24px; text-align: center;
+  background: var(--bone-2); border: 1px dashed var(--rule); border-radius: 4px;
+}
+.camp-page .camp-empty p { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--ink-2); margin: 0; }
+.camp-page .camp-empty-icon { display: none; }
+
+/* ── Títulos de grupo/fase ── */
+.camp-page .camp-group-title,
+.camp-page .camp-phase-title {
+  font-family: var(--display); font-weight: 800; font-size: 20px;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink);
+  display: flex; align-items: center; gap: 12px;
+  padding: 2px 0 2px 14px; margin: 0 0 16px;
+  border-left: 4px solid var(--gold);
+}
+.camp-page .camp-day-count {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--gold-2); font-weight: 500; margin-left: auto;
+}
+
+/* ── Tabelas (classificação / artilharia) ── */
+.camp-page .camp-table-wrap { border: 1px solid var(--rule); border-radius: 4px; }
+.camp-page .camp-table { border-collapse: collapse; width: 100%; background: var(--bone); }
+.camp-page .camp-table thead tr { background: var(--ink); }
+.camp-page .camp-th {
+  font-family: var(--display); font-weight: 700; font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--bone); padding: 12px 8px; border: none; white-space: nowrap;
+}
+.camp-page .camp-th.pts { color: var(--gold-3); }
+.camp-page .camp-td {
+  font-family: var(--sans); font-size: 14px; color: var(--ink-2);
+  padding: 11px 8px; border-bottom: 1px solid var(--rule); background: transparent;
+}
+.camp-page .camp-tr:hover td { background: rgba(200, 149, 37, 0.08); }
+.camp-page .camp-td.pts { font-family: var(--display); font-weight: 900; font-size: 18px; color: var(--ink); }
+.camp-page .camp-td.center, .camp-page .camp-th.center { text-align: center; }
+.camp-page .st-team-name {
+  font-family: var(--display); font-weight: 700; font-size: 14px;
+  letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink);
+}
+.camp-page .camp-tr.advancing td:first-child { box-shadow: inset 4px 0 0 var(--gold); }
+.camp-page .camp-advance-dot { background: var(--gold); }
+.camp-page .camp-legend { font-family: var(--mono); font-size: 11px; color: var(--ink-2); letter-spacing: 0.02em; }
+
+/* ── Cards de time ── */
+.camp-page .camp-team-card {
+  background: var(--bone);
+  border: 1px solid var(--rule);
+  border-top: 4px solid var(--gold);
+  border-radius: 4px;
+}
+.camp-page .camp-team-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px -22px rgba(13, 23, 48, 0.5);
+}
+.camp-page .camp-team-card-pos {
+  background: var(--ink); color: var(--gold-3);
+  font-family: var(--display); font-weight: 800;
+}
+.camp-page .camp-team-card-name {
+  font-family: var(--display); font-weight: 800; font-size: 16px;
+  letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink);
+}
+.camp-page .camp-team-card-group { font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+.camp-page .camp-team-card-stat-value { font-family: var(--display); font-weight: 900; color: var(--ink); }
+.camp-page .camp-team-card-stat-pts { color: var(--gold-2); }
+.camp-page .camp-team-card-stat-label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2);
+}
+.camp-page .camp-team-card-cta {
+  font-family: var(--display); font-weight: 700; font-size: 12px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold-2);
+}
+
+/* ── Partidas ── */
+.camp-page .camp-day-btn {
+  font-family: var(--display); font-weight: 700; font-size: 12px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  border: 1.5px solid var(--rule); border-radius: 2px; background: var(--bone); color: var(--ink-2);
+}
+.camp-page .camp-day-btn.active { background: var(--ink); border-color: var(--ink); color: var(--bone); }
+.camp-page .camp-match-card {
+  background: var(--bone);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--rule);
+  border-radius: 4px;
+}
+.camp-page .camp-match-card.finished { border-left-color: var(--gold); }
+.camp-page .camp-match-time { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--gold-2); }
+.camp-page .camp-match-team-name {
+  font-family: var(--display); font-weight: 700; font-size: 14px;
+  letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink);
+}
+.camp-page .camp-match-score { font-family: var(--display); font-weight: 900; font-size: 30px; color: var(--ink); }
+.camp-page .camp-match-score .bold { color: var(--gold-2); }
+.camp-page .camp-match-score-sep { color: var(--ink-2); font-weight: 400; }
+.camp-page .camp-match-vs { font-family: var(--display); font-weight: 800; letter-spacing: 0.1em; color: var(--ink-2); }
+.camp-page .camp-match-penalties { font-family: var(--mono); font-size: 10px; color: var(--ink-2); }
+.camp-page .camp-match-footer { border-top: 1px solid var(--rule); }
+.camp-page .camp-match-phase-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2);
+}
+.camp-page .camp-detail-chip {
+  font-family: var(--display); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink);
+  background: var(--bone-2); border: 1px solid var(--rule); border-radius: 2px;
+}
+.camp-page .camp-detail-chip:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.camp-page .camp-sumula-dot { background: var(--gold); }
+.camp-page .camp-match-status.scheduled {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-2);
+}
+
+/* ── Bracket (mata-mata) ── */
+.camp-page .wb-top-bar-side { font-family: var(--display); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.camp-page .wb-top-bar-center {
+  font-family: var(--display); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink);
+}
+.camp-page .wb-col-header {
+  font-family: var(--display); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--bone); background: var(--ink); border-radius: 2px;
+}
+.camp-page .wb-card { background: var(--bone); border: 1px solid var(--rule); border-radius: 3px; }
+.camp-page .wb-card--final { border-color: var(--gold); }
+.camp-page .wb-card--done { border-left: 3px solid var(--gold); }
+.camp-page .wb-name {
+  font-family: var(--display); font-weight: 700; font-size: 12px;
+  letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink);
+}
+.camp-page .wb-row--won { background: rgba(200, 149, 37, 0.16); }
+.camp-page .wb-row--tbd .wb-name { color: var(--ink-2); opacity: 0.7; }
+.camp-page .wb-score { font-family: var(--display); font-weight: 900; color: var(--ink-2); }
+.camp-page .wb-score--won { color: var(--gold-2); }
+.camp-page .wb-seed-badge { background: var(--ink); color: var(--gold-3); font-family: var(--display); font-weight: 800; border-radius: 2px; }
+.camp-page .wb-date { font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em; color: var(--gold-2); }
+.camp-page .wb-pen { font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+.camp-page .wb-venue { font-family: var(--mono); font-size: 10px; color: var(--ink-2); }
+.camp-page .wb-final-badge {
+  font-family: var(--display); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+  background: var(--gold); color: var(--ink); border-radius: 2px;
+}
+.camp-page .wb-champion-label { font-family: var(--display); font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-2); }
+.camp-page .wb-champion-name {
+  font-family: var(--display); font-weight: 900; font-size: 24px;
+  letter-spacing: -0.01em; text-transform: uppercase; color: var(--ink);
+}
+.camp-page .wb-champion-trophy { line-height: 0; }
+.camp-page .wb-trophy-bg { opacity: 0.06; display: flex; align-items: center; justify-content: center; }
+.camp-page .wb-legend-dot--won { background: var(--gold); }
+.camp-page .wb-legend-dot--tbd { background: var(--rule); }
+.camp-page .wb-final-tbd-icon {
+  width: 10px; height: 10px; border-radius: 50%; background: var(--gold); display: inline-block;
+}
+
+/* ── Modal de detalhe da partida ── */
+.camp-page .camp-rm-icon--goal {
+  width: 9px; height: 9px; border-radius: 50%; background: var(--gold); display: inline-block; flex-shrink: 0;
+}
+.camp-rm-events-label, .camp-rm-no-events { font-family: var(--display); }

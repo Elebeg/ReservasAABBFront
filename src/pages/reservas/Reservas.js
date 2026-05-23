@@ -34,6 +34,7 @@ function ReservationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [cancelTarget, setCancelTarget] = useState(null);
 
   const formRef = useRef(null);
   const reservationsListRef = useRef(null);
@@ -249,10 +250,6 @@ function ReservationsPage() {
 
   const handleDeleteReservation = async (id) => {
     if (!setupApiAuthToken()) return;
-
-    if (!window.confirm('Tem certeza que deseja cancelar esta reserva?')) {
-      return;
-    }
 
     try {
       setLoading(true);
@@ -521,7 +518,7 @@ function ReservationsPage() {
                             <button className="res-link" onClick={() => handleEditReservation(reservation)}>
                               Editar
                             </button>
-                            <button className="res-link res-link--danger" onClick={() => handleDeleteReservation(reservation.id)}>
+                            <button className="res-link res-link--danger" onClick={() => setCancelTarget(reservation)}>
                               Cancelar
                             </button>
                           </div>
@@ -588,6 +585,39 @@ function ReservationsPage() {
           <p className="res-hint">Toque em um horário livre para preenchê-lo no formulário acima.</p>
         </section>
       </div>
+
+      {/* Modal de cancelamento */}
+      {cancelTarget && (
+        <div className="res-modal-backdrop" onClick={() => setCancelTarget(null)}>
+          <div className="res-modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <div className="res-modal-head">
+              <span className="res-modal-eyebrow">Cancelar reserva</span>
+              <h3>Tem certeza?</h3>
+            </div>
+            <div className="res-modal-body">
+              <p>O horário será liberado para outros sócios. Esta ação não pode ser desfeita.</p>
+              <div className="res-modal-card">
+                <span className="res-modal-court">{cancelTarget.court.name}</span>
+                <span className="res-modal-when">
+                  {format(parseISO(cancelTarget.startTime), "EEEE, dd/MM 'às' HH:mm", { locale: ptBR })}
+                </span>
+              </div>
+            </div>
+            <div className="res-modal-actions">
+              <button className="res-btn res-btn--ghost-ink" onClick={() => setCancelTarget(null)} disabled={loading}>
+                Voltar
+              </button>
+              <button
+                className="res-btn res-btn--danger"
+                onClick={() => { handleDeleteReservation(cancelTarget.id); setCancelTarget(null); }}
+                disabled={loading}
+              >
+                {loading ? 'Cancelando…' : 'Cancelar reserva'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
