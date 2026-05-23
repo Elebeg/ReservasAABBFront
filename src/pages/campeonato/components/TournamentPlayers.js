@@ -120,6 +120,15 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
           </div>
         </div>
 
+        <div className="camp-search-row">
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Buscar jogador pelo nome..."
+          />
+        </div>
+
         <div className="camp-table-wrap">
           <table className="camp-table">
             <thead>
