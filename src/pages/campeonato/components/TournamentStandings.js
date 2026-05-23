@@ -53,6 +53,8 @@ export default function TournamentStandings({ standings, teamsAdvancing, matches
                   <th className="cs-hide-sm">GP</th>
                   <th className="cs-hide-sm">GC</th>
                   <th>SG</th>
+                  <th className="cs-hide-sm cs-card-col" title="Cartões Amarelos"><svg viewBox="0 0 10 14" width="10" height="14"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#eab308"/></svg></th>
+                  <th className="cs-hide-sm cs-card-col" title="Cartões Vermelhos"><svg viewBox="0 0 10 14" width="10" height="14"><rect x="1" y="1" width="8" height="12" rx="1.5" fill="#dc2626"/></svg></th>
                 </tr>
               </thead>
               <tbody>
@@ -81,6 +83,12 @@ export default function TournamentStandings({ standings, teamsAdvancing, matches
                       <td className="cs-hide-sm">{s.goalsFor || 0}</td>
                       <td className="cs-hide-sm">{s.goalsAgainst || 0}</td>
                       <td className="cs-sg">{s.goalDiff > 0 ? `+${s.goalDiff}` : s.goalDiff}</td>
+                      <td className="cs-hide-sm cs-card-col" style={{ color: (s.yellowCards ?? 0) > 0 ? '#d68910' : undefined }}>
+                        {s.yellowCards ?? 0}
+                      </td>
+                      <td className="cs-hide-sm cs-card-col" style={{ color: (s.redCards ?? 0) > 0 ? '#c0392b' : undefined }}>
+                        {s.redCards ?? 0}
+                      </td>
                     </tr>
                   );
                 })}

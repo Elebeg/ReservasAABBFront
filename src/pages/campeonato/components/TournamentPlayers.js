@@ -51,7 +51,7 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
   const trimmed = query.trim();
   const visibleScorers = trimmed
     ? scorers.filter(p => normalize(p.name).includes(normalize(trimmed)))
-    : scorers;
+    : scorers.slice(0, 10);
   
   // Top 3 para destaque
   const topThree = scorers.slice(0, 3);

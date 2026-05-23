@@ -352,31 +352,46 @@ function AgendaRow({ match, tournamentYear, onTeamClick }) {
         tabIndex={finished ? 0 : undefined}
         onKeyDown={(e) => { if (finished && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setReportOpen(true); } }}
       >
-        <span className="ag-time">
-          {time || <span className="ag-time-tbd">{(PHASE_LABELS[match.phase] || '—').split(' ')[0]}</span>}
-        </span>
+        <div className="ag-row-main">
+          <span className="ag-time">
+            {time || <span className="ag-time-tbd">{(PHASE_LABELS[match.phase] || '—').split(' ')[0]}</span>}
+          </span>
 
-        <span className={`ag-team ag-home${homeWon ? ' won' : ''}`}>
-          <span className="ag-team-name" onClick={(e) => clickTeam(match.homeTeam, e)}>{homeName}</span>
-          <TeamLogo name={homeName} logoUrl={match.homeTeam?.logoUrl} size={26} shape="shield" />
-        </span>
+          <span className={`ag-team ag-home${homeWon ? ' won' : ''}`}>
+            <span className="ag-team-name" onClick={(e) => clickTeam(match.homeTeam, e)}>{homeName}</span>
+            <TeamLogo name={homeName} logoUrl={match.homeTeam?.logoUrl} size={26} shape="shield" />
+          </span>
 
-        <span className={`ag-score ${scoreClass}`}>
-          {finished
-            ? <>{match.homeScore}<i>–</i>{match.awayScore}</>
-            : <span className="ag-vs">vs</span>}
-        </span>
+          <span className={`ag-score ${scoreClass}`}>
+            {finished
+              ? <>{match.homeScore}<i>–</i>{match.awayScore}</>
+              : <span className="ag-vs">vs</span>}
+          </span>
 
-        <span className={`ag-team ag-away${awayWon ? ' won' : ''}`}>
-          <TeamLogo name={awayName} logoUrl={match.awayTeam?.logoUrl} size={26} shape="shield" />
-          <span className="ag-team-name" onClick={(e) => clickTeam(match.awayTeam, e)}>{awayName}</span>
-        </span>
+          <span className={`ag-team ag-away${awayWon ? ' won' : ''}`}>
+            <TeamLogo name={awayName} logoUrl={match.awayTeam?.logoUrl} size={26} shape="shield" />
+            <span className="ag-team-name" onClick={(e) => clickTeam(match.awayTeam, e)}>{awayName}</span>
+          </span>
 
-        {match.homePenalties != null
-          ? <span className="ag-tag">pên {match.homePenalties}×{match.awayPenalties}</span>
-          : match.hasSumula && finished
-            ? <span className="ag-tag ag-tag--sumula">súmula</span>
-            : <span className="ag-tag ag-tag--ghost" />}
+          {match.homePenalties != null
+            ? <span className="ag-tag">pên {match.homePenalties}×{match.awayPenalties}</span>
+            : match.hasSumula && finished
+              ? <span className="ag-tag ag-tag--sumula">súmula</span>
+              : <span className="ag-tag ag-tag--ghost" />}
+        </div>
+
+        {/* Venue info na segunda linha */}
+        {match.venue && (
+          <div className="ag-row-meta">
+            <span className="ag-venue">
+              <svg viewBox="0 0 14 18" width="12" height="14" style={{ flexShrink: 0, opacity: 0.6 }}>
+                <path d="M7 0C4.24 0 2 2.24 2 5c0 3.75 5 11 5 11s5-7.25 5-11c0-2.76-2.24-5-5-5z" fill="currentColor" />
+                <circle cx="7" cy="5" r="2" fill="white" />
+              </svg>
+              <span className="ag-venue-text">{match.venue.name}{match.venue.city ? ` · ${match.venue.city}` : ''}</span>
+            </span>
+          </div>
+        )}
       </div>
 
       {reportOpen && (
@@ -388,6 +403,8 @@ function AgendaRow({ match, tournamentYear, onTeamClick }) {
 
 // ─── Export: agenda por data ──────────────────────────────────────────────────
 export default function TournamentMatches({ matches, tournamentYear = new Date().getFullYear(), onTeamClick }) {
+  const [selectedDay, setSelectedDay] = useState(null);
+
   if (!matches || matches.length === 0) {
     return (
       <div className="camp-empty">
@@ -407,6 +424,9 @@ export default function TournamentMatches({ matches, tournamentYear = new Date()
   Object.values(byDay).forEach(list => list.sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt)));
   const sortedDays = Object.keys(byDay).sort();
 
+  // Auto-select primeiro dia se nenhum selecionado
+  const activeDay = selectedDay || sortedDays[0] || null;
+
   const phaseOrder = ['GROUP', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'FINAL'];
   const byPhase = {};
   withoutDate.forEach(m => { (byPhase[m.phase] = byPhase[m.phase] || []).push(m); });
@@ -414,18 +434,38 @@ export default function TournamentMatches({ matches, tournamentYear = new Date()
 
   return (
     <div className="ag-wrap">
-      {sortedDays.map(day => (
-        <section className="ag-day" key={day}>
+      {/* Filtro de dias */}
+      {sortedDays.length > 1 && (
+        <div className="camp-day-filters">
+          {sortedDays.map(day => (
+            <button
+              key={day}
+              className={`camp-day-btn${activeDay === day ? ' active' : ''}`}
+              onClick={() => setSelectedDay(day)}
+            >
+              {formatDateHeader(day).split(' ')[0].charAt(0).toUpperCase() + formatDateHeader(day).split(' ')[0].slice(1)}{' '}
+              <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>
+                {new Date(day + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Jogos do dia selecionado */}
+      {activeDay && byDay[activeDay] && (
+        <section className="ag-day">
           <div className="ag-day-head">
-            <span className="ag-day-date">{formatDateHeader(day)}</span>
-            <span className="ag-day-count">{byDay[day].length} jogo{byDay[day].length > 1 ? 's' : ''}</span>
+            <span className="ag-day-date">{formatDateHeader(activeDay)}</span>
+            <span className="ag-day-count">{byDay[activeDay].length} jogo{byDay[activeDay].length > 1 ? 's' : ''}</span>
           </div>
           <div className="ag-list">
-            {byDay[day].map(m => <AgendaRow key={m.id} match={m} tournamentYear={tournamentYear} onTeamClick={onTeamClick} />)}
+            {byDay[activeDay].map(m => <AgendaRow key={m.id} match={m} tournamentYear={tournamentYear} onTeamClick={onTeamClick} />)}
           </div>
         </section>
-      ))}
+      )}
 
+      {/* Jogos sem data */}
       {sortedPhases.map(phase => (
         <section className="ag-day" key={phase}>
           <div className="ag-day-head">
