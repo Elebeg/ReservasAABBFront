@@ -5,6 +5,7 @@ import TournamentBracket   from './components/TournamentBracket';
 import TournamentMatches   from './components/TournamentMatches';
 import TournamentPlayers   from './components/TournamentPlayers';
 import TournamentTeams     from './components/TournamentTeams';
+import TournamentSummary   from './components/TournamentSummary';
 import TeamProfile         from './components/TeamProfile';
 import './Campeonato.css';
 
@@ -51,7 +52,7 @@ const STATUS_COLORS = {
 
 export default function Campeonato() {
   const { tournament, standings, bracket, matches, players, loading, error } = useChampionship();
-  const [tab, setTab] = useState('matches');
+  const [tab, setTab] = useState('summary');
   const [selectedTeam, setSelectedTeam] = useState(null);
 
   const tournamentYear = tournament
@@ -77,7 +78,11 @@ export default function Campeonato() {
 
   const tabs = [
     {
-      key: 'matches', show: true, label: 'Partidas',
+      key: 'summary', show: true, label: 'Resumo',
+      icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>,
+    },
+    {
+      key: 'matches', show: true, label: 'Jogos',
       icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
     },
     {
@@ -85,7 +90,7 @@ export default function Campeonato() {
       icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
     },
     {
-      key: 'bracket', show: true, label: 'Bracket',
+      key: 'bracket', show: true, label: 'Mata-mata',
       icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="18" y2="12"/><rect x="10" y="9" width="4" height="6" rx="1"/></svg>,
     },
     {
@@ -209,6 +214,15 @@ export default function Campeonato() {
         </div>
 
         <div className="camp-tab-content">
+          {tab === 'summary' && (
+            <TournamentSummary
+              standings={standings}
+              matches={matches}
+              players={players}
+              onTab={setTab}
+              onTeamClick={setSelectedTeam}
+            />
+          )}
           {tab === 'matches' && (
             <TournamentMatches matches={matches} tournamentYear={tournamentYear} onTeamClick={setSelectedTeam} />
           )}
@@ -216,6 +230,7 @@ export default function Campeonato() {
             <TournamentStandings
               standings={standings}
               teamsAdvancing={tournament.teamsAdvancing}
+              matches={matches}
               onTeamClick={setSelectedTeam}
             />
           )}

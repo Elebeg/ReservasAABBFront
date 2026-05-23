@@ -327,93 +327,56 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
   );
 }
 
-// ─── Match Card ───────────────────────────────────────────────────────────────
-
-function MatchCard({ match, tournamentYear, onTeamClick }) {
+// ─── Linha de jogo (agenda por data) ────────────────────────────────────────
+function AgendaRow({ match, tournamentYear, onTeamClick }) {
   const [reportOpen, setReportOpen] = useState(false);
   const finished = match.status === 'FINISHED';
   const time     = match.scheduledAt ? formatTime(match.scheduledAt) : null;
+  const homeName = match.homeTeam?.name || 'A definir';
+  const awayName = match.awayTeam?.name || 'A definir';
+  const homeWon  = finished && match.homeScore > match.awayScore;
+  const awayWon  = finished && match.awayScore > match.homeScore;
+  const scoreClass = !finished ? '' : homeWon ? 'ag-score--home' : awayWon ? 'ag-score--away' : 'ag-score--draw';
 
-  function handleTeamClick(team) {
+  const clickTeam = (team, e) => {
+    e.stopPropagation();
     if (onTeamClick && team) onTeamClick({ name: team.name, logoUrl: team.logoUrl });
-  }
-
-  const teamNameClass = onTeamClick ? 'camp-team-clickable' : '';
+  };
 
   return (
     <>
-      <div className={`camp-match-card ${finished ? 'finished' : ''}`}>
-        {time && <div className="camp-match-time">{time}</div>}
+      <div
+        className={`ag-row${finished ? ' is-done' : ''}`}
+        onClick={() => finished && setReportOpen(true)}
+        role={finished ? 'button' : undefined}
+        tabIndex={finished ? 0 : undefined}
+        onKeyDown={(e) => { if (finished && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setReportOpen(true); } }}
+      >
+        <span className="ag-time">
+          {time || <span className="ag-time-tbd">{(PHASE_LABELS[match.phase] || '—').split(' ')[0]}</span>}
+        </span>
 
-        <div className="camp-match-teams">
-          <div className={`camp-match-team home ${finished && match.homeScore > match.awayScore ? 'won' : ''}`}>
-            {match.homeTeam
-              ? <TeamLogo name={match.homeTeam.name} logoUrl={match.homeTeam.logoUrl} size={28} shape="shield" />
-              : <TeamLogo name="?" logoUrl={null} size={28} shape="shield" />
-            }
-            <span
-              className={`camp-match-team-name${match.homeTeam ? ` ${teamNameClass}` : ''}`}
-              onClick={() => handleTeamClick(match.homeTeam)}
-            >
-              {match.homeTeam?.name || <em className="tbd">A definir</em>}
-            </span>
-          </div>
+        <span className={`ag-team ag-home${homeWon ? ' won' : ''}`}>
+          <span className="ag-team-name" onClick={(e) => clickTeam(match.homeTeam, e)}>{homeName}</span>
+          <TeamLogo name={homeName} logoUrl={match.homeTeam?.logoUrl} size={26} shape="shield" />
+        </span>
 
-          <div className="camp-match-center">
-            {finished ? (
-              <div
-                className="camp-match-score clickable"
-                onClick={() => setReportOpen(true)}
-                title="Ver detalhes da partida"
-              >
-                <span className={match.homeScore > match.awayScore ? 'bold' : ''}>{match.homeScore}</span>
-                <span className="camp-match-score-sep">×</span>
-                <span className={match.awayScore > match.homeScore ? 'bold' : ''}>{match.awayScore}</span>
-              </div>
-            ) : (
-              <span className="camp-match-vs">VS</span>
-            )}
-            {match.homePenalties != null && (
-              <div className="camp-match-penalties">
-                ({match.homePenalties} × {match.awayPenalties} pen.)
-              </div>
-            )}
-          </div>
+        <span className={`ag-score ${scoreClass}`}>
+          {finished
+            ? <>{match.homeScore}<i>–</i>{match.awayScore}</>
+            : <span className="ag-vs">vs</span>}
+        </span>
 
-          <div className={`camp-match-team away ${finished && match.awayScore > match.homeScore ? 'won' : ''}`}>
-            <span
-              className={`camp-match-team-name${match.awayTeam ? ` ${teamNameClass}` : ''}`}
-              onClick={() => handleTeamClick(match.awayTeam)}
-            >
-              {match.awayTeam?.name || <em className="tbd">A definir</em>}
-            </span>
-            {match.awayTeam
-              ? <TeamLogo name={match.awayTeam.name} logoUrl={match.awayTeam.logoUrl} size={28} shape="shield" />
-              : <TeamLogo name="?" logoUrl={null} size={28} shape="shield" />
-            }
-          </div>
-        </div>
+        <span className={`ag-team ag-away${awayWon ? ' won' : ''}`}>
+          <TeamLogo name={awayName} logoUrl={match.awayTeam?.logoUrl} size={26} shape="shield" />
+          <span className="ag-team-name" onClick={(e) => clickTeam(match.awayTeam, e)}>{awayName}</span>
+        </span>
 
-        {/* ── Local no card ── */}
-        {match.venue && (
-          <div className="camp-match-venue">
-            <VenueChip venue={match.venue} />
-          </div>
-        )}
-
-        <div className="camp-match-footer">
-          <span className="camp-match-phase-label">{PHASE_LABELS[match.phase] || match.phase}</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {finished ? (
-              <button className="camp-detail-chip" onClick={() => setReportOpen(true)}>
-                Ver detalhes
-                {match.hasSumula && <span className="camp-sumula-dot" title="Súmula disponível" />}
-              </button>
-            ) : (
-              <span className="camp-match-status scheduled">Agendada</span>
-            )}
-          </div>
-        </div>
+        {match.homePenalties != null
+          ? <span className="ag-tag">pên {match.homePenalties}×{match.awayPenalties}</span>
+          : match.hasSumula && finished
+            ? <span className="ag-tag ag-tag--sumula">súmula</span>
+            : <span className="ag-tag ag-tag--ghost" />}
       </div>
 
       {reportOpen && (
@@ -423,15 +386,11 @@ function MatchCard({ match, tournamentYear, onTeamClick }) {
   );
 }
 
-// ─── Export ───────────────────────────────────────────────────────────────────
-
+// ─── Export: agenda por data ──────────────────────────────────────────────────
 export default function TournamentMatches({ matches, tournamentYear = new Date().getFullYear(), onTeamClick }) {
-  const [activeDay, setActiveDay] = useState(null);
-
   if (!matches || matches.length === 0) {
     return (
       <div className="camp-empty">
-        <span className="camp-empty-icon">—</span>
         <p>Nenhuma partida disponível ainda.</p>
       </div>
     );
@@ -443,69 +402,41 @@ export default function TournamentMatches({ matches, tournamentYear = new Date()
   const byDay = {};
   withDate.forEach(m => {
     const key = toDateKey(m.scheduledAt);
-    if (!byDay[key]) byDay[key] = [];
-    byDay[key].push(m);
+    (byDay[key] = byDay[key] || []).push(m);
   });
+  Object.values(byDay).forEach(list => list.sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt)));
   const sortedDays = Object.keys(byDay).sort();
-  const filteredDays = activeDay ? [activeDay] : sortedDays;
 
   const phaseOrder = ['GROUP', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'FINAL'];
   const byPhase = {};
-  withoutDate.forEach(m => {
-    if (!byPhase[m.phase]) byPhase[m.phase] = [];
-    byPhase[m.phase].push(m);
-  });
-  const sortedPhases = Object.keys(byPhase).sort(
-    (a, b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b)
-  );
+  withoutDate.forEach(m => { (byPhase[m.phase] = byPhase[m.phase] || []).push(m); });
+  const sortedPhases = Object.keys(byPhase).sort((a, b) => phaseOrder.indexOf(a) - phaseOrder.indexOf(b));
 
   return (
-    <div className="camp-matches">
-
-      {sortedDays.length > 0 && (
-        <div className="camp-day-filters">
-          <button
-            className={`camp-day-btn ${!activeDay ? 'active' : ''}`}
-            onClick={() => setActiveDay(null)}
-          >
-            Todos os dias
-          </button>
-          {sortedDays.map(day => (
-            <button
-              key={day}
-              className={`camp-day-btn ${activeDay === day ? 'active' : ''}`}
-              onClick={() => setActiveDay(activeDay === day ? null : day)}
-            >
-              {new Date(day + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {filteredDays.map(day => (
-        <div className="camp-phase-section" key={day}>
-          <h3 className="camp-phase-title camp-phase-title--date">
-            {formatDateHeader(day)}
-            <span className="camp-day-count">{byDay[day].length} partida{byDay[day].length > 1 ? 's' : ''}</span>
-          </h3>
-          <div className="camp-matches-grid">
-            {byDay[day].map(m => <MatchCard key={m.id} match={m} tournamentYear={tournamentYear} onTeamClick={onTeamClick} />)}
+    <div className="ag-wrap">
+      {sortedDays.map(day => (
+        <section className="ag-day" key={day}>
+          <div className="ag-day-head">
+            <span className="ag-day-date">{formatDateHeader(day)}</span>
+            <span className="ag-day-count">{byDay[day].length} jogo{byDay[day].length > 1 ? 's' : ''}</span>
           </div>
-        </div>
+          <div className="ag-list">
+            {byDay[day].map(m => <AgendaRow key={m.id} match={m} tournamentYear={tournamentYear} onTeamClick={onTeamClick} />)}
+          </div>
+        </section>
       ))}
 
-      {!activeDay && sortedPhases.map(phase => (
-        <div className="camp-phase-section" key={phase}>
-          <h3 className="camp-phase-title">
-            {PHASE_LABELS[phase] || phase}
-            <span className="camp-day-count" style={{ opacity: 0.6 }}>Sem data definida</span>
-          </h3>
-          <div className="camp-matches-grid">
-            {byPhase[phase].map(m => <MatchCard key={m.id} match={m} tournamentYear={tournamentYear} onTeamClick={onTeamClick} />)}
+      {sortedPhases.map(phase => (
+        <section className="ag-day" key={phase}>
+          <div className="ag-day-head">
+            <span className="ag-day-date">{PHASE_LABELS[phase] || phase}</span>
+            <span className="ag-day-count">sem data</span>
           </div>
-        </div>
+          <div className="ag-list">
+            {byPhase[phase].map(m => <AgendaRow key={m.id} match={m} tournamentYear={tournamentYear} onTeamClick={onTeamClick} />)}
+          </div>
+        </section>
       ))}
-
     </div>
   );
 }

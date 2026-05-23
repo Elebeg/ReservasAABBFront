@@ -2371,3 +2371,194 @@
 /* Chip de local */
 .camp-page .camp-venue-chip { font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
 .camp-page .camp-rm-venue .camp-venue-chip { color: var(--gold-3); }
+
+/* ═══════════════════════════════════════════════════════════════
+   REIMAGINADO · Resumo, Agenda de jogos e Classificação v2
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Indicadores de forma (V/E/D) ── */
+.camp-page .cs-form, .camp-page .rs-form { display: inline-flex; gap: 3px; }
+.camp-page .cs-form-dot {
+  width: 18px; height: 18px; border-radius: 3px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--display); font-weight: 800; font-size: 10px; color: #fff;
+}
+.camp-page .cs-form-w { background: #2e7d3a; }
+.camp-page .cs-form-d { background: var(--gold-2); color: #0e244a; }
+.camp-page .cs-form-l { background: var(--red); }
+.camp-page .cs-form-empty { color: var(--ink-2); opacity: 0.5; }
+
+/* ── Agenda de jogos ── */
+.camp-page .ag-wrap { display: flex; flex-direction: column; gap: 28px; }
+.camp-page .ag-day-head {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--rule);
+}
+.camp-page .ag-day-date {
+  font-family: var(--display); font-weight: 800; font-size: 16px;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink);
+}
+.camp-page .ag-day-count {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--gold-2); margin-left: auto;
+}
+.camp-page .ag-list { display: flex; flex-direction: column; gap: 6px; }
+.camp-page .ag-row {
+  display: grid;
+  grid-template-columns: 64px 1fr auto 1fr 80px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: var(--bone);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 12px 16px;
+  font: inherit;
+  transition: background 0.12s, border-color 0.12s;
+}
+.camp-page .ag-row.is-done { cursor: pointer; }
+.camp-page .ag-row.is-done:hover { border-color: var(--gold); background: var(--bone-2); }
+.camp-page .ag-time { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.camp-page .ag-time-tbd { font-family: var(--display); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold-2); }
+.camp-page .ag-team { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.camp-page .ag-home { justify-content: flex-end; }
+.camp-page .ag-away { justify-content: flex-start; }
+.camp-page .ag-team-name {
+  font-family: var(--display); font-weight: 700; font-size: 15px;
+  letter-spacing: 0.01em; text-transform: uppercase; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.camp-page .ag-home .ag-team-name { text-align: right; }
+.camp-page .ag-team.won .ag-team-name { color: var(--gold-2); }
+.camp-page .ag-score {
+  display: inline-flex; align-items: center; gap: 4px; justify-content: center;
+  font-family: var(--display); font-weight: 900; font-size: 20px; color: var(--ink);
+  padding: 4px 12px; border-radius: 3px; border: 1px solid var(--rule);
+  background: var(--bone-2); min-width: 62px;
+}
+.camp-page .ag-score i { font-style: normal; color: var(--ink-2); font-weight: 400; }
+.camp-page .ag-score--home { background: rgba(46,125,58,0.14); border-color: rgba(46,125,58,0.4); }
+.camp-page .ag-score--away { background: rgba(167,48,34,0.14); border-color: rgba(167,48,34,0.4); }
+.camp-page .ag-score--draw { background: rgba(200,149,37,0.18); border-color: rgba(200,149,37,0.45); }
+.camp-page .ag-vs { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; color: var(--ink-2); }
+.camp-page .ag-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gold-2); text-align: right; }
+.camp-page .ag-tag--ghost { visibility: hidden; }
+
+/* ── Classificação v2 ── */
+.camp-page .cs-wrap { display: flex; flex-direction: column; gap: 32px; }
+.camp-page .cs-group-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.camp-page .cs-group-title {
+  font-family: var(--display); font-weight: 800; font-size: 18px;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink);
+  margin: 0; padding-left: 14px; border-left: 4px solid var(--gold);
+}
+.camp-page .cs-key { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
+.camp-page .cs-key-band { width: 16px; height: 16px; border-radius: 2px; background: rgba(200,149,37,0.18); box-shadow: inset 3px 0 0 var(--gold); }
+.camp-page .cs-table-wrap { border: 1px solid var(--rule); border-radius: 4px; overflow-x: auto; }
+.camp-page .cs-table { width: 100%; border-collapse: collapse; }
+.camp-page .cs-table thead tr { background: var(--ink); }
+.camp-page .cs-table th {
+  font-family: var(--display); font-weight: 700; font-size: 11px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--bone); padding: 12px 10px; text-align: center; white-space: nowrap;
+}
+.camp-page .cs-th-pos { width: 46px; }
+.camp-page .cs-th-team { text-align: left; }
+.camp-page .cs-table td { padding: 10px; text-align: center; font-family: var(--sans); font-size: 14px; color: var(--ink-2); border-bottom: 1px solid var(--rule); }
+.camp-page .cs-row:last-child td { border-bottom: none; }
+.camp-page .cs-row { transition: background 0.12s; }
+.camp-page .cs-row:hover td { background: rgba(200,149,37,0.06); }
+.camp-page td.cs-pos { width: 46px; }
+.camp-page .cs-pos-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 4px;
+  font-family: var(--display); font-weight: 800; font-size: 14px; color: var(--ink-2); background: var(--bone-2);
+}
+.camp-page td.cs-team { text-align: left; white-space: nowrap; }
+.camp-page td.cs-team svg { vertical-align: middle; }
+.camp-page .cs-team-name {
+  display: inline-block; vertical-align: middle; margin-left: 10px;
+  font-family: var(--display); font-weight: 700; font-size: 14px;
+  letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink);
+}
+.camp-page .cs-form-cell { text-align: center; }
+.camp-page td.cs-pts { font-family: var(--display); font-weight: 900; font-size: 18px; color: var(--ink); }
+.camp-page td.cs-sg { font-weight: 700; color: var(--ink); }
+
+/* zona de classificação */
+.camp-page .cs-row.is-advancing td { background: rgba(200,149,37,0.10); }
+.camp-page .cs-row.is-advancing:hover td { background: rgba(200,149,37,0.16); }
+.camp-page .cs-row.is-advancing td.cs-pos { box-shadow: inset 4px 0 0 var(--gold); }
+.camp-page .cs-row.is-advancing .cs-pos-num { background: var(--gold); color: var(--ink); }
+.camp-page .cs-row.is-cutoff td { border-bottom: 2px solid var(--gold); }
+.camp-page .cs-foot { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--ink-2); margin: 10px 0 0; }
+.camp-page .cs-foot strong { color: var(--gold-2); font-style: normal; }
+
+/* ── Resumo ── */
+.camp-page .rs-wrap { display: flex; flex-direction: column; gap: 22px; }
+.camp-page .rs-highlights { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.camp-page .rs-hl {
+  position: relative; overflow: hidden; text-align: left; width: 100%; cursor: pointer;
+  background: linear-gradient(135deg, #16305d 0%, var(--ink) 70%);
+  color: var(--bone); border: 1px solid var(--gold); border-radius: 6px;
+  padding: 20px 22px 20px 26px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.camp-page .rs-hl::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--gold); }
+.camp-page .rs-hl:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -24px rgba(13,23,48,0.6); }
+.camp-page .rs-hl-tag { font-family: var(--display); font-weight: 700; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-3); }
+.camp-page .rs-hl-main { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
+.camp-page .rs-hl-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; }
+.camp-page .rs-hl-name {
+  font-family: var(--display); font-weight: 900; font-size: clamp(20px, 2.4vw, 28px);
+  text-transform: uppercase; letter-spacing: -0.01em; color: var(--bone); line-height: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.camp-page .rs-hl-sub { font-family: var(--mono); font-size: 11px; letter-spacing: 0.03em; color: rgba(239,230,206,0.72); }
+.camp-page .rs-hl-goals { text-align: center; flex-shrink: 0; }
+.camp-page .rs-hl-goals-num { display: block; font-family: var(--display); font-weight: 900; font-size: 46px; line-height: 1; color: var(--gold-3); }
+.camp-page .rs-hl-goals-lbl { font-family: var(--display); font-weight: 700; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(239,230,206,0.6); }
+
+.camp-page .rs-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.camp-page .rs-block { background: var(--bone-2); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 20px; }
+.camp-page .rs-block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--rule); }
+.camp-page .rs-block-head h3 { font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink); margin: 0; }
+.camp-page .rs-link { background: none; border: none; cursor: pointer; font-family: var(--display); font-weight: 700; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-2); }
+.camp-page .rs-link:hover { color: var(--ink); }
+.camp-page .rs-mini { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.camp-page .rs-mini-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--rule); }
+.camp-page .rs-mini-row:last-child { border-bottom: none; }
+.camp-page .rs-mini-when { font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--gold-2); flex-shrink: 0; width: 84px; }
+.camp-page .rs-mini-game { display: flex; align-items: center; gap: 8px; font-family: var(--serif); font-size: 14px; color: var(--ink); flex: 1; min-width: 0; }
+.camp-page .rs-mini-game strong { font-weight: 500; font-style: italic; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.camp-page .rs-mini-game strong:last-child { text-align: right; }
+.camp-page .rs-mini-game em { color: var(--gold-2); font-size: 12px; font-style: normal; flex-shrink: 0; }
+.camp-page .rs-mini-row--result { cursor: pointer; }
+.camp-page .rs-mini-team { flex: 1; min-width: 0; font-family: var(--display); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.01em; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.camp-page .rs-mini-team.ta-right { text-align: right; }
+.camp-page .rs-mini-team.won { color: var(--gold-2); }
+.camp-page .rs-mini-score { flex-shrink: 0; font-family: var(--display); font-weight: 900; font-size: 16px; color: var(--ink); padding: 3px 10px; border-radius: 3px; border: 1px solid var(--rule); background: var(--bone); }
+.camp-page .rs-mini-score i { font-style: normal; color: var(--ink-2); font-weight: 400; }
+.camp-page .rs-mini-score.ag-score--home { background: rgba(46,125,58,0.14); border-color: rgba(46,125,58,0.4); }
+.camp-page .rs-mini-score.ag-score--away { background: rgba(167,48,34,0.14); border-color: rgba(167,48,34,0.4); }
+.camp-page .rs-mini-score.ag-score--draw { background: rgba(200,149,37,0.18); border-color: rgba(200,149,37,0.45); }
+.camp-page .rs-empty { font-family: var(--serif); font-style: italic; color: var(--ink-2); margin: 8px 0; }
+
+/* ── Responsivo ── */
+@media (max-width: 760px) {
+  .camp-page .rs-highlights, .camp-page .rs-cols { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .camp-page .ag-row { grid-template-columns: 48px 1fr auto 1fr; gap: 8px; padding: 10px 12px; }
+  .camp-page .ag-tag { display: none; }
+  .camp-page .ag-team-name { font-size: 13px; }
+  .camp-page .ag-score { font-size: 18px; min-width: 54px; padding: 4px 8px; }
+}
+@media (max-width: 620px) {
+  .camp-page .cs-hide-sm { display: none; }
+}
+@media (max-width: 440px) {
+  .camp-page .ag-time { font-size: 11px; }
+  .camp-page .ag-team { gap: 6px; }
+  .camp-page .rs-hl-goals-num { font-size: 38px; }
+}
