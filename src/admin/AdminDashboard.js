@@ -1,11 +1,47 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './AdminDashboard.css';
 
 const API_URL = 'https://reservasaabb-production.up.railway.app';
 
 function authHeader() {
   return { Authorization: `Bearer ${localStorage.getItem('admin_token')}` };
 }
+
+// ── Ícones (SVG, sem emoji) ────────────────────────────────────────────────
+const Icon = {
+  dashboard: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+  ),
+  users: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  ),
+  calendar: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+  ),
+  trophy: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+  ),
+  refresh: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+  ),
+  logout: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+  ),
+};
+
+const NAV = [
+  { key: 'dashboard',    label: 'Dashboard',   icon: Icon.dashboard },
+  { key: 'users',        label: 'Usuários',    icon: Icon.users },
+  { key: 'reservations', label: 'Reservas',    icon: Icon.calendar },
+  { key: 'championship', label: 'Campeonatos', icon: Icon.trophy },
+];
+
+const PAGE_META = {
+  dashboard:    { title: 'Visão geral',  subtitle: 'Resumo do clube em tempo real' },
+  users:        { title: 'Usuários',     subtitle: 'Gerencie as contas cadastradas' },
+  reservations: { title: 'Reservas',     subtitle: 'Todas as reservas de quadra' },
+};
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -71,139 +107,152 @@ export default function AdminDashboard() {
   function formatDateTime(iso) {
     if (!iso) return '—';
     const d = new Date(iso);
-    return `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+    return `${d.toLocaleDateString('pt-BR')} · ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
   }
 
-  const tabs = ['dashboard', 'users', 'reservations', 'championship'];
+  const meta = PAGE_META[tab] || PAGE_META.dashboard;
 
   return (
-    <div style={styles.page}>
-      <aside style={styles.sidebar}>
-        <div style={styles.sidebarLogo}>⚙️ Admin</div>
-        <nav style={styles.nav}>
-          {tabs.map((t) => (
+    <div className="admin-page">
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <div className="admin-brand">
+          <span className="admin-brand-mark">AB</span>
+          <span className="admin-brand-text">
+            <strong>AABB</strong>
+            <small>Painel administrativo</small>
+          </span>
+        </div>
+
+        <nav className="admin-nav">
+          {NAV.map((item) => (
             <button
-              key={t}
-              onClick={() => t === 'championship' ? navigate('/admin/campeonato') : setTab(t)}
-              style={{ ...styles.navItem, ...(tab === t ? styles.navItemActive : {}) }}
+              key={item.key}
+              className={`admin-nav-item${tab === item.key ? ' is-active' : ''}`}
+              onClick={() => item.key === 'championship' ? navigate('/admin/campeonato') : setTab(item.key)}
             >
-              {t === 'dashboard'    && '📊 Dashboard'}
-              {t === 'users'        && '👤 Usuários'}
-              {t === 'reservations' && '📅 Reservas'}
-              {t === 'championship' && '🏆 Campeonatos'}
+              <span className="admin-nav-icon">{item.icon}</span>
+              {item.label}
             </button>
           ))}
         </nav>
-        <a href="/" style={styles.backSiteBtn}>← Voltar ao site</a>
-        <button onClick={logout} style={styles.logoutBtn}>Sair</button>
+
+        <div className="admin-sidebar-foot">
+          <a href="/" className="admin-side-link">← Voltar ao site</a>
+          <button onClick={logout} className="admin-logout">
+            <span className="admin-nav-icon">{Icon.logout}</span>
+            Sair
+          </button>
+        </div>
       </aside>
 
-      <main style={styles.main}>
-        {loading && <p style={styles.loading}>Carregando...</p>}
-
-        {tab === 'dashboard' && stats && (
+      {/* Conteúdo */}
+      <main className="admin-main">
+        <header className="admin-header">
           <div>
-            <h2 style={styles.heading}>Visão Geral</h2>
-            <div style={styles.statsGrid}>
-              <StatCard label="Usuários cadastrados" value={stats.totalUsers}        emoji="👤" />
-              <StatCard label="Total de reservas"    value={stats.totalReservations} emoji="📅" />
-              <StatCard label="Reservas hoje"        value={stats.reservationsToday} emoji="📆" />
-            </div>
+            <h1 className="admin-title">{meta.title}</h1>
+            <p className="admin-subtitle">{meta.subtitle}</p>
+          </div>
+          <button className="admin-refresh" onClick={() => fetchData(tab)} disabled={loading}>
+            <span className={`admin-refresh-icon${loading ? ' is-spinning' : ''}`}>{Icon.refresh}</span>
+            {loading ? 'Atualizando…' : 'Atualizar'}
+          </button>
+        </header>
+
+        {/* Dashboard */}
+        {tab === 'dashboard' && (
+          <div className="admin-stats">
+            <StatCard label="Usuários cadastrados" value={stats?.totalUsers} icon={Icon.users} accent="indigo" />
+            <StatCard label="Total de reservas" value={stats?.totalReservations} icon={Icon.calendar} accent="emerald" />
+            <StatCard label="Reservas hoje" value={stats?.reservationsToday} icon={Icon.dashboard} accent="amber" />
           </div>
         )}
 
+        {/* Usuários */}
         {tab === 'users' && (
-          <div>
-            <h2 style={styles.heading}>Usuários ({users.length})</h2>
-            <div style={styles.tableWrap}>
-              <table style={styles.table}>
+          <section className="admin-card">
+            <div className="admin-card-head">
+              <h2>Usuários <span className="admin-count">{users.length}</span></h2>
+            </div>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
                 <thead>
-                  <tr><Th>ID</Th><Th>Nome</Th><Th>Email</Th><Th>Verificado</Th><Th>Google</Th><Th>Ações</Th></tr>
+                  <tr>
+                    <th>ID</th><th>Nome</th><th>Email</th><th>Verificado</th><th>Google</th><th className="ta-right">Ações</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {users.map((u) => (
-                    <tr key={u.id} style={styles.tr}>
-                      <td style={styles.td}>{u.id}</td>
-                      <td style={styles.td}>{u.name}</td>
-                      <td style={styles.td}>{u.email}</td>
-                      <td style={styles.td}>{u.emailVerified ? '✅' : '❌'}</td>
-                      <td style={styles.td}>{u.googleId ? '✅' : '—'}</td>
-                      <td style={styles.td}>
-                        <button onClick={() => deleteUser(u.id)} style={styles.deleteBtn}>Remover</button>
+                    <tr key={u.id}>
+                      <td className="admin-mono">#{u.id}</td>
+                      <td className="admin-strong">{u.name}</td>
+                      <td className="admin-muted">{u.email}</td>
+                      <td>
+                        <span className={`admin-pill ${u.emailVerified ? 'pill-ok' : 'pill-off'}`}>
+                          {u.emailVerified ? 'Verificado' : 'Pendente'}
+                        </span>
+                      </td>
+                      <td>
+                        {u.googleId
+                          ? <span className="admin-pill pill-info">Google</span>
+                          : <span className="admin-dash">—</span>}
+                      </td>
+                      <td className="ta-right">
+                        <button onClick={() => deleteUser(u.id)} className="admin-btn-danger">Remover</button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {!loading && users.length === 0 && <div className="admin-empty">Nenhum usuário cadastrado.</div>}
             </div>
-          </div>
+          </section>
         )}
 
+        {/* Reservas */}
         {tab === 'reservations' && (
-          <div>
-            <h2 style={styles.heading}>Reservas ({reservations.length})</h2>
-            <div style={styles.tableWrap}>
-              <table style={styles.table}>
+          <section className="admin-card">
+            <div className="admin-card-head">
+              <h2>Reservas <span className="admin-count">{reservations.length}</span></h2>
+            </div>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
                 <thead>
-                  <tr><Th>ID</Th><Th>Data / Horário</Th><Th>Usuário</Th><Th>Quadra</Th><Th>Ações</Th></tr>
+                  <tr>
+                    <th>ID</th><th>Data / Horário</th><th>Usuário</th><th>Quadra</th><th className="ta-right">Ações</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {reservations.map((r) => (
-                    <tr key={r.id} style={styles.tr}>
-                      <td style={styles.td}>{r.id}</td>
-                      <td style={styles.td}>{formatDateTime(r.startTime)}</td>
-                      <td style={styles.td}>{r.user?.name ?? '—'}</td>
-                      <td style={styles.td}>{r.court?.name ?? '—'}</td>
-                      <td style={styles.td}>
-                        <button onClick={() => deleteReservation(r.id)} style={styles.deleteBtn}>Cancelar</button>
+                    <tr key={r.id}>
+                      <td className="admin-mono">#{r.id}</td>
+                      <td className="admin-strong">{formatDateTime(r.startTime)}</td>
+                      <td className="admin-muted">{r.user?.name ?? '—'}</td>
+                      <td><span className="admin-pill pill-neutral">{r.court?.name ?? '—'}</span></td>
+                      <td className="ta-right">
+                        <button onClick={() => deleteReservation(r.id)} className="admin-btn-danger">Cancelar</button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {!loading && reservations.length === 0 && <div className="admin-empty">Nenhuma reserva encontrada.</div>}
             </div>
-          </div>
+          </section>
         )}
       </main>
     </div>
   );
 }
 
-function StatCard({ label, value, emoji }) {
+function StatCard({ label, value, icon, accent }) {
   return (
-    <div style={styles.statCard}>
-      <span style={styles.statEmoji}>{emoji}</span>
-      <span style={styles.statValue}>{value}</span>
-      <span style={styles.statLabel}>{label}</span>
+    <div className={`admin-stat accent-${accent}`}>
+      <span className="admin-stat-icon">{icon}</span>
+      <div className="admin-stat-body">
+        <span className="admin-stat-value">{value ?? '—'}</span>
+        <span className="admin-stat-label">{label}</span>
+      </div>
     </div>
   );
 }
-
-function Th({ children }) {
-  return <th style={styles.th}>{children}</th>;
-}
-
-const styles = {
-  page:          { display: 'flex', minHeight: '100vh', background: '#0f172a', color: '#f8fafc' },
-  sidebar:       { width: 220, background: '#1e293b', display: 'flex', flexDirection: 'column', padding: '24px 16px', gap: 4, flexShrink: 0 },
-  sidebarLogo:   { fontSize: 18, fontWeight: 700, color: '#f8fafc', marginBottom: 24, paddingLeft: 8 },
-  nav:           { display: 'flex', flexDirection: 'column', gap: 4, flex: 1 },
-  navItem:       { background: 'transparent', border: 'none', color: '#94a3b8', textAlign: 'left', padding: '10px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 14, fontWeight: 500 },
-  navItemActive: { background: '#334155', color: '#f8fafc' },
-  backSiteBtn:   { display: 'block', textAlign: 'center', marginTop: 'auto', marginBottom: 8, background: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: 8, padding: '10px 12px', cursor: 'pointer', fontSize: 13, textDecoration: 'none' },
-  logoutBtn:     { background: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: 8, padding: '10px 12px', cursor: 'pointer', fontSize: 14 },
-  main:          { flex: 1, padding: '32px 40px', overflowY: 'auto' },
-  heading:       { color: '#f8fafc', fontSize: 22, fontWeight: 700, marginBottom: 24 },
-  loading:       { color: '#94a3b8', fontSize: 14 },
-  statsGrid:     { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 },
-  statCard:      { background: '#1e293b', borderRadius: 12, padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: 8 },
-  statEmoji:     { fontSize: 28 },
-  statValue:     { fontSize: 36, fontWeight: 700, color: '#3b82f6' },
-  statLabel:     { fontSize: 13, color: '#94a3b8' },
-  tableWrap:     { overflowX: 'auto' },
-  table:         { width: '100%', borderCollapse: 'collapse', fontSize: 14 },
-  th:            { textAlign: 'left', color: '#64748b', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', padding: '8px 12px', borderBottom: '1px solid #1e293b' },
-  tr:            { borderBottom: '1px solid #1e293b' },
-  td:            { padding: '12px 12px', color: '#cbd5e1', verticalAlign: 'middle' },
-  deleteBtn:     { background: '#7f1d1d', color: '#fca5a5', border: 'none', borderRadius: 6, padding: '5px 12px', cursor: 'pointer', fontSize: 12, fontWeight: 600 },
-};
