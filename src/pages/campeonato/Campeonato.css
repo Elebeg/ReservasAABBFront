@@ -3,7 +3,7 @@
 :root {
   /* Mapeia o "tema campeonato" para as cores globais da landing */
   --camp-primary:       var(--primary-blue);
-  --camp-primary-dark:  #08365f;                 /* azul mais escuro p/ gradiente */
+  --camp-primary-dark:  #0a1a36;                 /* azul mais escuro p/ gradiente */
   --camp-primary-light: rgba(200, 149, 37, 0.14); /* amarelo suave */
   --camp-accent:        var(--primary-yellow);
 
@@ -884,9 +884,9 @@
   gap: 0;
   border-radius: 18px;
   overflow: hidden;
-  background: #fafafa;
-  border: 1px solid rgba(245,184,0,0.25);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.07), 0 0 0 1px rgba(245,184,0,0.12);
+  background: var(--bone-2);
+  border: 1px solid rgba(200,149,37,0.25);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07), 0 0 0 1px rgba(200,149,37,0.12);
 }
 
 /* ── Campeão ───────────────────────────────────────────────────────────── */
@@ -896,8 +896,8 @@
   align-items: center;
   gap: 4px;
   padding: 28px 24px 20px;
-  background: linear-gradient(135deg, rgba(245,184,0,0.12) 0%, rgba(245,184,0,0.22) 50%, rgba(245,184,0,0.12) 100%);
-  border-bottom: 1px solid rgba(245,184,0,0.3);
+  background: linear-gradient(135deg, rgba(200,149,37,0.12) 0%, rgba(200,149,37,0.22) 50%, rgba(200,149,37,0.12) 100%);
+  border-bottom: 1px solid rgba(200,149,37,0.3);
   animation: wbChampionIn 0.6s ease;
 }
 
@@ -912,12 +912,12 @@
   font-weight: 900;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: #9a6800;
+  color: #a07415;
 }
 .wb-champion-name   {
   font-size: 1.6rem;
   font-weight: 900;
-  color: #7a5000;
+  color: #0e244a;
   text-shadow: none;
 }
 
@@ -927,8 +927,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  background: rgba(245,184,0,0.06);
-  border-bottom: 1px solid rgba(245,184,0,0.18);
+  background: rgba(200,149,37,0.06);
+  border-bottom: 1px solid rgba(200,149,37,0.18);
 }
 
 .wb-top-bar-side {
@@ -936,7 +936,7 @@
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(140,90,0,0.85);
+  color: rgba(14,36,74,0.85);
   flex: 1;
 }
 
@@ -947,8 +947,8 @@
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #F5B800;
-  text-shadow: 0 0 20px rgba(245,184,0,0.4);
+  color: #c89525;
+  text-shadow: 0 0 20px rgba(200,149,37,0.4);
   padding: 0 16px;
 }
 
@@ -958,14 +958,14 @@
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: rgba(245,184,0,0.3) transparent;
+  scrollbar-color: rgba(200,149,37,0.3) transparent;
   padding: 28px 20px 24px;
-  background: linear-gradient(180deg, rgba(245,184,0,0.03) 0%, transparent 60%);
+  background: linear-gradient(180deg, rgba(200,149,37,0.03) 0%, transparent 60%);
 }
 
 .wb-scroll-wrap::-webkit-scrollbar { height: 4px; }
 .wb-scroll-wrap::-webkit-scrollbar-track { background: transparent; }
-.wb-scroll-wrap::-webkit-scrollbar-thumb { background: rgba(245,184,0,0.3); border-radius: 999px; }
+.wb-scroll-wrap::-webkit-scrollbar-thumb { background: rgba(200,149,37,0.3); border-radius: 999px; }
 
 /* ── Arena (layout flex horizontal) ───────────────────────────────────── */
 .wb-arena {
@@ -1019,8 +1019,8 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(140,85,0,0.9);
-  border-bottom: 1px solid rgba(245,184,0,0.18);
-  background: rgba(245,184,0,0.07);
+  border-bottom: 1px solid rgba(200,149,37,0.18);
+  background: rgba(200,149,37,0.07);
 }
 
 .wb-col-header::before {
@@ -1028,12 +1028,12 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(245,184,0,0.55);
+  background: rgba(200,149,37,0.55);
   flex-shrink: 0;
 }
 
-.wb-col--left  { border-right: 1px solid rgba(245,184,0,0.1); }
-.wb-col--right { border-left:  1px solid rgba(245,184,0,0.1); }
+.wb-col--left  { border-right: 1px solid rgba(200,149,37,0.1); }
+.wb-col--right { border-left:  1px solid rgba(200,149,37,0.1); }
 
 .wb-col-matches {
   display: flex;
@@ -1058,17 +1058,17 @@
   top: 50%;
   width: 14px;
   height: 1px;
-  background: linear-gradient(90deg, rgba(245,184,0,0.15), rgba(245,184,0,0.45));
+  background: linear-gradient(90deg, rgba(200,149,37,0.15), rgba(200,149,37,0.45));
 }
 .wb-col--left  .wb-slot::after { right: -14px; }
-.wb-col--right .wb-slot::after { left: -14px; background: linear-gradient(270deg, rgba(245,184,0,0.15), rgba(245,184,0,0.45)); }
+.wb-col--right .wb-slot::after { left: -14px; background: linear-gradient(270deg, rgba(200,149,37,0.15), rgba(200,149,37,0.45)); }
 
 /* ── Match Card ────────────────────────────────────────────────────────── */
 .wb-card {
   width: 100%;
   background: #ffffff;
-  border: 1px solid rgba(245,184,0,0.22);
-  border-left: 3px solid rgba(245,184,0,0.5);
+  border: 1px solid rgba(200,149,37,0.22);
+  border-left: 3px solid rgba(200,149,37,0.5);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -1076,42 +1076,42 @@
 }
 
 .wb-card:hover {
-  border-color: rgba(245,184,0,0.55);
-  border-left-color: #F5B800;
+  border-color: rgba(200,149,37,0.55);
+  border-left-color: #c89525;
   box-shadow: 0 6px 24px rgba(0,0,0,0.12);
   transform: translateY(-1px);
 }
 
 .wb-card--done {
-  border-left-color: rgba(245,184,0,0.7);
+  border-left-color: rgba(200,149,37,0.7);
 }
 
 /* Card preview (placeholder / sem times definidos) */
 .wb-card--preview {
-  background: rgba(245,184,0,0.02);
-  border: 1px dashed rgba(245,184,0,0.28);
+  background: rgba(200,149,37,0.02);
+  border: 1px dashed rgba(200,149,37,0.28);
   border-left: none;
   box-shadow: none;
 }
 .wb-card--preview:hover {
-  border-color: rgba(245,184,0,0.5);
+  border-color: rgba(200,149,37,0.5);
   box-shadow: none;
   transform: none;
 }
 
 /* Card da Final — maior, mais dourado */
 .wb-card--final {
-  background: #fffdf0;
-  border: 2px solid rgba(200,140,0,0.5);
-  border-left: 4px solid #F5B800;
+  background: #fdf6e0;
+  border: 2px solid rgba(160,116,21,0.5);
+  border-left: 4px solid #c89525;
   border-radius: 12px;
-  box-shadow: 0 0 40px rgba(245,184,0,0.12), 0 8px 32px rgba(0,0,0,0.08);
+  box-shadow: 0 0 40px rgba(200,149,37,0.12), 0 8px 32px rgba(0,0,0,0.08);
 }
 
 .wb-card--final:hover {
-  border-color: rgba(245,184,0,0.7);
-  border-left-color: #F5B800;
-  box-shadow: 0 0 60px rgba(245,184,0,0.2), 0 8px 32px rgba(0,0,0,0.12);
+  border-color: rgba(200,149,37,0.7);
+  border-left-color: #c89525;
+  box-shadow: 0 0 60px rgba(200,149,37,0.2), 0 8px 32px rgba(0,0,0,0.12);
 }
 
 /* ── Row (time) ────────────────────────────────────────────────────────── */
@@ -1127,7 +1127,7 @@
 .wb-card--final .wb-row { padding: 12px 14px; }
 
 .wb-row--won {
-  background: linear-gradient(90deg, rgba(245,184,0,0.18) 0%, rgba(245,184,0,0.04) 100%);
+  background: linear-gradient(90deg, rgba(200,149,37,0.18) 0%, rgba(200,149,37,0.04) 100%);
 }
 
 .wb-row--tbd .wb-name {
@@ -1141,9 +1141,9 @@
   min-width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: rgba(245,184,0,0.12);
-  border: 1px solid rgba(245,184,0,0.35);
-  color: rgba(140,90,0,0.65);
+  background: rgba(200,149,37,0.12);
+  border: 1px solid rgba(200,149,37,0.35);
+  color: rgba(14,36,74,0.65);
   font-size: 0.58rem;
   font-weight: 900;
   display: flex;
@@ -1182,8 +1182,8 @@
 }
 
 .wb-score--won {
-  color: #F5B800;
-  text-shadow: 0 0 12px rgba(245,184,0,0.5);
+  color: #c89525;
+  text-shadow: 0 0 12px rgba(200,149,37,0.5);
 }
 
 .wb-card--final .wb-score { font-size: 1rem; }
@@ -1200,8 +1200,8 @@
 
 .wb-card--final .wb-date {
   color: #c68b00;
-  border-bottom-color: rgba(245,184,0,0.15);
-  background: rgba(245,184,0,0.04);
+  border-bottom-color: rgba(200,149,37,0.15);
+  background: rgba(200,149,37,0.04);
 }
 
 /* ── Separador entre times ─────────────────────────────────────────────── */
@@ -1211,7 +1211,7 @@
   margin: 0;
 }
 
-.wb-card--final .wb-sep { background: rgba(245,184,0,0.15); }
+.wb-card--final .wb-sep { background: rgba(200,149,37,0.15); }
 
 /* ── Pênaltis ──────────────────────────────────────────────────────────── */
 .wb-pen {
@@ -1219,8 +1219,8 @@
   font-size: 0.68rem;
   font-weight: 800;
   color: #c68b00;
-  background: rgba(245,184,0,0.08);
-  border-top: 1px solid rgba(245,184,0,0.15);
+  background: rgba(200,149,37,0.08);
+  border-top: 1px solid rgba(200,149,37,0.15);
   letter-spacing: 0.04em;
   text-align: center;
 }
@@ -1233,9 +1233,9 @@
   z-index: 2;
   flex-shrink: 0;
   width: 190px;
-  border-left:  2px solid rgba(245,184,0,0.22);
-  border-right: 2px solid rgba(245,184,0,0.22);
-  background: radial-gradient(ellipse at center, rgba(245,184,0,0.08) 0%, transparent 75%);
+  border-left:  2px solid rgba(200,149,37,0.22);
+  border-right: 2px solid rgba(200,149,37,0.22);
+  background: radial-gradient(ellipse at center, rgba(200,149,37,0.08) 0%, transparent 75%);
 }
 
 .wb-final-badge {
@@ -1247,10 +1247,10 @@
   font-weight: 900;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #F5B800;
-  text-shadow: 0 0 16px rgba(245,184,0,0.5);
-  background: rgba(245,184,0,0.07);
-  border-bottom: 1px solid rgba(245,184,0,0.2);
+  color: #c89525;
+  text-shadow: 0 0 16px rgba(200,149,37,0.5);
+  background: rgba(200,149,37,0.07);
+  border-bottom: 1px solid rgba(200,149,37,0.2);
 }
 
 .wb-final-body {
@@ -1298,7 +1298,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  border-top: 1px solid rgba(245,184,0,0.15);
+  border-top: 1px solid rgba(200,149,37,0.15);
   font-size: 0.72rem;
   color: rgba(0,0,0,0.4);
   letter-spacing: 0.04em;
@@ -1312,7 +1312,7 @@
   flex-shrink: 0;
 }
 
-.wb-legend-dot--won { background: #F5B800; box-shadow: 0 0 6px rgba(245,184,0,0.5); }
+.wb-legend-dot--won { background: #c89525; box-shadow: 0 0 6px rgba(200,149,37,0.5); }
 .wb-legend-dot--tbd { background: rgba(0,0,0,0.15); }
 
 /* ── Responsive ────────────────────────────────────────────────────────── */
@@ -1673,7 +1673,7 @@
 
 /* ── Cabeçalho ── */
 .camp-rm-header {
-  background: linear-gradient(135deg, var(--camp-primary) 60%, #0e4f8a 130%);
+  background: linear-gradient(135deg, var(--camp-primary) 60%, #1c3a72 130%);
   padding: 16px 20px 18px;
   color: #fff;
   /* espaço à direita para o botão fechar */
@@ -2328,3 +2328,46 @@
   letter-spacing: 0.08em;
   color: rgba(239, 230, 206, 0.6);
 }
+
+/* ── Superfícies: creme + cantos quadrados (em vez de branco/arredondado) ── */
+.camp-page .camp-match-card { background: var(--bone); border-radius: 4px; }
+.camp-page .camp-match-card.finished { background: var(--bone-2); }
+.camp-page .camp-team-card { border-radius: 4px; }
+.camp-page .camp-table-wrap { border-radius: 4px; }
+
+/* Bracket */
+.camp-page .wb-wrapper {
+  background: var(--bone-2);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  box-shadow: 0 18px 40px -26px rgba(13, 23, 48, 0.45);
+}
+.camp-page .wb-champion {
+  background: linear-gradient(135deg, rgba(200,149,37,0.14) 0%, rgba(200,149,37,0.26) 50%, rgba(200,149,37,0.14) 100%);
+  border-bottom: 1px solid var(--gold);
+}
+.camp-page .wb-card { background: var(--bone); border-radius: 3px; }
+.camp-page .wb-card--final { background: #fdf6e0; border-radius: 4px; }
+.camp-page .wb-card--preview { background: rgba(200,149,37,0.04); }
+.camp-page .wb-trophy-bg { opacity: 0.06; filter: none; display: flex; align-items: center; justify-content: center; }
+.camp-page .wb-champion-trophy { filter: drop-shadow(0 6px 12px rgba(200,149,37,0.35)); }
+
+/* ── Modal de detalhe da partida (camp-rm) ── */
+.camp-page .camp-rm-header { background: var(--ink); color: var(--bone); }
+.camp-page .camp-rm-meta { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-3); }
+.camp-page .camp-rm-team-name { font-family: var(--display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; color: var(--bone); }
+.camp-page .camp-rm-score { font-family: var(--display); font-weight: 900; color: var(--bone); }
+.camp-page .camp-rm-score .bold { color: var(--gold-3); }
+.camp-page .camp-rm-score-sep { color: rgba(239,230,206,0.55); }
+.camp-page .camp-rm-events-label { font-family: var(--display); font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
+.camp-page .camp-rm-name { font-family: var(--sans); color: var(--ink); }
+.camp-page .camp-rm-num { font-family: var(--mono); color: var(--gold-2); }
+.camp-page .camp-rm-sumula-btn {
+  font-family: var(--display); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--ink); color: var(--bone); border: none; border-radius: 2px;
+}
+.camp-page .camp-rm-sumula-btn:hover { background: var(--gold); color: var(--ink); }
+
+/* Chip de local */
+.camp-page .camp-venue-chip { font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+.camp-page .camp-rm-venue .camp-venue-chip { color: var(--gold-3); }

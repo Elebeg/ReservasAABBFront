@@ -43,13 +43,13 @@ function StatBox({ label, value, primary }) {
   return (
     <div style={{
       textAlign: 'center',
-      padding: '8px 4px',
-      borderRadius: 8,
-      background: primary ? 'var(--camp-primary, #1a56db)' : '#f1f3f5',
-      color: primary ? '#fff' : '#212529',
+      padding: '10px 4px',
+      borderRadius: 2,
+      background: primary ? '#0e244a' : '#e4d9b8',
+      color: primary ? '#e8b647' : '#0e244a',
     }}>
-      <div style={{ fontSize: '1rem', fontWeight: 800, lineHeight: 1.1 }}>{value}</div>
-      <div style={{ fontSize: '0.6rem', fontWeight: 600, opacity: 0.7, marginTop: 3, textTransform: 'uppercase' }}>{label}</div>
+      <div style={{ fontFamily: 'var(--display)', fontSize: '1.25rem', fontWeight: 900, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: '0.58rem', fontWeight: 700, opacity: 0.72, marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
     </div>
   );
 }
@@ -91,21 +91,21 @@ export default function TeamProfile({ team, players, standings, matches, tournam
       onClick={onClose}
     >
       <div
-        style={{ background: '#fff', borderRadius: 14, width: '100%', maxWidth: 540, maxHeight: '88vh', display: 'flex', flexDirection: 'column', boxShadow: '0 12px 48px rgba(0,0,0,0.22)' }}
+        style={{ background: '#fdf6e0', borderRadius: 6, width: '100%', maxWidth: 540, maxHeight: '88vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 60px -20px rgba(13,23,48,0.55)', overflow: 'hidden', border: '1px solid #c89525' }}
         onClick={e => e.stopPropagation()}
       >
         {/* ── Header ── */}
-        <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #e9ecef', display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
+        <div style={{ padding: '20px 24px', borderBottom: '4px solid #c89525', background: '#0e244a', display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
           <TeamLogo name={team.name} logoUrl={team.logoUrl} size={52} shape="shield" />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{team.name}</h2>
+            <h2 style={{ margin: 0, fontFamily: 'var(--display)', fontSize: '1.4rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.02em', color: '#efe6ce', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{team.name}</h2>
             {groupName && standing && (
-              <span style={{ fontSize: '0.78rem', color: '#6c757d', fontWeight: 500 }}>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.72rem', color: '#e8b647', letterSpacing: '0.04em' }}>
                 {groupName} &bull; {standing.position}º lugar &bull; {standing.points} pts
               </span>
             )}
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#6c757d', padding: '4px 8px', borderRadius: 6, flexShrink: 0 }}>✕</button>
+          <button onClick={onClose} aria-label="Fechar" style={{ background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#efe6ce', padding: '4px 8px', borderRadius: 4, flexShrink: 0 }}>✕</button>
         </div>
 
         {/* ── Corpo (scrollável) ── */}
@@ -137,7 +137,7 @@ export default function TeamProfile({ team, players, standings, matches, tournam
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem' }}>
                   <thead>
-                    <tr style={{ background: '#f8f9fa' }}>
+                    <tr style={{ background: '#0e244a' }}>
                       <th style={th()}>Nome</th>
                       <th style={th('center')}>Pos.</th>
                       <th style={th('center')} title="Gols">G</th>
@@ -164,7 +164,7 @@ export default function TeamProfile({ team, players, standings, matches, tournam
                             </span>
                           ) : '—'}
                         </td>
-                        <td style={{ ...td('center'), fontWeight: 700, color: p.goals > 0 ? '#1a56db' : '#ced4da' }}>
+                        <td style={{ ...td('center'), fontWeight: 700, color: p.goals > 0 ? '#a07415' : '#ced4da' }}>
                           {p.goals || '—'}
                         </td>
                         <td style={{ ...td('center'), fontWeight: p.yellowCards > 0 ? 700 : 400, color: p.yellowCards > 0 ? '#d68910' : '#ced4da' }}>
@@ -195,7 +195,7 @@ export default function TeamProfile({ team, players, standings, matches, tournam
                   const scoreAway     = m.status === 'FINISHED' ? m.awayScore : null;
 
                   return (
-                    <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: '#f8f9fa', borderRadius: 8, fontSize: '0.83rem' }}>
+                    <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: '#e4d9b8', borderRadius: 2, fontSize: '0.83rem' }}>
                       {rs ? (
                         <span style={{ ...rs, fontWeight: 700, fontSize: '0.68rem', padding: '2px 7px', borderRadius: 4, minWidth: 20, textAlign: 'center', flexShrink: 0 }}>
                           {rs.label}
@@ -246,16 +246,19 @@ export default function TeamProfile({ team, players, standings, matches, tournam
 
 // ── helpers de estilo ──────────────────────────────────────────────────────────
 const sectionTitle = {
-  margin: '0 0 10px',
-  fontSize: '0.78rem',
-  fontWeight: 700,
-  color: '#868e96',
+  margin: '0 0 12px',
+  fontFamily: 'var(--display)',
+  fontSize: '0.92rem',
+  fontWeight: 800,
+  color: '#0e244a',
   textTransform: 'uppercase',
   letterSpacing: '0.06em',
+  borderLeft: '4px solid #c89525',
+  paddingLeft: '10px',
 };
 
 function th(align = 'left') {
-  return { padding: '7px 8px', textAlign: align, fontWeight: 600, color: '#495057', fontSize: '0.78rem', whiteSpace: 'nowrap' };
+  return { padding: '9px 8px', textAlign: align, fontFamily: 'var(--display)', fontWeight: 700, color: '#efe6ce', fontSize: '0.72rem', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' };
 }
 function td(align = 'left') {
   return { padding: '7px 8px', textAlign: align };

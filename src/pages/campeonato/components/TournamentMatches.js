@@ -172,7 +172,7 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
   };
   const dialogStyle = {
     position: 'relative', zIndex: 1,
-    background: '#fff', borderRadius: 14,
+    background: '#fdf6e0', borderRadius: 6,
     width: '100%',
     maxWidth: 'min(540px, calc(100vw - 16px))',
     maxHeight: '90vh',

@@ -4,23 +4,24 @@ import React, { useState } from 'react';
 const S = 'M50 5 L93 20 L93 67 Q93 95 50 111 Q7 95 7 67 L7 20 Z';
 
 // ── 16 temas de cor (primária, secundária, destaque) ──────────────────────────
+// Paleta do clube: tinta-marinho, ouro, vermelho-tijolo, verde-feltro, creme, cobre
 const THEMES = [
-  { p: '#1a2b6d', s: '#ffffff', a: '#e8b800' }, // 00 · azul-marinho / branco / ouro
-  { p: '#8b0000', s: '#ffffff', a: '#ffd700' }, // 01 · vermelho escuro / branco / ouro
-  { p: '#005c1e', s: '#ffffff', a: '#ffd700' }, // 02 · verde floresta / branco / ouro
-  { p: '#4a0080', s: '#ffd700', a: '#ffd700' }, // 03 · roxo / ouro / ouro
-  { p: '#0d3349', s: '#e8a200', a: '#e8a200' }, // 04 · azul-profundo / âmbar / âmbar
-  { p: '#111111', s: '#e8b800', a: '#e8b800' }, // 05 · preto / ouro / ouro
-  { p: '#005f5f', s: '#ffffff', a: '#ffd700' }, // 06 · verde-azulado / branco / ouro
-  { p: '#6b1010', s: '#ffffff', a: '#e8c000' }, // 07 · bordô / branco / ouro
-  { p: '#c04000', s: '#111111', a: '#ffd700' }, // 08 · laranja-queimado / preto / ouro
-  { p: '#002366', s: '#cc0000', a: '#ffffff' }, // 09 · azul-real / vermelho / branco
-  { p: '#1a5e00', s: '#f5c518', a: '#f5c518' }, // 10 · verde-grama / amarelo-ouro / amarelo-ouro
-  { p: '#7c3800', s: '#f5deb3', a: '#ffd700' }, // 11 · marrom-cobre / trigo / ouro
-  { p: '#1c1c2e', s: '#00b4d8', a: '#00b4d8' }, // 12 · azul-noite / ciano / ciano
-  { p: '#3d1a00', s: '#c9a84c', a: '#c9a84c' }, // 13 · marrom-escuro / ouro-âmbar / ouro-âmbar
-  { p: '#880e4f', s: '#ffffff', a: '#f8bbd0' }, // 14 · magenta-escuro / branco / rosa
-  { p: '#004d40', s: '#e0f2f1', a: '#ffd700' }, // 15 · esmeralda-escuro / menta-clara / ouro
+  { p: '#0e244a', s: '#efe6ce', a: '#c89525' }, // 00 · ink / creme / ouro
+  { p: '#a73022', s: '#efe6ce', a: '#e8b647' }, // 01 · vermelho-tijolo / creme / ouro
+  { p: '#29512f', s: '#efe6ce', a: '#c89525' }, // 02 · verde-feltro / creme / ouro
+  { p: '#c89525', s: '#0e244a', a: '#0e244a' }, // 03 · ouro / ink / ink
+  { p: '#1c3a72', s: '#e8b647', a: '#e8b647' }, // 04 · navy / ouro
+  { p: '#0a1a36', s: '#c89525', a: '#c89525' }, // 05 · ink profundo / ouro
+  { p: '#2a4e8f', s: '#efe6ce', a: '#e8b647' }, // 06 · azul-clube / creme / ouro
+  { p: '#6b1d12', s: '#efe6ce', a: '#c89525' }, // 07 · bordô / creme / ouro
+  { p: '#a07415', s: '#0e244a', a: '#efe6ce' }, // 08 · ouro-velho / ink / creme
+  { p: '#0e244a', s: '#a73022', a: '#efe6ce' }, // 09 · ink / vermelho / creme
+  { p: '#1f4d2b', s: '#e8b647', a: '#e8b647' }, // 10 · verde / ouro
+  { p: '#5b3a1c', s: '#efe6ce', a: '#c89525' }, // 11 · cobre / creme / ouro
+  { p: '#1a3a1f', s: '#c89525', a: '#c89525' }, // 12 · verde-escuro / ouro
+  { p: '#3d2812', s: '#c9a84c', a: '#c9a84c' }, // 13 · marrom / âmbar-ouro
+  { p: '#0e244a', s: '#e8b647', a: '#a73022' }, // 14 · ink / ouro / vermelho
+  { p: '#1a5f9e', s: '#efe6ce', a: '#c89525' }, // 15 · azul-piscina / creme / ouro
 ];
 
 // ── Determinístico: mesmo time → mesmo hash ───────────────────────────────────
