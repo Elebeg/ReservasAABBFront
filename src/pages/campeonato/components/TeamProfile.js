@@ -87,15 +87,17 @@ export default function TeamProfile({ team, players, standings, matches, tournam
 
   return (
     <div
+      className="camp-team-modal-overlay"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
       onClick={onClose}
     >
       <div
+        className="camp-team-modal"
         style={{ background: '#fdf6e0', borderRadius: 6, width: '100%', maxWidth: 540, maxHeight: '88vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 60px -20px rgba(13,23,48,0.55)', overflow: 'hidden', border: '1px solid #c89525' }}
         onClick={e => e.stopPropagation()}
       >
         {/* ── Header ── */}
-        <div style={{ padding: '20px 24px', borderBottom: '4px solid #c89525', background: '#0e244a', display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
+        <div className="camp-team-modal-header" style={{ padding: '20px 24px', borderBottom: '4px solid #c89525', background: '#0e244a', display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
           <TeamLogo name={team.name} logoUrl={team.logoUrl} size={52} shape="shield" />
           <div style={{ flex: 1, minWidth: 0 }}>
             <h2 style={{ margin: 0, fontFamily: 'var(--display)', fontSize: '1.4rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.02em', color: '#efe6ce', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{team.name}</h2>
@@ -109,7 +111,7 @@ export default function TeamProfile({ team, players, standings, matches, tournam
         </div>
 
         {/* ── Corpo (scrollável) ── */}
-        <div style={{ overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div className="camp-team-modal-body" style={{ overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 24 }}>
 
           {/* Desempenho */}
           {standing && (

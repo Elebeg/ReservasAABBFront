@@ -226,10 +226,10 @@ function MatchReportModal({ match, tournamentYear, onClose }) {
   return (
     <>
     {sumulaOverlay}
-    <div style={wrapStyle} role="dialog" aria-modal="true">
+    <div className="camp-rm-overlay" style={wrapStyle} role="dialog" aria-modal="true">
       <div style={backdropStyle} onClick={onClose} />
 
-      <div style={dialogStyle}>
+      <div className="camp-rm-modal" style={dialogStyle}>
 
         {/* ── Barra do topo: botão fechar ── */}
         <div style={{
@@ -403,7 +403,7 @@ function AgendaRow({ match, tournamentYear, onTeamClick }) {
 
 // ─── Export: agenda por data ──────────────────────────────────────────────────
 export default function TournamentMatches({ matches, tournamentYear = new Date().getFullYear(), onTeamClick }) {
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedDay, setSelectedDay] = useState('all');
 
   if (!matches || matches.length === 0) {
     return (
@@ -424,8 +424,8 @@ export default function TournamentMatches({ matches, tournamentYear = new Date()
   Object.values(byDay).forEach(list => list.sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt)));
   const sortedDays = Object.keys(byDay).sort();
 
-  // Auto-select primeiro dia se nenhum selecionado
-  const activeDay = selectedDay || sortedDays[0] || null;
+  const activeDay = selectedDay === 'all' ? null : selectedDay;
+  const daysToRender = selectedDay === 'all' ? sortedDays : sortedDays.filter(day => day === activeDay);
 
   const phaseOrder = ['GROUP', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'FINAL'];
   const byPhase = {};
@@ -435,12 +435,20 @@ export default function TournamentMatches({ matches, tournamentYear = new Date()
   return (
     <div className="ag-wrap">
       {/* Filtro de dias */}
-      {sortedDays.length > 1 && (
+      {sortedDays.length > 0 && (
         <div className="camp-day-filters">
+          <button
+            type="button"
+            className={`camp-day-btn${selectedDay === 'all' ? ' active' : ''}`}
+            onClick={() => setSelectedDay('all')}
+          >
+            Todos
+          </button>
           {sortedDays.map(day => (
             <button
+              type="button"
               key={day}
-              className={`camp-day-btn${activeDay === day ? ' active' : ''}`}
+              className={`camp-day-btn${selectedDay === day ? ' active' : ''}`}
               onClick={() => setSelectedDay(day)}
             >
               {formatDateHeader(day).split(' ')[0].charAt(0).toUpperCase() + formatDateHeader(day).split(' ')[0].slice(1)}{' '}
@@ -453,17 +461,17 @@ export default function TournamentMatches({ matches, tournamentYear = new Date()
       )}
 
       {/* Jogos do dia selecionado */}
-      {activeDay && byDay[activeDay] && (
-        <section className="ag-day">
+      {daysToRender.map(day => (
+        <section className="ag-day" key={day}>
           <div className="ag-day-head">
-            <span className="ag-day-date">{formatDateHeader(activeDay)}</span>
-            <span className="ag-day-count">{byDay[activeDay].length} jogo{byDay[activeDay].length > 1 ? 's' : ''}</span>
+            <span className="ag-day-date">{formatDateHeader(day)}</span>
+            <span className="ag-day-count">{byDay[day].length} jogo{byDay[day].length > 1 ? 's' : ''}</span>
           </div>
           <div className="ag-list">
-            {byDay[activeDay].map(m => <AgendaRow key={m.id} match={m} tournamentYear={tournamentYear} onTeamClick={onTeamClick} />)}
+            {byDay[day].map(m => <AgendaRow key={m.id} match={m} tournamentYear={tournamentYear} onTeamClick={onTeamClick} />)}
           </div>
         </section>
-      )}
+      ))}
 
       {/* Jogos sem data */}
       {sortedPhases.map(phase => (

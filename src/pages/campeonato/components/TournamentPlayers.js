@@ -31,6 +31,8 @@ function normalize(str) {
 
 export default function TournamentPlayers({ players, tournamentYear = new Date().getFullYear(), onTeamClick }) {
   const [query, setQuery] = useState('');
+  const [scorerLimit, setScorerLimit] = useState('top10');
+  const [disciplinaryLimit, setDisciplinaryLimit] = useState('top10');
 
   if (!players || players.length === 0) {
     return (
@@ -49,9 +51,15 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
   const rankMap = new Map(scorers.map((p, i) => [p.id, i + 1]));
 
   const trimmed = query.trim();
-  const visibleScorers = trimmed
+  const filteredScorers = trimmed
     ? scorers.filter(p => normalize(p.name).includes(normalize(trimmed)))
-    : scorers.slice(0, 10);
+    : scorers;
+  const visibleScorers = scorerLimit === 'top10'
+    ? filteredScorers.slice(0, 10)
+    : filteredScorers;
+  const visibleDisciplinary = disciplinaryLimit === 'top10'
+    ? disciplinary.slice(0, 10)
+    : disciplinary;
   
   // Top 3 para destaque
   const topThree = scorers.slice(0, 3);
@@ -100,25 +108,16 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
 
       {/* ── Artilharia Completa ── */}
       <div className="camp-group-section">
-        <h3 className="camp-group-title">Artilharia Completa</h3>
-
-        {/* Barra de busca */}
-        <div style={{ marginBottom: 12 }}>
-          <input
-            type="text"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Buscar jogador pelo nome…"
-            style={{
-              width: '100%',
-              padding: '7px 12px',
-              fontSize: '0.875rem',
-              border: '1px solid var(--border-color, #dee2e6)',
-              borderRadius: 6,
-              outline: 'none',
-              boxSizing: 'border-box',
-            }}
-          />
+        <div className="camp-section-head">
+          <h3 className="camp-group-title">Artilharia Completa</h3>
+          <div className="camp-segmented" aria-label="Filtro da artilharia">
+            <button type="button" className={scorerLimit === 'top10' ? 'active' : ''} onClick={() => setScorerLimit('top10')}>
+              Top 10
+            </button>
+            <button type="button" className={scorerLimit === 'all' ? 'active' : ''} onClick={() => setScorerLimit('all')}>
+              Todos
+            </button>
+          </div>
         </div>
 
         <div className="camp-table-wrap">
@@ -193,7 +192,17 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
       {/* ── Ranking Disciplinar ── */}
       {disciplinary.length > 0 && (
         <div className="camp-group-section" style={{ marginTop: 32 }}>
-          <h3 className="camp-group-title">Ranking Disciplinar</h3>
+          <div className="camp-section-head">
+            <h3 className="camp-group-title">Ranking Disciplinar</h3>
+            <div className="camp-segmented" aria-label="Filtro do ranking disciplinar">
+              <button type="button" className={disciplinaryLimit === 'top10' ? 'active' : ''} onClick={() => setDisciplinaryLimit('top10')}>
+                Top 10
+              </button>
+              <button type="button" className={disciplinaryLimit === 'all' ? 'active' : ''} onClick={() => setDisciplinaryLimit('all')}>
+                Todos
+              </button>
+            </div>
+          </div>
           <div className="camp-table-wrap">
             <table className="camp-table">
               <thead>
@@ -205,7 +214,7 @@ export default function TournamentPlayers({ players, tournamentYear = new Date()
                 </tr>
               </thead>
               <tbody>
-                {disciplinary.map(p => (
+                {visibleDisciplinary.map(p => (
                   <tr key={p.id} className="camp-tr">
                     <td className="camp-td" style={{ fontWeight: 600 }}>
                       {p.name}
